@@ -1,0 +1,32 @@
+# Các thư mục chứa thư viện đã tải về (Cực kỳ nặng, tuyệt đối không up lên Git)
+node_modules/
+**/node_modules/
+
+# Các file chứa mật khẩu bí mật, token, chuỗi kết nối Database (Cần bảo mật tuyệt đối)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+**/.env
+**/.env.*
+
+# Thư mục chứa code sau khi build/đóng gói của Frontend
+dist/
+dist-ssr/
+*.local
+
+# Các file rác tự sinh của hệ điều hành (Mac và Windows)
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Các file log khi hệ thống chạy bị lỗi
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Thư mục cấu hình riêng của các IDE như VS Code hoặc WebStorm
+.vscode/
+.idea/
