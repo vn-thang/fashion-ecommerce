@@ -1,0 +1,519 @@
+const prisma = require('../../config/database');
+const { PAYMENT_STATUS, PAYMENT_METHOD } = require('../../constants/paymentStatus.constant');
+const { ORDER_STATUS } = require('../../constants/orderStatus.constant');
+
+const orderRepository = {
+  findSelectedCartItems: async (userId, cartItemIds) => {
+    return await prisma.cartItem.findMany({
+      where: { id: { in: cartItemIds }, cart: { userId: userId } },
+      include: {
+       variant: {
+  include: {
+    product: true,
+    flashSaleVariants: {
+      where: {
+        flashSale: {
+          isActive: true
+        }
+      },
+      include: {
+        flashSale: true
+      },
+      take: 1
+    }
+  }
+}
+      }
+    });
+  },
+
+  findBuyNowItems: async (buyNowItems) => {
+    const variantIds = buyNowItems.map(item => item.variantId);
+    
+  const variants = await prisma.productVariant.findMany({
+  where:{
+    id:{ in: variantIds }
+  },
+  include:{
+    product:true,
+    flashSaleVariants:{
+      where:{
+        flashSale:{
+          isActive:true
+        }
+      },
+      include:{
+        flashSale:true
+      },
+      take:1
+    }
+  }
+});
+
+    return buyNowItems.map(reqItem => {
+      const variant = variants.find(v => v.id === reqItem.variantId);
+      if (!variant) throw new Error(`Không tìm thấy sản phẩm có ID: ${reqItem.variantId}`);
+      
+      return {
+        productVariantId: variant.id,
+        quantity: reqItem.quantity,
+        variant: variant 
+      };
+    });
+  },
+
+  findCouponByCode: async (code) => {
+    return await prisma.coupon.findUnique({ where: { code } });
+  },
+
+  checkUserCouponUsage: async (userId, couponId) => {
+    return await prisma.couponUsage.findFirst({
+      where: { userId: userId, couponId: couponId }
+    });
+  },
+
+  createOrderTransaction: async ({ orderData, orderItemsData, cartItemIds, couponId, userId, paymentMethod }) => {
+    return await prisma.$transaction(async tx => {
+
+    for (const item of orderItemsData) {
+      const variant = await tx.productVariant.findUnique({
+        where: {
+          id: item.productVariantId
+        }
+      });
+
+      if (!variant || variant.status !== 'ACTIVE') {
+        throw new Error(`Sản phẩm [${item.productName}] hiện tại không còn tồn tại hoặc đã ngừng bán!`);
+      }
+
+      if (variant.stockQuantity < item.quantity) {
+        throw new Error(
+          `Sản phẩm [${item.productName}] (Màu: ${item.color || 'N/A'}, Size: ${item.size || 'N/A'}) chỉ còn ${variant.stockQuantity} sản phẩm trong kho. Không đủ đáp ứng số lượng bạn yêu cầu!`
+        );
+      }
+
+      if (item.flashSaleVariantId) {
+        const flashSaleVariant = await tx.flashSaleVariant.findUnique({
+          where: {
+            id: item.flashSaleVariantId
+          }
+        });
+
+        if (!flashSaleVariant) {
+          throw new Error(`Flash Sale của sản phẩm [${item.productName}] không tồn tại!`);
+        }
+
+        if (flashSaleVariant.flashSaleStock < item.quantity) {
+          throw new Error(
+            `Flash Sale của sản phẩm [${item.productName}] chỉ còn ${flashSaleVariant.flashSaleStock} sản phẩm.`
+          );
+        }
+
+        await tx.flashSaleVariant.update({
+          where: {
+            id: item.flashSaleVariantId
+          },
+          data: {
+            flashSaleStock: {
+              decrement: item.quantity
+            }
+          }
+        });
+      }
+
+      await tx.productVariant.update({
+        where: {
+          id: item.productVariantId
+        },
+        data: {
+          stockQuantity: {
+            decrement: item.quantity
+          }
+        }
+      });
+
+      await tx.inventoryTransaction.create({
+        data: {
+          productVariantId: item.productVariantId,
+          type: 'Export',
+          quantity: item.quantity,
+          note: `Xuất kho tự động phục vụ đơn hàng: ${orderData.orderNumber}`,
+          createdBy: userId
+        }
+      });
+    }
+
+    const order = await tx.order.create({
+      data: orderData
+    });
+
+    const itemsWithOrderId = orderItemsData.map(item => ({
+      orderId: order.id,
+      productVariantId: item.productVariantId,
+      flashSaleVariantId: item.flashSaleVariantId,
+      productName: item.productName,
+      color: item.color,
+      size: item.size,
+      originalPrice: item.originalPrice,
+      unitPrice: item.unitPrice,
+      quantity: item.quantity,
+      subtotal: item.subtotal
+    }));
+
+    await tx.orderItem.createMany({
+      data: itemsWithOrderId
+    });
+
+    await tx.payment.create({
+      data: {
+        orderId: order.id,
+        paymentMethod,
+        status: PAYMENT_STATUS.PENDING,
+        amount: orderData.totalAmount
+      }
+    });
+
+    if (paymentMethod === PAYMENT_METHOD.COD && cartItemIds?.length) {
+      await tx.cartItem.deleteMany({
+        where: {
+          id: {
+            in: cartItemIds
+          }
+        }
+      });
+    }
+
+    if (couponId) {
+      await tx.couponUsage.create({
+        data: {
+          couponId,
+          userId,
+          orderId: order.id
+        }
+      });
+
+      await tx.coupon.update({
+        where: {
+          id: couponId
+        },
+        data: {
+          usageLimit: {
+            decrement: 1
+          }
+        }
+      });
+    }
+
+    return await tx.order.findUnique({
+      where: {
+        id: order.id
+      },
+      include: {
+        payment: true
+      }
+    });
+  });
+},
+findOrdersByUserId: async (userId, skip, limit, status) => {
+    const whereCondition = { userId: userId };
+    if (status && status.trim() !== '') {
+      whereCondition.status = status; 
+    }
+
+    const total = await prisma.order.count({ where: whereCondition });
+    
+    const data = await prisma.order.findMany({
+      where: whereCondition,
+      skip: skip,
+      take: limit,
+      orderBy: { createdAt: 'desc' },
+      include: { 
+        items: {
+          include: {
+            variant: {
+              include: {
+                product: true
+              }
+            },
+            reviews: true 
+          }
+        }, 
+        payment: true 
+      }
+    });
+
+    return { data, total };
+  },
+
+  findOrderById: async (orderId, userId) => {
+    return await prisma.order.findFirst({
+      where: { id: orderId, userId },
+      include: { 
+        items: {
+          include: {
+            variant: {
+              include: {
+                product: true
+              }
+            },
+            reviews: true 
+          }
+        }, 
+        payment: true 
+      }
+    });
+  },
+
+findOrdersForAdmin: async ({ skip, limit, where }) => {
+  const [orders, totalItems] = await Promise.all([
+    prisma.order.findMany({
+      where,
+      skip,
+      take: limit,
+      orderBy: {
+        createdAt: 'desc'
+      },
+      include: {
+        payment: {
+          select: {
+            paymentMethod: true,
+            status: true,
+            amount: true,
+            paidAt: true
+          }
+        }
+      }
+    }),
+    prisma.order.count({ where })
+  ]);
+
+  return {
+    orders,
+    totalItems
+  };
+},
+
+findOrderDetailForAdmin: async (orderId) => {
+  return await prisma.order.findUnique({
+    where: {
+      id: orderId
+    },
+    include: {
+      user: {
+        select: {
+          email: true,
+          fullName: true
+        }
+      },
+      items: {
+        include: {
+          variant: {
+            include: {
+              product: true
+            }
+          }
+        }
+      },
+      payment: true,
+      couponUsages: true
+    }
+  });
+},
+
+findOrderForCancel: async (orderId) => {
+  return await prisma.order.findUnique({
+    where: {
+      id: orderId
+    },
+    include: {
+      items: true,
+      payment: true
+    }
+  });
+},
+
+cancelOrderTransaction: async ({
+  orderId,
+  paymentId,
+  paymentStatus,
+  cancelledBy,
+  cancelReason
+}) => {
+  return await prisma.$transaction(async tx => {
+    await tx.order.update({
+      where: {
+        id: orderId
+      },
+      data: {
+        status: ORDER_STATUS.CANCELLED,
+        cancelledAt: new Date(),
+        cancelledBy,
+        cancelReason
+      }
+    });
+
+    const paymentData = {
+      status: paymentStatus
+    };
+
+    if (paymentStatus === PAYMENT_STATUS.REFUNDED) {
+      paymentData.paidAt = new Date();
+    }
+
+    await tx.payment.update({
+      where: {
+        id: paymentId
+      },
+      data: paymentData
+    });
+
+    return true;
+  });
+},
+
+findExpiredPendingOrders: async (expiredTime) => {
+  return await prisma.order.findMany({
+    where: {
+      status: ORDER_STATUS.PENDING,
+      createdAt: {
+        lte: expiredTime
+      },
+      payment: {
+        paymentMethod: PAYMENT_METHOD.VNPAY,
+        status: PAYMENT_STATUS.PENDING
+      }
+    },
+    include: {
+      payment: true,
+      items: true
+    }
+  });
+},
+
+restoreOrderResourcesTransaction: async (orderId) => {
+  return await prisma.$transaction(async tx => {
+
+    const order = await tx.order.findUnique({
+      where: {
+        id: orderId
+      },
+      include: {
+        payment: true,
+        items: true,
+        couponUsages: true
+      }
+    });
+
+    if (!order) {
+      throw new Error('Không tìm thấy đơn hàng.');
+    }
+
+    if (order.status === ORDER_STATUS.CANCELLED) {
+      return order;
+    }
+
+    for (const item of order.items) {
+
+      await tx.productVariant.update({
+        where: {
+          id: item.productVariantId
+        },
+        data: {
+          stockQuantity: {
+            increment: item.quantity
+          }
+        }
+      });
+
+      if (item.flashSaleVariantId) {
+        await tx.flashSaleVariant.update({
+          where: {
+            id: item.flashSaleVariantId
+          },
+          data: {
+            flashSaleStock: {
+              increment: item.quantity
+            }
+          }
+        });
+      }
+
+      await tx.inventoryTransaction.create({
+        data: {
+          productVariantId: item.productVariantId,
+          type: 'Import',
+          quantity: item.quantity,
+          note: `Hoàn kho do hủy đơn ${order.orderNumber}`,
+          createdBy: order.userId
+        }
+      });
+    }
+
+   if (!order.payment || order.payment.status !== PAYMENT_STATUS.SUCCESS) {
+      const usage = order.couponUsages[0];
+
+      if (usage) {
+        await tx.coupon.update({
+          where: {
+            id: usage.couponId
+          },
+          data: {
+            usageLimit: {
+              increment: 1
+            }
+          }
+        });
+
+        await tx.couponUsage.delete({
+          where: {
+            id: usage.id
+          }
+        });
+      }
+    }
+    return true;
+  });
+},
+
+deleteCartItemsByOrder: async (orderId) => {
+
+  const order = await prisma.order.findUnique({
+    where: {
+      id: orderId
+    },
+    include: {
+      items: {
+        select: {
+          productVariantId: true
+        }
+      }
+    }
+  });
+
+  if (!order) {
+    throw new Error('Không tìm thấy đơn hàng.');
+  }
+
+  const variantIds = order.items.map(
+    item => item.productVariantId
+  );
+
+  if (!variantIds.length) {
+    return;
+  }
+
+  await prisma.cartItem.deleteMany({
+    where: {
+      cart: {
+        userId: order.userId
+      },
+      productVariantId: {
+        in: variantIds
+      }
+    }
+  });
+
+},
+};
+
+module.exports = orderRepository;

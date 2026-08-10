@@ -1,0 +1,51 @@
+const express = require('express');
+const router = express.Router();
+
+const authRoutes = require('../modules/auth/auth.routes');
+const categoryRoutes = require('../modules/category/category.routes');
+const categoryAdminRoutes = require('../modules/category/admin/category.admin.routes');
+const brandRoutes = require('../modules/brand/brand.routes');
+const brandAdminRoutes = require('../modules/brand/admin/brandAdmin.routes');
+const productRoutes = require('../modules/product/product.routes');
+const productAdminRoutes = require('../modules/product/admin/product.admin.routes');
+const cartRoutes = require('../modules/cart/cart.routes');
+const userRoutes = require('../modules/user/user.routes');
+const couponRoutes = require('../modules/coupon/coupon.routes');
+const orderRoutes = require('../modules/order/order.route');
+const adminOrderRoutes = require('../modules/order/admin/adminOrder.routes');
+const reviewRoutes = require('../modules/review/review.routes');
+const adminReviewRoutes = require('../modules/review/admin/review.admin.routes');
+const storeSettingRoutes = require('../modules/storeSetting/storeSetting.routes');
+const bannerRoutes = require('../modules/banner/banner.routes');
+const flashSaleRoutes = require('../modules/flashSale/flashSale.routes');
+const paymentRoutes = require('../modules/payment/payment.routes');
+const adminPaymentRoutes = require('../modules/payment/admin/payment.admin.routes');
+const adminInventoryRoutes = require('../modules/inventory/inventory.routes');
+const adminUserRoutes = require('../modules/user/admin/adminUser.route');
+const adminDashboardRoutes = require('../modules/dashboard/dashboard.route');
+
+router.use('/auth', authRoutes);           
+router.use('/categories', categoryRoutes); 
+router.use('/admin/categories', categoryAdminRoutes); 
+router.use('/brands', brandRoutes);      
+router.use('/admin/brands', brandAdminRoutes);       
+router.use('/products', productRoutes);  
+router.use('/admin/products', productAdminRoutes); 
+router.use('/cart', cartRoutes);   
+router.use('/users', userRoutes);  
+router.use('/admin/coupons', couponRoutes);
+router.use('/order', orderRoutes);
+router.use('/admin/orders', adminOrderRoutes);
+router.use('/review', reviewRoutes);
+router.use('/admin/review', adminReviewRoutes);
+router.use('/storeSetting', storeSettingRoutes);
+router.use('/banners', bannerRoutes);
+router.use('/flashSales', flashSaleRoutes);
+router.use('/payments', paymentRoutes);
+router.use('/admin/payments', adminPaymentRoutes);
+router.use('/admin/inventory', adminInventoryRoutes);
+router.use('/admin/users', adminUserRoutes );
+router.use('/admin/dashboard', adminDashboardRoutes );
+
+
+module.exports = router;

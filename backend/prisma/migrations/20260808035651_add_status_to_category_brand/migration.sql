@@ -1,0 +1,5 @@
+-- AlterTable
+ALTER TABLE "Brand" ADD COLUMN     "status" VARCHAR(20) NOT NULL DEFAULT 'ACTIVE';
+
+-- AlterTable
+ALTER TABLE "Category" ADD COLUMN     "status" VARCHAR(20) NOT NULL DEFAULT 'ACTIVE';

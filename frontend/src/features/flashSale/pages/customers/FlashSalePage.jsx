@@ -1,0 +1,55 @@
+import React from 'react';
+import { Link } from 'react-router-dom';
+
+import useFlashSaleCustomer from '../../hooks/useFlashSaleCustomer';
+
+import FlashSaleBanner from '../../components/customers/FlashSaleBanner';
+import FlashSaleToolbar from '../../components/customers/FlashSaleToolbar';
+import FlashSaleGrid from '../../components/customers/FlashSaleGrid';
+import FlashSaleSkeleton from '../../components/customers/FlashSaleSkeleton';
+import FlashSaleEmpty from '../../components/customers/FlashSaleEmpty';
+import FlashSalePagination from '../../components/customers/FlashSalePagination';
+
+const FlashSalePage = () => {
+  const {
+    loading,
+    flashSale,
+    products,
+    currentPage,
+    totalPages,
+    totalItems,
+    sortBy,
+    handleSort,
+    handlePageChange
+  } = useFlashSaleCustomer();
+
+  return (
+    <div className="w-full mx-auto px-4 lg:px-6 py-6">
+      <FlashSaleBanner flashSale={flashSale} />
+
+     <FlashSaleToolbar
+    totalProducts={totalItems}
+    sortBy={sortBy}
+    onSort={handleSort}
+/>
+      {loading ? (
+        <FlashSaleSkeleton />
+      ) : products.length === 0 ? (
+        <FlashSaleEmpty />
+      ) : (
+        <FlashSaleGrid
+          products={products}
+        />
+      )}
+
+      <FlashSalePagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={handlePageChange}
+      />
+
+    </div>
+  );
+};
+
+export default FlashSalePage;

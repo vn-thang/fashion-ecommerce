@@ -1,13 +1,450 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// 1. Users
+model User {
+  id                  String               @id @default(uuid()) @db.Uuid
+  email               String               @unique @db.VarChar(255)
+  passwordHash        String?              @db.VarChar(500)
+  fullName            String?              @db.VarChar(255)
+  phoneNumber         String?              @unique @db.VarChar(20)
+  avatarUrl           String?              @db.Text
+  totalPoints         Int                  @default(0)
+  role                String               @default("Customer") @db.VarChar(20) // Admin, Customer
+  isActive            Boolean              @default(true)
+  createdAt           DateTime             @default(now()) @db.Timestamp
+  updatedAt           DateTime             @updatedAt @db.Timestamp
+  
+  refreshTokens       RefreshToken[]
+  addresses           UserAddress[]
+  inventoryLines      InventoryTransaction[]
+  cart                Cart?
+  wishlists           Wishlist[]
+  orders              Order[]
+  couponUsages        CouponUsage[]
+  reviews             Review[]
+  notifications       Notification[]
+  conversations       Conversation[]
+  messages            Message[]
+  loyaltyTransactions LoyaltyTransaction[]
+  auditLogs           AuditLog[]
+  passwordResetTokens PasswordResetToken[]
+}
+
+// 2. RefreshTokens
+model RefreshToken {
+  id        String    @id @default(uuid()) @db.Uuid
+  userId    String    @db.Uuid
+  token     String    @db.Text
+  expiresAt DateTime  @db.Timestamp
+  revokedAt DateTime? @db.Timestamp
+  createdAt DateTime  @default(now()) @db.Timestamp
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model PasswordResetToken {
+  id        String    @id @default(uuid()) @db.Uuid
+  userId    String    @db.Uuid
+  tokenHash String    @unique @db.Text
+  expiresAt DateTime  @db.Timestamp
+  usedAt    DateTime? @db.Timestamp
+  createdAt DateTime  @default(now()) @db.Timestamp
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+// 3. UserAddresses
+model UserAddress {
+  id           String   @id @default(uuid()) @db.Uuid
+  userId       String   @db.Uuid
+  receiverName String   @db.VarChar(255)
+  phoneNumber  String   @db.VarChar(20)
+  province     String   @db.VarChar(100)
+  ward         String   @db.VarChar(100)
+  addressLine  String   @db.VarChar(500)
+  isDefault    Boolean  @default(false)
+  createdAt    DateTime @default(now()) @db.Timestamp
+
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// 4. Categories
+model Category {
+  id          String     @id @default(uuid()) @db.Uuid
+  parentId    String?    @db.Uuid
+  name        String     @db.VarChar(255)
+  slug        String     @unique @db.VarChar(255)
+  description String?    @db.Text
+  status      String     @default("ACTIVE") @db.VarChar(20)
+  createdAt   DateTime   @default(now()) @db.Timestamp
+  updatedAt   DateTime   @updatedAt @db.Timestamp
+
+  parent      Category?  @relation("CategoryToCategory", fields: [parentId], references: [id], onDelete: Cascade)
+  children    Category[] @relation("CategoryToCategory")
+  products    Product[]
+}
+
+// 5. Brands
+model Brand {
+  id        String    @id @default(uuid()) @db.Uuid
+  name      String    @db.VarChar(255)
+  slug      String    @unique @db.VarChar(255)
+  logoUrl   String?   @db.Text
+  status    String     @default("ACTIVE") @db.VarChar(20)
+  createdAt DateTime  @default(now()) @db.Timestamp
+
+  products  Product[]
+}
+
+// 6. Products
+model Product {
+  id           String           @id @default(uuid()) @db.Uuid
+  categoryId   String           @db.Uuid
+  brandId      String           @db.Uuid
+  name         String           @db.VarChar(255)
+  slug         String           @unique @db.VarChar(255)
+  thumbnailUrl String?          @db.Text
+  description  String?          @db.Text
+  status       String           @db.VarChar(20)
+  soldCount    Int              @default(0)       // Lượt bán (như mình vừa bàn)
+  reviewCount  Int              @default(0)       // Tổng số lượng đánh giá
+  rating       Decimal          @default(0.0) @db.Decimal(3, 2) // Sao trung bình (VD: 4.85)
+  createdAt    DateTime         @default(now()) @db.Timestamp
+  updatedAt    DateTime         @updatedAt @db.Timestamp
+
+  category     Category         @relation(fields: [categoryId], references: [id])
+  brand        Brand            @relation(fields: [brandId], references: [id])
+  images       ProductImage[]
+  variants     ProductVariant[]
+  wishlists    Wishlist[]
+  reviews      Review[]
+}
+
+// 7. ProductImages
+model ProductImage {
+  id           String   @id @default(uuid()) @db.Uuid
+  productId    String   @db.Uuid
+  imageUrl     String   @db.Text
+  displayOrder Int      @default(0)
+  createdAt    DateTime @default(now()) @db.Timestamp
+
+  product      Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+// 8. ProductVariants
+model ProductVariant {
+  id                    String                 @id @default(uuid()) @db.Uuid
+  productId             String                 @db.Uuid
+  sku                   String                 @unique @db.VarChar(100)
+  color                 String?                @db.VarChar(50)
+  size                  String?                @db.VarChar(20)
+  price                 Decimal                @db.Decimal(18, 2)
+  stockQuantity         Int                    @default(0)
+  status                String                 @db.VarChar(20)
+  createdAt             DateTime               @default(now()) @db.Timestamp
+  updatedAt             DateTime               @updatedAt @db.Timestamp
+
+  product               Product                @relation(fields: [productId], references: [id], onDelete: Cascade)
+  inventoryTransactions InventoryTransaction[]
+  cartItems             CartItem[]
+  orderItems            OrderItem[]
+  flashSaleVariants     FlashSaleVariant[]
+}
+
+// 9. InventoryTransactions
+model InventoryTransaction {
+  id               String         @id @default(uuid()) @db.Uuid
+  productVariantId String         @db.Uuid
+  type             String         @db.VarChar(20) // Import, Export, Adjustment
+  quantity         Int
+  balanceAfter     Int?
+  note             String?        @db.Text
+  createdBy        String         @db.Uuid
+  createdAt        DateTime       @default(now()) @db.Timestamp
+
+  variant          ProductVariant @relation(fields: [productVariantId], references: [id], onDelete: Cascade)
+  user             User           @relation(fields: [createdBy], references: [id])
+}
+
+// 10. Carts
+model Cart {
+  id        String     @id @default(uuid()) @db.Uuid
+  userId    String     @unique @db.Uuid
+  createdAt DateTime   @default(now()) @db.Timestamp
+
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items     CartItem[]
+}
+
+// 11. CartItems
+model CartItem {
+  id               String         @id @default(uuid()) @db.Uuid
+  cartId           String         @db.Uuid
+  productVariantId String         @db.Uuid
+  quantity         Int            @default(1)
+  createdAt        DateTime       @default(now()) @db.Timestamp
+
+  cart             Cart           @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  variant          ProductVariant @relation(fields: [productVariantId], references: [id], onDelete: Cascade)
+
+  @@unique([cartId, productVariantId])
+}
+
+// 12. Wishlists
+model Wishlist {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @db.Uuid
+  productId String   @db.Uuid
+  createdAt DateTime @default(now()) @db.Timestamp
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, productId])
+}
+
+// 13. Orders
+model Order {
+  id             String        @id @default(uuid()) @db.Uuid
+  userId         String        @db.Uuid
+  orderNumber    String        @unique @db.VarChar(50)
+  status         String        @db.VarChar(30)
+  receiverName   String        @db.VarChar(255)
+  phoneNumber    String        @db.VarChar(20)
+  province       String        @db.VarChar(100)
+  ward           String        @db.VarChar(100)
+  addressLine    String        @db.VarChar(500)
+  subtotal       Decimal       @db.Decimal(18, 2)
+  discountAmount Decimal       @db.Decimal(18, 2)
+  shippingFee    Decimal       @db.Decimal(18, 2)
+  totalAmount    Decimal       @db.Decimal(18, 2)
+  couponCode     String?       @db.VarChar(50)
+  note           String?       @db.Text
+  cancelledAt   DateTime? @db.Timestamp
+  cancelledBy   String?   @db.VarChar(30)
+  cancelReason  String?   @db.Text
+  createdAt      DateTime      @default(now()) @db.Timestamp
+  updatedAt      DateTime      @updatedAt @db.Timestamp
+
+  user           User          @relation(fields: [userId], references: [id])
+  items          OrderItem[]
+  payment        Payment?
+  couponUsages   CouponUsage[]
+}
+
+// 14. OrderItems
+model OrderItem {
+  id               String         @id @default(uuid()) @db.Uuid
+  orderId          String         @db.Uuid
+  flashSaleVariantId String?        @db.Uuid
+  productVariantId String         @db.Uuid
+  productName      String         @db.VarChar(255)
+  color            String?        @db.VarChar(50)
+  size             String?        @db.VarChar(20)
+  originalPrice Decimal @default(0) @db.Decimal(18,2)
+  unitPrice        Decimal        @db.Decimal(18, 2)
+  quantity         Int
+  subtotal         Decimal        @db.Decimal(18, 2)
+
+  order            Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  variant          ProductVariant @relation(fields: [productVariantId], references: [id])
+  flashSaleVariant   FlashSaleVariant? @relation(fields: [flashSaleVariantId], references: [id])
+
+  reviews          Review[]
+}
+
+// 15. Payments
+model Payment {
+  id                  String    @id @default(uuid()) @db.Uuid
+  orderId             String    @unique @db.Uuid
+  paymentMethod       String    @db.VarChar(30)
+  status              String    @db.VarChar(30)
+  amount              Decimal   @db.Decimal(18, 2)
+  transactionRef      String?   @db.VarChar(255)
+  transactionNo       String?   @db.VarChar(255)
+  gatewayResponseCode String?   @db.VarChar(50)
+  paidAt              DateTime? @db.Timestamp
+  createdAt           DateTime  @default(now()) @db.Timestamp
+  updatedAt           DateTime  @updatedAt @db.Timestamp
+
+  order               Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+}
+
+// 16. Coupons
+model Coupon {
+  id                String        @id @default(uuid()) @db.Uuid
+  code              String        @unique @db.VarChar(50)
+  discountType      String        @db.VarChar(20)
+  discountValue     Decimal       @db.Decimal(18, 2)
+  minOrderAmount    Decimal       @db.Decimal(18, 2)
+  maxDiscountAmount Decimal       @db.Decimal(18, 2)
+  usageLimit        Int
+  startDate         DateTime      @db.Timestamp
+  endDate           DateTime      @db.Timestamp
+  isActive          Boolean       @default(true)
+
+  usages            CouponUsage[]
+}
+
+// 17. CouponUsages
+model CouponUsage {
+  id       String   @id @default(uuid()) @db.Uuid
+  couponId String   @db.Uuid
+  userId   String   @db.Uuid
+  orderId  String   @db.Uuid
+  usedAt   DateTime @default(now()) @db.Timestamp
+
+  coupon   Coupon   @relation(fields: [couponId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id])
+  order    Order    @relation(fields: [orderId], references: [id])
+
+  @@unique([couponId, orderId])
+}
+
+// 18. Reviews
+model Review {
+  id          String    @id @default(uuid()) @db.Uuid
+  userId      String    @db.Uuid
+  productId   String    @db.Uuid
+  orderItemId String    @db.Uuid
+  rating      Int
+  comment     String?   @db.Text
+  reply       String?   @db.Text
+  repliedAt   DateTime? @db.Timestamp
+  isHidden    Boolean   @default(false)
+  createdAt   DateTime  @default(now()) @db.Timestamp
+  updatedAt   DateTime  @updatedAt @db.Timestamp
+
+  user        User      @relation(fields: [userId], references: [id])
+  product     Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  orderItem   OrderItem @relation(fields: [orderItemId], references: [id])
+}
+
+// 19. StoreSettings
+model StoreSetting {
+  id           String   @id @default(uuid()) @db.Uuid
+  storeName    String   @db.VarChar(255)
+  logoUrl      String?  @db.Text
+  hotline      String?  @db.VarChar(20)
+  zalo         String?  @db.VarChar(20)
+  email        String?  @db.VarChar(255)
+  address      String?  @db.Text
+  description  String?  @db.Text
+  openingHours String?  @db.VarChar(255)
+  createdAt    DateTime @default(now()) @db.Timestamp
+  updatedAt    DateTime @updatedAt @db.Timestamp
+}
+
+// 20. Banners
+model Banner {
+  id           String   @id @default(uuid()) @db.Uuid
+  title        String?  @db.VarChar(255)
+  description  String?  @db.Text
+  imageUrl     String   @db.Text
+  displayOrder Int      @default(0)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now()) @db.Timestamp
+  updatedAt    DateTime @updatedAt @db.Timestamp
+}
+
+// 21. Notifications
+model Notification {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @db.Uuid
+  title     String   @db.VarChar(255)
+  content   String   @db.Text
+  type      String   @db.VarChar(30)
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now()) @db.Timestamp
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// 22. Conversations
+model Conversation {
+  id         String    @id @default(uuid()) @db.Uuid
+  customerId String    @db.Uuid
+  createdAt  DateTime  @default(now()) @db.Timestamp
+
+  customer   User      @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  messages   Message[]
+}
+
+// 23. Messages
+model Message {
+  id             String       @id @default(uuid()) @db.Uuid
+  conversationId String       @db.Uuid
+  senderId       String       @db.Uuid
+  message        String       @db.Text
+  isRead         Boolean      @default(false)
+  createdAt      DateTime     @default(now()) @db.Timestamp
+
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender         User         @relation(fields: [senderId], references: [id])
+}
+
+// 24. LoyaltyTransactions
+model LoyaltyTransaction {
+  id          String   @id @default(uuid()) @db.Uuid
+  userId      String   @db.Uuid
+  points      Int
+  type        String   @db.VarChar(20)
+  description String?  @db.Text
+  createdAt   DateTime @default(now()) @db.Timestamp
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// 25. FlashSales
+model FlashSale {
+  id                String             @id @default(uuid()) @db.Uuid
+  name              String             @db.VarChar(255)
+  startDate         DateTime           @db.Timestamp
+  endDate           DateTime           @db.Timestamp
+  isActive          Boolean            @default(true)
+  createdAt        DateTime       @default(now()) @db.Timestamp
+  updatedAt        DateTime       @updatedAt @db.Timestamp
+  flashSaleVariants FlashSaleVariant[]
+}
+
+// 26. FlashSaleVariants
+model FlashSaleVariant {
+  id               String         @id @default(uuid()) @db.Uuid
+  flashSaleId      String         @db.Uuid
+  productVariantId String         @db.Uuid
+  flashSalePrice   Decimal        @db.Decimal(18, 2)
+  flashSaleStock   Int
+  soldCount        Int            @default(0)
+  createdAt        DateTime       @default(now()) @db.Timestamp
+  updatedAt        DateTime       @updatedAt @db.Timestamp
+
+  flashSale        FlashSale      @relation(fields: [flashSaleId], references: [id], onDelete: Cascade)
+  variant          ProductVariant @relation(fields: [productVariantId], references: [id], onDelete: Cascade)
+  orderItems OrderItem[]
+
+  @@unique([flashSaleId, productVariantId])
+}
+
+// 27. AuditLogs
+model AuditLog {
+  id         String   @id @default(uuid()) @db.Uuid
+  userId     String   @db.Uuid
+  action     String   @db.VarChar(255)
+  entityName String   @db.VarChar(255)
+  entityId   String?  @db.Uuid
+  oldValues  Json?
+  newValues  Json?
+  createdAt  DateTime @default(now()) @db.Timestamp
+
+  user       User     @relation(fields: [userId], references: [id])
 }
