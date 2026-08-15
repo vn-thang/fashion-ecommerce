@@ -8,21 +8,21 @@ const orderRepository = {
       where: { id: { in: cartItemIds }, cart: { userId: userId } },
       include: {
        variant: {
-  include: {
-    product: true,
-    flashSaleVariants: {
-      where: {
-        flashSale: {
-          isActive: true
+        include: {
+          product: true,
+          flashSaleVariants: {
+            where: {
+              flashSale: {
+                isActive: true
+              }
+            },
+            include: {
+              flashSale: true
+            },
+            take: 1
+          }
         }
-      },
-      include: {
-        flashSale: true
-      },
-      take: 1
-    }
-  }
-}
+      }
       }
     });
   },

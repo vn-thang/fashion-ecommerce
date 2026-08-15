@@ -2,40 +2,105 @@ const productRepository = require('./product.repository');
 const { STATUS, INVENTORY_TYPE, MESSAGES } = require('./product.constants');
 const slugify = require('slugify');
 const { getPagination, getPaginationMetadata } = require('../../utils/pagination');
+const auditLogService = require('../auditLog/auditLog.service');
 
 const productService = {
  
-  createProduct: async (body, file) => {
-    const { categoryId, brandId, name, description, status } = body;
-    const slug = slugify(name, { lower: true, strict: true });
+  createProduct: async (body, file, adminId) => {
+    const {
+      categoryId,
+      brandId,
+      name,
+      description,
+      status
+    } = body;
 
-    const existingProduct = await productRepository.findBySlug(slug);
-    if (existingProduct) throw new Error(MESSAGES.SLUG_EXISTED);
+    const slug = slugify(name, {
+      lower: true,
+      strict: true
+    });
 
-    return await productRepository.createProduct({
-      categoryId, brandId, name, slug, description,
+    const existingProduct =
+      await productRepository.findBySlug(slug);
+
+    if (existingProduct) {
+      throw new Error(MESSAGES.SLUG_EXISTED);
+    }
+
+    const product = await productRepository.createProduct({
+      categoryId,
+      brandId,
+      name,
+      slug,
+      description,
       thumbnailUrl: file.path,
       status: status || STATUS.ACTIVE
     });
+
+    await auditLogService.createAuditLog({
+      userId: adminId,
+      action: 'CREATE',
+      entityName: 'Product',
+      entityId: product.id,
+      newValues: product
+    });
+
+    return product;
   },
 
-  uploadAlbumImages: async (productId, files) => {
+   uploadAlbumImages: async (
+    productId,
+    files,
+    adminId
+  ) => {
     const imagesData = files.map((file, index) => ({
       productId,
       imageUrl: file.path,
       displayOrder: index + 1
     }));
-    return await productRepository.createProductImages(imagesData);
+
+    const images =
+      await productRepository.createProductImages(
+        imagesData
+      );
+
+    await auditLogService.createAuditLog({
+      userId: adminId,
+      action: 'CREATE_IMAGE',
+      entityName: 'Product',
+      entityId: productId,
+      newValues: images
+    });
+
+    return images;
   },
 
-  createVariant: async (productId, body, adminId) => {
-    const { sku, color, size, price, stockQuantity, status } = body;
+  createVariant: async (
+    productId,
+    body,
+    adminId
+  ) => {
+    const {
+      sku,
+      color,
+      size,
+      price,
+      stockQuantity,
+      status
+    } = body;
 
-    const existingVariant = await productRepository.findVariantBySku(sku);
-    if (existingVariant) throw new Error(MESSAGES.SKU_EXISTED);
+    const existingVariant =
+      await productRepository.findVariantBySku(sku);
+
+    if (existingVariant) {
+      throw new Error(MESSAGES.SKU_EXISTED);
+    }
 
     const variantData = {
-      productId, sku, color, size,
+      productId,
+      sku,
+      color,
+      size,
       price: parseFloat(price),
       stockQuantity: parseInt(stockQuantity),
       status: status || STATUS.ACTIVE
@@ -48,7 +113,21 @@ const productService = {
       createdBy: adminId
     };
 
-    return await productRepository.createVariantWithInventory(variantData, transactionData);
+    const variant =
+      await productRepository.createVariantWithInventory(
+        variantData,
+        transactionData
+      );
+
+    await auditLogService.createAuditLog({
+      userId: adminId,
+      action: 'CREATE_VARIANT',
+      entityName: 'ProductVariant',
+      entityId: variant.id,
+      newValues: variant
+    });
+
+    return variant;
   },
 
 getAllProducts: async queryParams => {
@@ -133,15 +212,47 @@ getProductById: async id => {
   };
 },
 
-  updateProduct: async (id, body, file) => {
-    const { name, categoryId, brandId, description, status } = body;
-    const dataToUpdate = { categoryId, brandId, description, status };
+   updateProduct: async (
+    id,
+    body,
+    file,
+    adminId
+  ) => {
+    const {
+      name,
+      categoryId,
+      brandId,
+      description,
+      status
+    } = body;
+
+    const oldProduct =
+      await productRepository.findProductById(id);
+
+    if (!oldProduct) {
+      throw new Error(MESSAGES.PRODUCT_NOT_FOUND);
+    }
+
+    const dataToUpdate = {
+      categoryId,
+      brandId,
+      description,
+      status
+    };
 
     if (name) {
-      const slug = slugify(name, { lower: true, strict: true });
-      const existing = await productRepository.findBySlug(slug);
-      if (existing && existing.id !== id) throw new Error(MESSAGES.SLUG_EXISTED);
-      
+      const slug = slugify(name, {
+        lower: true,
+        strict: true
+      });
+
+      const existing =
+        await productRepository.findBySlug(slug);
+
+      if (existing && existing.id !== id) {
+        throw new Error(MESSAGES.SLUG_EXISTED);
+      }
+
       dataToUpdate.name = name;
       dataToUpdate.slug = slug;
     }
@@ -150,59 +261,201 @@ getProductById: async id => {
       dataToUpdate.thumbnailUrl = file.path;
     }
 
-    return await productRepository.updateProduct(id, dataToUpdate);
+    const updatedProduct =
+      await productRepository.updateProduct(
+        id,
+        dataToUpdate
+      );
+
+    await auditLogService.createAuditLog({
+      userId: adminId,
+      action: 'UPDATE',
+      entityName: 'Product',
+      entityId: id,
+      oldValues: oldProduct,
+      newValues: updatedProduct
+    });
+
+    return updatedProduct;
   },
 
-  updateVariant: async (variantId, body) => {
-    const { sku, color, size, price, status } = body;
-    const dataToUpdate = { color, size, status };
+  updateVariant: async (
+    variantId,
+    body,
+    adminId
+  ) => {
+    const {
+      sku,
+      color,
+      size,
+      price,
+      status
+    } = body;
+
+    const oldVariant =
+      await productRepository.findVariantById(
+        variantId
+      );
+
+    if (!oldVariant) {
+      throw new Error(MESSAGES.VARIANT_NOT_FOUND);
+    }
+
+    const dataToUpdate = {
+      color,
+      size,
+      status
+    };
 
     if (sku) {
-      const existing = await productRepository.findVariantBySku(sku);
-      if (existing && existing.id !== variantId) throw new Error(MESSAGES.SKU_EXISTED);
+      const existing =
+        await productRepository.findVariantBySku(sku);
+
+      if (
+        existing &&
+        existing.id !== variantId
+      ) {
+        throw new Error(MESSAGES.SKU_EXISTED);
+      }
+
       dataToUpdate.sku = sku;
     }
-    if (price) dataToUpdate.price = parseFloat(price);
-    return await productRepository.updateVariant(variantId, dataToUpdate);
+
+    if (price) {
+      dataToUpdate.price = parseFloat(price);
+    }
+
+    const updatedVariant =
+      await productRepository.updateVariant(
+        variantId,
+        dataToUpdate
+      );
+
+    await auditLogService.createAuditLog({
+      userId: adminId,
+      action: 'UPDATE_VARIANT',
+      entityName: 'ProductVariant',
+      entityId: variantId,
+      oldValues: oldVariant,
+      newValues: updatedVariant
+    });
+    return updatedVariant;
   },
 
-deleteProduct: async id => {
-  return productRepository.deactivateProduct(id);
-},
 
-deleteVariant: async id => {
-  return productRepository.deactivateVariant(id);
-},
+ deleteProduct: async (id, adminId) => {
+    const oldProduct =
+      await productRepository.findProductById(id);
 
-activateVariant: async variantId => {
-  const variant = await productRepository.findVariantById(variantId);
+    if (!oldProduct) {
+      throw new Error(MESSAGES.PRODUCT_NOT_FOUND);
+    }
 
-  if (!variant) {
-    throw new Error(MESSAGES.VARIANT_NOT_FOUND);
-  }
+    const updatedProduct =
+      await productRepository.deactivateProduct(id);
 
-  if (variant.status === 'ACTIVE') {
-    throw new Error('Phân loại đang hoạt động.');
-  }
+    await auditLogService.createAuditLog({
+      userId: adminId,
+      action: 'DEACTIVATE',
+      entityName: 'Product',
+      entityId: id,
+      oldValues: oldProduct,
+      newValues: updatedProduct
+    });
 
-  return await productRepository.activateVariant(variantId);
-},
+    return updatedProduct;
+  },
 
-deleteProductImage: async (productId, imageId) => {
-  const image = await productRepository.findProductImageById(
+  deleteVariant: async (id, adminId) => {
+    const oldVariant =
+      await productRepository.findVariantById(id);
+
+    if (!oldVariant) {
+      throw new Error(MESSAGES.VARIANT_NOT_FOUND);
+    }
+
+    const updatedVariant =
+      await productRepository.deactivateVariant(id);
+
+    await auditLogService.createAuditLog({
+      userId: adminId,
+      action: 'DEACTIVATE_VARIANT',
+      entityName: 'ProductVariant',
+      entityId: id,
+      oldValues: oldVariant,
+      newValues: updatedVariant
+    });
+
+    return updatedVariant;
+  },
+
+ activateVariant: async (
+    variantId,
+    adminId
+  ) => {
+    const oldVariant =
+      await productRepository.findVariantById(
+        variantId
+      );
+
+    if (!oldVariant) {
+      throw new Error(MESSAGES.VARIANT_NOT_FOUND);
+    }
+
+    if (oldVariant.status === 'ACTIVE') {
+      throw new Error('Phân loại đang hoạt động.');
+    }
+
+    const updatedVariant =
+      await productRepository.activateVariant(
+        variantId
+      );
+
+    await auditLogService.createAuditLog({
+      userId: adminId,
+      action: 'ACTIVATE_VARIANT',
+      entityName: 'ProductVariant',
+      entityId: variantId,
+      oldValues: oldVariant,
+      newValues: updatedVariant
+    });
+
+    return updatedVariant;
+  },
+
+  deleteProductImage: async (
     productId,
-    imageId
-  );
+    imageId,
+    adminId
+  ) => {
+    const image =
+      await productRepository.findProductImageById(
+        productId,
+        imageId
+      );
 
-  if (!image) {
-    throw new Error(MESSAGES.PRODUCT_IMAGE_NOT_FOUND);
-  }
+    if (!image) {
+      throw new Error(
+        MESSAGES.PRODUCT_IMAGE_NOT_FOUND
+      );
+    }
 
-  return productRepository.deleteProductImage(
-    productId,
-    imageId
-  );
-},
+    const result =
+      await productRepository.deleteProductImage(
+        productId,
+        imageId
+      );
+
+    await auditLogService.createAuditLog({
+      userId: adminId,
+      action: 'DELETE_IMAGE',
+      entityName: 'Product',
+      entityId: productId,
+      oldValues: image
+    });
+
+    return result;
+  },
 
 getProductsClient: async queryParams => {
   const {
@@ -722,6 +975,122 @@ getNewestProducts: async () => {
       };
     })
   };
+},
+
+getHighestRatedProducts: async () => {
+  const products =
+    await productRepository.findHighestRatedProducts(10);
+  return {
+    products: products.map(product => {
+      const variants = product.variants.map(variant => {
+        const flash =
+          variant.flashSaleVariants?.[0];
+        return {
+          originalPrice: Number(variant.price),
+          displayPrice: flash
+            ? Number(flash.flashSalePrice)
+            : Number(variant.price),
+          flashSalePrice: flash
+            ? Number(flash.flashSalePrice)
+            : null,
+          discountPercent: flash
+            ? Math.round(
+                (
+                  (Number(variant.price) -
+                    Number(flash.flashSalePrice)) /
+                  Number(variant.price)
+                ) * 100
+              )
+            : 0,
+          isFlashSale: !!flash
+        };
+      });
+      const originalPrices = variants.map(
+        x => x.originalPrice
+      );
+      const displayPrices = variants.map(
+        x => x.displayPrice
+      );
+      const flashVariants = variants.filter(
+        x => x.isFlashSale
+      );
+      return {
+        id: product.id,
+        name: product.name,
+        slug: product.slug,
+        thumbnailUrl:
+          product.thumbnailUrl ||
+          product.images?.[0]?.imageUrl ||
+          null,
+        brand: product.brand,
+        category: product.category,
+        rating: Number(product.rating || 0),
+        soldCount: product.soldCount || 0,
+        reviewCount: product.reviewCount || 0,
+        minPrice:
+          displayPrices.length
+            ? Math.min(...displayPrices)
+            : null,
+        maxPrice:
+          displayPrices.length
+            ? Math.max(...displayPrices)
+            : null,
+        minOriginalPrice:
+          originalPrices.length
+            ? Math.min(...originalPrices)
+            : null,
+        maxOriginalPrice:
+          originalPrices.length
+            ? Math.max(...originalPrices)
+            : null,
+        isFlashSale:
+          flashVariants.length > 0,
+        flashSale:
+          flashVariants.length > 0
+            ? {
+                minFlashPrice: Math.min(
+                  ...flashVariants.map(
+                    x => x.flashSalePrice
+                  )
+                ),
+                maxFlashPrice: Math.max(
+                  ...flashVariants.map(
+                    x => x.flashSalePrice
+                  )
+                ),
+                minOriginalPrice: Math.min(
+                  ...flashVariants.map(
+                    x => x.originalPrice
+                  )
+                ),
+                maxOriginalPrice: Math.max(
+                  ...flashVariants.map(
+                    x => x.originalPrice
+                  )
+                ),
+                maxDiscountPercent: Math.max(
+                  ...flashVariants.map(
+                    x => x.discountPercent
+                  )
+                )
+              }
+            : null
+      };
+    })
+  };
+},
+
+getSearchSuggestions: async keyword => {
+  const search = keyword?.trim();
+
+  if (!search) {
+    return [];
+  }
+
+  return productRepository.findSearchSuggestions(
+    search,
+    8
+  );
 },
 };
 

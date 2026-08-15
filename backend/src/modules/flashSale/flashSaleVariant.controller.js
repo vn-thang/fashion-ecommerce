@@ -7,7 +7,8 @@ const flashSaleVariantController = {
     try {
       const result = await flashSaleVariantService.addVariants(
         req.params.flashSaleId,
-        req.body.variants
+        req.body.variants,
+        req.user.userId
       );
 
       return sendSuccess(
@@ -63,7 +64,8 @@ const flashSaleVariantController = {
       const result =
         await flashSaleVariantService.update(
           req.params.id,
-          req.body
+          req.body,
+          req.user.userId
         );
 
       return sendSuccess(
@@ -80,7 +82,8 @@ const flashSaleVariantController = {
   remove: async (req, res) => {
     try {
       await flashSaleVariantService.remove(
-        req.params.id
+        req.params.id,
+        req.user.userId
       );
 
       return sendSuccess(

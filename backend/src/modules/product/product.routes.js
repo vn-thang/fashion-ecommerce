@@ -25,9 +25,19 @@ productController.getNewestProducts
 );
 
 router.get(
+  '/highest-rated',
+  productController.getHighestRatedProducts
+);
+
+router.get(
 '/:id/related',
 productValidation.validateId,
 productController.getRelatedProducts
+);
+
+router.get(
+  '/search-suggestions',
+  productController.getSearchSuggestions
 );
 
 router.get(

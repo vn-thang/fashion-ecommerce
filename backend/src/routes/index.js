@@ -23,6 +23,7 @@ const adminPaymentRoutes = require('../modules/payment/admin/payment.admin.route
 const adminInventoryRoutes = require('../modules/inventory/inventory.routes');
 const adminUserRoutes = require('../modules/user/admin/adminUser.route');
 const adminDashboardRoutes = require('../modules/dashboard/dashboard.route');
+const auditLogRoutes = require('../modules/auditLog/auditLog.routes');
 
 router.use('/auth', authRoutes);           
 router.use('/categories', categoryRoutes); 
@@ -46,6 +47,7 @@ router.use('/admin/payments', adminPaymentRoutes);
 router.use('/admin/inventory', adminInventoryRoutes);
 router.use('/admin/users', adminUserRoutes );
 router.use('/admin/dashboard', adminDashboardRoutes );
+router.use('/admin/auditLog', auditLogRoutes );
 
 
 module.exports = router;

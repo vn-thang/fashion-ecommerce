@@ -74,6 +74,11 @@ title: 'Quản lý đánh giá',
 path: '/admin/reviews',
     icon: '⭐',
 },
+{
+  title: 'Nhật ký hệ thống',
+  path: '/admin/audit-logs',
+  icon: '📋'
+},
  {
     title: 'Cài đặt',
     icon: '⚙️',

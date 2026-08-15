@@ -30,6 +30,7 @@ model User {
   couponUsages        CouponUsage[]
   reviews             Review[]
   notifications       Notification[]
+  devices             UserDevice[]
   conversations       Conversation[]
   messages            Message[]
   loyaltyTransactions LoyaltyTransaction[]
@@ -368,6 +369,22 @@ model Notification {
   createdAt DateTime @default(now()) @db.Timestamp
 
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([userId, isRead])
+}
+
+model UserDevice {
+  id         String   @id @default(uuid()) @db.Uuid
+  userId     String   @db.Uuid
+  token      String   @unique @db.Text
+  deviceType String?  @db.VarChar(20)
+  createdAt  DateTime @default(now()) @db.Timestamp
+  updatedAt  DateTime @updatedAt @db.Timestamp
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 // 22. Conversations

@@ -2,6 +2,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const authRepository = require('./auth.repository');
 const { TOKEN_EXPIRY, MESSAGES, ROLES } = require('./auth.constants');
+const auditLogService = require('../auditLog/auditLog.service');
 
 const crypto = require('crypto');
 const mailService = require('../../services/email.service');
@@ -26,13 +27,13 @@ const signResetToken = (userId) => {
 const authService = {
   
   register: async ({ email, password, fullName }) => {
-    const existingUser = await authRepository.findUserByEmailOrPhone(email, null);
+    const existingUser = await authRepository.findUserByEmailOrPhone(email);
     if (existingUser) {
       throw new Error(MESSAGES.EXISTING_USER);
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-
+    const hashedPassword = await bcrypt.hash(password, 10); // 10: độ tốn công khi hash
+ 
     const newUser = await authRepository.createUserWithCart({
       email,
       passwordHash: hashedPassword,
@@ -204,14 +205,17 @@ resetPassword: async (token, newPassword) => {
     return true;
   },
 
-  changePassword: async (userId, oldPassword, newPassword) => {
+changePassword: async (userId, oldPassword, newPassword) => {
   const user = await authRepository.findUserById(userId);
 
   if (!user) {
     throw new Error('Người dùng không tồn tại!');
   }
 
-  const isMatch = await bcrypt.compare(oldPassword, user.passwordHash);
+  const isMatch = await bcrypt.compare(
+    oldPassword,
+    user.passwordHash
+  );
 
   if (!isMatch) {
     throw new Error('Mật khẩu hiện tại không chính xác!');
@@ -219,9 +223,19 @@ resetPassword: async (token, newPassword) => {
 
   const hashedPassword = await bcrypt.hash(newPassword, 10);
 
-  await authRepository.updatePassword(userId, hashedPassword);
+  await authRepository.updatePassword(
+    userId,
+    hashedPassword
+  );
 
   await authRepository.revokeAllRefreshTokens(userId);
+
+  await auditLogService.createAuditLog({
+    userId,
+    action: 'CHANGE_PASSWORD',
+    entityName: 'User',
+    entityId: userId
+  });
 
   return {
     message: 'Đổi mật khẩu thành công! Vui lòng đăng nhập lại.'

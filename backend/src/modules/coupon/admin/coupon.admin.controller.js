@@ -5,7 +5,7 @@ const { MESSAGES } = require('./coupon.constants');
 const couponAdminController = {
   create: async (req, res) => {
     try {
-      const result = await couponService.createCoupon(req.body);
+      const result = await couponService.createCoupon(req.body, req.user.userId);
       return sendSuccess(res, 201, MESSAGES.CREATE_SUCCESS, result);
     } catch (err) {
       return sendError(res, 400, err.message);
@@ -35,7 +35,8 @@ const couponAdminController = {
     try {
       const result = await couponService.updateCoupon(
         req.params.id,
-        req.body
+        req.body,
+        req.user.userId
       );
 
       return sendSuccess(res, 200, MESSAGES.UPDATE_SUCCESS, result);
@@ -46,7 +47,7 @@ const couponAdminController = {
 
 deactivate: async (req, res) => {
   try {
-    await couponService.deactivateCoupon(req.params.id);
+    await couponService.deactivateCoupon(req.params.id, req.user.userId);
 
     return sendSuccess(
       res,

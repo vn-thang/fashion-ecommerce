@@ -15,5 +15,8 @@ export const homeApi = {
   },
     getNewestProducts: async () => {
     return await productApi.getNewestProducts();
+  },
+  getHighestRatedProducts: async () => {
+    return await productApi.getHighestRatedProducts();
   }
 };

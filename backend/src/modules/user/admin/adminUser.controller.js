@@ -38,6 +38,7 @@ const adminUserController = {
   updateUserStatus: async (req, res) => {
     try {
       const result = await userService.updateUserStatus(
+        req.user.userId,
         req.params.userId,
         req.body.isActive
       );
