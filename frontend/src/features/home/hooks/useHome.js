@@ -9,6 +9,7 @@ export const useHome = () => {
   const [flashSale, setFlashSale] = useState(null);
   const [bestSellingProducts, setBestSellingProducts] = useState([]);
   const [newestProducts, setNewestProducts] = useState([]);
+  const [highlyRatedProducts, setHighlyRatedProducts] = useState([]);
 
   const [categories, setCategories] = useState([]);
   const [recommendProducts, setRecommendProducts] = useState([]);
@@ -18,21 +19,24 @@ export const useHome = () => {
 
     try {
       const [
-        bannerRes,
-        flashSaleRes,
-        bestSellerRes,
-        newestRes
-      ] = await Promise.all([
-        homeApi.getBanners(),
-        homeApi.getFlashSale(),
-        homeApi.getBestSellingProducts(),
-        homeApi.getNewestProducts()
-      ]);
+  bannerRes,
+  flashSaleRes,
+  bestSellerRes,
+  newestRes,
+  highlyRatedRes
+] = await Promise.all([
+  homeApi.getBanners(),
+  homeApi.getFlashSale(),
+  homeApi.getBestSellingProducts(),
+  homeApi.getNewestProducts(),
+  homeApi.getHighestRatedProducts()
+]);
 
       const bannerData = bannerRes.data || bannerRes;
       const flashSaleData = flashSaleRes.data || flashSaleRes;
       const bestSellerData = bestSellerRes.data || bestSellerRes;
       const newestData = newestRes.data || newestRes;
+      const highlyRatedData = highlyRatedRes.data || highlyRatedRes;
 
       setBanners(
         Array.isArray(bannerData)
@@ -49,7 +53,9 @@ export const useHome = () => {
       setNewestProducts(
         newestData.products || []
       );
-
+      setHighlyRatedProducts(
+        highlyRatedData.products || []
+      );
     } catch (error) {
       console.error(error);
       toast.error('Không thể tải dữ liệu trang chủ');
@@ -68,6 +74,7 @@ export const useHome = () => {
     flashSale,
     bestSellingProducts,
     newestProducts,
+    highlyRatedProducts,
     categories,
     recommendProducts,
     refreshHome: fetchHomeData

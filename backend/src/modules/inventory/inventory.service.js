@@ -1,6 +1,7 @@
 const inventoryRepository = require('./inventory.repository');
 const { MESSAGES } = require('./inventory.constants');
 const paginationHelper = require('../../utils/pagination');
+const auditLogService = require('../auditLog/auditLog.service');
 
 const inventoryService = {
   importStock: async (data, userId) => {
@@ -12,12 +13,30 @@ const inventoryService = {
       throw new Error(MESSAGES.VARIANT_NOT_FOUND);
     }
 
-    return await inventoryRepository.importStockTransaction({
+    const quantity = Number(data.quantity);
+
+    const result = await inventoryRepository.importStockTransaction({
       productVariantId: data.productVariantId,
-      quantity: Number(data.quantity),
+      quantity,
       note: data.note || 'Nhập kho',
       createdBy: userId
     });
+
+    await auditLogService.createAuditLog({
+      userId,
+      action: 'IMPORT_STOCK',
+      entityName: 'ProductVariant',
+      entityId: data.productVariantId,
+      oldValues: {
+        stockQuantity: variant.stockQuantity
+      },
+      newValues: {
+        stockQuantity: variant.stockQuantity + quantity,
+        quantity
+      }
+    });
+
+    return result;
   },
 
   adjustStock: async (data, userId) => {
@@ -35,12 +54,29 @@ const inventoryService = {
       throw new Error(MESSAGES.INVALID_STOCK);
     }
 
-    return await inventoryRepository.adjustmentStockTransaction({
-      productVariantId: data.productVariantId,
-      quantity,
-      note: data.note || 'Điều chỉnh tồn kho',
-      createdBy: userId
+    const result =
+      await inventoryRepository.adjustmentStockTransaction({
+        productVariantId: data.productVariantId,
+        quantity,
+        note: data.note || 'Điều chỉnh tồn kho',
+        createdBy: userId
+      });
+
+    await auditLogService.createAuditLog({
+      userId,
+      action: 'ADJUST_STOCK',
+      entityName: 'ProductVariant',
+      entityId: data.productVariantId,
+      oldValues: {
+        stockQuantity: variant.stockQuantity
+      },
+      newValues: {
+        stockQuantity: variant.stockQuantity + quantity,
+        quantity
+      }
     });
+
+    return result;
   },
 
 getTransactions: async query => {

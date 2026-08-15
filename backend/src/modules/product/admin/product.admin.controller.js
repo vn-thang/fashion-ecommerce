@@ -6,7 +6,8 @@ const productAdminController = {
     try {
       const result = await productService.createProduct(
         req.body,
-        req.file
+        req.file,
+        req.user.userId
       );
 
       return sendSuccess(
@@ -24,7 +25,8 @@ const productAdminController = {
     try {
       const result = await productService.uploadAlbumImages(
         req.params.productId,
-        req.files
+        req.files,
+        req.user.userId
       );
 
       return sendSuccess(
@@ -53,7 +55,8 @@ const productAdminController = {
       const result = await productService.createVariant(
         req.params.productId,
         req.body,
-        adminId
+        adminId,
+        req.user.userId
       );
 
       return sendSuccess(
@@ -106,7 +109,8 @@ const productAdminController = {
       const result = await productService.updateProduct(
         req.params.id,
         req.body,
-        req.file
+        req.file,
+        req.user.userId
       );
 
       return sendSuccess(
@@ -124,7 +128,8 @@ const productAdminController = {
     try {
       const result = await productService.updateVariant(
         req.params.id,
-        req.body
+        req.body,
+        req.user.userId
       );
 
       return sendSuccess(
@@ -140,7 +145,7 @@ const productAdminController = {
 
   deleteProduct: async (req, res) => {
     try {
-      await productService.deleteProduct(req.params.id);
+      await productService.deleteProduct(req.params.id, req.user.userId);
 
       return sendSuccess(
         res,
@@ -154,7 +159,7 @@ const productAdminController = {
 
   deleteVariant: async (req, res) => {
     try {
-      await productService.deleteVariant(req.params.id);
+      await productService.deleteVariant(req.params.id, req.user.userId);
 
       return sendSuccess(
         res,
@@ -168,7 +173,7 @@ const productAdminController = {
 
   activateVariant: async (req, res) => {
   try {
-    const result = await productService.activateVariant(req.params.id);
+    const result = await productService.activateVariant(req.params.id, req.user.userId);
 
     return sendSuccess(
       res,
@@ -185,7 +190,8 @@ deleteImage: async (req, res) => {
   try {
     await productService.deleteProductImage(
       req.params.productId,
-      req.params.imageId
+      req.params.imageId,
+      req.user.userId
     );
 
     return sendSuccess(res, 200, 'Xóa ảnh thành công!');

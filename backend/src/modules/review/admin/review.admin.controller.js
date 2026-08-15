@@ -17,7 +17,7 @@ const reviewAdminController = {
     try {
       const { id } = req.params;
       const { reply } = req.body;
-      const result = await reviewService.replyToReview(id, reply);
+      const result = await reviewService.replyToReview(req.user.userId, id, reply);
       return sendSuccess(res, 200, REVIEW_MESSAGES.REPLY_SUCCESS, result);
     } catch (err) {
       return sendError(res, 400, err.message);
@@ -27,7 +27,7 @@ const reviewAdminController = {
   hideReview: async (req, res) => {
     try {
       const { id } = req.params;
-      await reviewService.hideReviewByAdmin(id);
+      await reviewService.hideReviewByAdmin(req.user.userId, id);
       return sendSuccess(res, 200, REVIEW_MESSAGES.HIDE_SUCCESS); 
     } catch (err) {
       return sendError(res, 400, err.message);
@@ -37,7 +37,7 @@ const reviewAdminController = {
   restoreReview: async (req, res) => {
     try {
       const { id } = req.params;
-      await reviewService.restoreReviewByAdmin(id);
+      await reviewService.restoreReviewByAdmin(req.user.userId, id);
       return sendSuccess(res, 200, REVIEW_MESSAGES.RESTORE_SUCCESS);
     } catch (err) {
       return sendError(res, 400, err.message);

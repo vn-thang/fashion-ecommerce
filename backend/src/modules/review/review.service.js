@@ -1,6 +1,7 @@
 const reviewRepository = require('./review.repository');
 const { REVIEW_MESSAGES } = require('./review.constants');
 const paginationHelper = require('../../utils/pagination'); 
+const auditLogService = require('../auditLog/auditLog.service');
 
 const reviewService = {
  createReview: async (userId, data) => {
@@ -101,45 +102,101 @@ getAdminReviews: async query => {
   };
 },
 
-  replyToReview: async (reviewId, replyText) => {
+ replyToReview: async (adminId, reviewId, replyText) => {
     if (!replyText || replyText.trim() === '') {
       throw new Error(REVIEW_MESSAGES.REPLY_REQUIRED);
     }
 
-    const review = await reviewRepository.findReviewById(reviewId);
+    const review =
+      await reviewRepository.findReviewById(reviewId);
+
     if (!review) {
       throw new Error(REVIEW_MESSAGES.REVIEW_NOT_FOUND);
     }
 
-    return await reviewRepository.updateReply(reviewId, replyText);
+    const updatedReview =
+      await reviewRepository.updateReply(
+        reviewId,
+        replyText
+      );
+
+    await auditLogService.createAuditLog({
+      userId: adminId,
+      action: 'REPLY_REVIEW',
+      entityName: 'Review',
+      entityId: reviewId,
+      oldValues: {
+        reply: review.reply
+      },
+      newValues: {
+        reply: updatedReview.reply
+      }
+    });
+
+    return updatedReview;
   },
 
-hideReviewByAdmin: async (reviewId) => {
-  const review = await reviewRepository.findReviewById(reviewId);
+  hideReviewByAdmin: async (adminId, reviewId) => {
+    const review =
+      await reviewRepository.findReviewById(reviewId);
 
-  if (!review) {
-    throw new Error(REVIEW_MESSAGES.REVIEW_NOT_FOUND);
+    if (!review) {
+      throw new Error(REVIEW_MESSAGES.REVIEW_NOT_FOUND);
+    }
+
+    if (review.isHidden) {
+      return review;
+    }
+
+    const updatedReview =
+      await reviewRepository.hideReview(reviewId);
+
+    await auditLogService.createAuditLog({
+      userId: adminId,
+      action: 'HIDE_REVIEW',
+      entityName: 'Review',
+      entityId: reviewId,
+      oldValues: {
+        isHidden: review.isHidden
+      },
+      newValues: {
+        isHidden: updatedReview.isHidden
+      }
+    });
+
+    return updatedReview;
+  },
+
+  restoreReviewByAdmin: async (adminId, reviewId) => {
+    const review =
+      await reviewRepository.findReviewById(reviewId);
+
+    if (!review) {
+      throw new Error(REVIEW_MESSAGES.REVIEW_NOT_FOUND);
+    }
+
+    if (!review.isHidden) {
+      return review;
+    }
+
+    const updatedReview =
+      await reviewRepository.restoreReview(reviewId);
+
+    await auditLogService.createAuditLog({
+      userId: adminId,
+      action: 'RESTORE_REVIEW',
+      entityName: 'Review',
+      entityId: reviewId,
+      oldValues: {
+        isHidden: review.isHidden
+      },
+      newValues: {
+        isHidden: updatedReview.isHidden
+      }
+    });
+
+    return updatedReview;
   }
-
-  if (review.isHidden) {
-    return review;
-  }
-
-  return await reviewRepository.hideReview(reviewId);
-},
-restoreReviewByAdmin: async (reviewId) => {
-  const review = await reviewRepository.findReviewById(reviewId);
-
-  if (!review) {
-    throw new Error(REVIEW_MESSAGES.REVIEW_NOT_FOUND);
-  }
-
-  if (!review.isHidden) {
-    return review;
-  }
-
-  return await reviewRepository.restoreReview(reviewId);
-},
 };
 
 module.exports = reviewService;

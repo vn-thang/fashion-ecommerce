@@ -4,6 +4,7 @@ const {
   getPagination,
   getPaginationMetadata
 } = require('../../utils/pagination');
+const auditLogService = require('../auditLog/auditLog.service');
 
 const userService = {
 
@@ -162,16 +163,31 @@ getAllUsers: async query => {
     return user;
   },
 
-  updateUserStatus: async (userId, isActive) => {
+updateUserStatus: async (adminId, userId, isActive) => {
   const user = await userRepository.getUserById(userId);
 
   if (!user) {
     throw new Error(MESSAGES.USER_NOT_FOUND);
   }
 
-  return await userRepository.updateUser(userId, {
+  const updatedUser = await userRepository.updateUser(userId, {
     isActive
   });
+
+  await auditLogService.createAuditLog({
+    userId: adminId,
+    action: isActive ? 'ACTIVATE_USER' : 'DEACTIVATE_USER',
+    entityName: 'User',
+    entityId: userId,
+    oldValues: {
+      isActive: user.isActive
+    },
+    newValues: {
+      isActive: updatedUser.isActive
+    }
+  });
+
+  return updatedUser;
 }
 
 };

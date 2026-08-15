@@ -4,7 +4,7 @@ const { sendSuccess, sendError } = require('../../../utils/response');
 const categoryAdminController = {
   create: async (req, res) => {
     try {
-      const result = await categoryService.createCategory(req.body);
+      const result = await categoryService.createCategory(req.body, req.user.userId);
       return sendSuccess(res, 201, 'Tạo danh mục thành công!', result);
     } catch (err) {
       return sendError(res, 400, err.message);
@@ -24,7 +24,8 @@ const categoryAdminController = {
     try {
       const result = await categoryService.updateCategory(
         req.params.id,
-        req.body
+        req.body,
+        req.user.userId
       );
 
       return sendSuccess(res, 200, 'Cập nhật danh mục thành công!', result);
@@ -36,7 +37,8 @@ const categoryAdminController = {
   deactivate: async (req, res) => {
     try {
       const result = await categoryService.deactivateCategory(
-        req.params.id
+        req.params.id,
+        req.user.userId
       );
 
       return sendSuccess(
@@ -53,7 +55,8 @@ const categoryAdminController = {
   activate: async (req, res) => {
     try {
       const result = await categoryService.activateCategory(
-        req.params.id
+        req.params.id,
+        req.user.userId
       );
 
       return sendSuccess(

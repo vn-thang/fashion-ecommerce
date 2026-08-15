@@ -100,7 +100,47 @@ const productController = {
     } catch (err) {
       return sendError(res, 400, err.message);
     }
+  },
+
+  getHighestRatedProducts: async (req, res) => {
+  try {
+    const result =
+      await productService.getHighestRatedProducts();
+
+    return sendSuccess(
+      res,
+      200,
+      'Lấy sản phẩm được đánh giá cao thành công!',
+      result
+    );
+  } catch (err) {
+    return sendError(res, 400, err.message);
   }
+},
+
+  getSearchSuggestions : async (req, res) => {
+  try {
+    const { search } = req.query;
+
+    const suggestions =
+      await productService.getSearchSuggestions(search);
+
+    return res.status(200).json({
+      success: true,
+      data: suggestions
+    });
+  } catch (error) {
+    console.error(
+      'Lỗi lấy search suggestions:',
+      error
+    );
+
+    return res.status(500).json({
+      success: false,
+      message: 'Không thể lấy gợi ý tìm kiếm'
+    });
+  }
+}
 };
 
 module.exports = productController; 

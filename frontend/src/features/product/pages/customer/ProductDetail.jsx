@@ -1,13 +1,18 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useProductDetail } from '../../hooks/useProductDetail';
 import ProductGallery from '../../components/customer/ProductGallery';
 import ProductInfo from '../../components/customer/ProductInfo';
 import ProductReviewSection from '../../components/customer/ProductReviewSection';
 import RelatedProducts from '../../components/customer/RelatedProducts';
+import useRecentlyViewed from '../../hooks/useRecentlyViewed';
 
 const ProductDetail = () => {
   const navigate = useNavigate();
+
+    const {
+  addRecentlyViewed
+} = useRecentlyViewed();
 
   const {
     product,
@@ -31,6 +36,15 @@ const ProductDetail = () => {
     relatedProducts,
     loadingRelated
   } = useProductDetail();
+
+  console.log('PRODUCT DETAIL:', product);
+useEffect(() => {
+  if (!product) {
+    return;
+  }
+
+  addRecentlyViewed(product);
+}, [product, addRecentlyViewed]);
 
   const handleBuyNow = () => {
     if (availableColors.length && !selectedColor) {

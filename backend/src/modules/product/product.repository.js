@@ -749,7 +749,109 @@ findNewestProducts: async (take = 10) => {
       }
     }
   });
-}
+},
+
+findHighestRatedProducts: async (take = 10) => {
+  return await prisma.product.findMany({
+    where: {
+      status: 'ACTIVE',
+      category: {
+        status: 'ACTIVE'
+      },
+      brand: {
+        status: 'ACTIVE'
+      },
+      reviewCount: {
+        gt: 0 //3
+      }
+    },
+    take,
+    orderBy: [
+      {
+        rating: 'desc'
+      },
+      {
+        reviewCount: 'desc'
+      },
+      {
+        createdAt: 'desc'
+      }
+    ],
+    include: {
+      brand: true,
+      category: true,
+      images: {
+        orderBy: {
+          displayOrder: 'asc'
+        },
+        take: 1
+      },
+      variants: {
+        where: {
+          status: 'ACTIVE'
+        },
+
+        include: {
+          flashSaleVariants: {
+            where: {
+              flashSale: {
+                isActive: true,
+                startDate: {
+                  lte: new Date()
+                },
+                endDate: {
+                  gte: new Date()
+                }
+              }
+            },
+            include: {
+              flashSale: true
+            }
+          }
+        }
+      }
+    }
+  });
+},
+
+findSearchSuggestions: async (keyword, limit = 8) => {
+  const search = keyword?.trim();
+
+  if (!search) {
+    return [];
+  }
+
+  const products = await prisma.product.findMany({
+    where: {
+      status: 'ACTIVE',
+
+      name: {
+        contains: search,
+        mode: 'insensitive'
+      },
+
+      brand: {
+        status: 'ACTIVE'
+      },
+
+      category: {
+        status: 'ACTIVE'
+      }
+    },
+
+    select: {
+      name: true
+    },
+
+    orderBy: {
+      soldCount: 'desc'
+    },
+
+    take: limit
+  });
+
+  return products.map(product => product.name);
+},
 };
 
 module.exports = productRepository;

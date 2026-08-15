@@ -13,6 +13,10 @@ export const productApi = {
     return axiosInstance.get('/products/newest');
   },
 
+   getHighestRatedProducts: async () => {
+    return axiosInstance.get('/products/highest-rated');
+  },
+
   getById: async id => {
     return axiosInstance.get(`/products/${id}`);
   },

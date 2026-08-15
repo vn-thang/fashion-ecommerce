@@ -31,7 +31,7 @@ const adminOrderController = {
         return sendError(res, 400, 'Vui lòng cung cấp trạng thái cần cập nhật (status)');
       }
 
-      const updatedOrder = await orderService.updateOrderStatusByAdmin(id, status);
+      const updatedOrder = await orderService.updateOrderStatusByAdmin(req.user.userId, id, status);
       return sendSuccess(res, 200, 'Cập nhật trạng thái đơn hàng thành công', updatedOrder);
     } catch (error) {
       return sendError(res, 400, error.message);
@@ -45,6 +45,7 @@ cancelOrder: async (req, res) => {
 
     const result =
       await orderService.cancelOrderByAdmin(
+        req.user.userId,
         id,
         cancelReason
       );

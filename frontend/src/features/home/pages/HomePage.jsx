@@ -1,15 +1,15 @@
 import React from 'react';
 import HomeBanner from '../components/banner/HomeBanner';
-
 import FlashSaleSection from '../components/flashSale/FlashSaleSection';
 import FlashSaleCarousel from '../components/flashSale/FlashSaleCarousel';
 import FlashSaleSkeleton from '../components/flashSale/FlashSaleSkeleton';
-
 import BestSellerSection from '../components/bestSeller/BestSellerSection';
 import BestSellerSkeleton from '../components/bestSeller/BestSellerSkeleton';
-
 import NewestSection from '../components/newest/NewestSection';
 import NewestSkeleton from '../components/newest/NewestSkeleton';
+import RecentlyViewed from '../../product/components/customer/RecentlyViewed';
+import HighlyRatedSection from '../components/highlyRated/HighlyRatedSection';
+import HighlyRatedSkeleton from '../components/highlyRated/HighlyRatedSkeleton';
 
 import { useHome } from '../hooks/useHome';
 
@@ -19,7 +19,8 @@ const HomePage = () => {
     banners,
     flashSale,
     bestSellingProducts,
-    newestProducts
+    newestProducts,
+    highlyRatedProducts
   } = useHome();
 
   return (
@@ -64,6 +65,16 @@ const HomePage = () => {
           products={newestProducts}
         />
       )}
+
+      {loading ? (
+      <HighlyRatedSkeleton />
+      ) : (
+        <HighlyRatedSection
+          products={highlyRatedProducts}
+        />
+      )}
+
+      <RecentlyViewed />
 
       <section className="rounded-xl border border-gray-100 bg-white p-8 shadow-sm">
         <h2 className="text-2xl font-bold text-gray-800">

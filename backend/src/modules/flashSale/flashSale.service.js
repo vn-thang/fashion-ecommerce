@@ -1,30 +1,58 @@
 const flashSaleRepository = require('./flashSale.repository');
 const { MESSAGES } = require('./flashSale.constants');
 const { getPagination, getPaginationMetadata } = require('../../utils/pagination');
+const auditLogService = require('../auditLog/auditLog.service');
 
 const flashSaleService = {
-  createFlashSale: async ({ name, startDate, endDate, isActive = true }) => {
+ createFlashSale: async (
+    { name, startDate, endDate, isActive = true },
+    adminId
+  ) => {
     if (new Date(endDate) <= new Date(startDate)) {
       throw new Error(MESSAGES.INVALID_DATE);
     }
 
-    const existedName = await flashSaleRepository.findByName(name);
+    const existedName =
+      await flashSaleRepository.findByName(name);
+
     if (existedName) {
-      throw new Error('Tên chương trình Flash Sale đã tồn tại.');
+      throw new Error(
+        'Tên chương trình Flash Sale đã tồn tại.'
+      );
     }
 
-    const overlap = await flashSaleRepository.findOverlap(startDate, endDate);
+    const overlap =
+      await flashSaleRepository.findOverlap(
+        startDate,
+        endDate
+      );
+
     if (overlap) {
-      throw new Error(MESSAGES.FLASH_SALE_OVERLAP);
+      throw new Error(
+        MESSAGES.FLASH_SALE_OVERLAP
+      );
     }
 
-    return await flashSaleRepository.create({
-      name,
-      startDate: new Date(startDate),
-      endDate: new Date(endDate),
-      isActive
+    const flashSale =
+      await flashSaleRepository.create({
+        name,
+        startDate: new Date(startDate),
+        endDate: new Date(endDate),
+        isActive
+      });
+
+    await auditLogService.createAuditLog({
+      userId: adminId,
+      action: 'CREATE',
+      entityName: 'FlashSale',
+      entityId: flashSale.id,
+      oldValues: null,
+      newValues: flashSale
     });
+
+    return flashSale;
   },
+
 
   getAllFlashSales: async (queryParams = {}) => {
     const { search, page: rawPage, limit: rawLimit } = queryParams;
@@ -63,69 +91,143 @@ const flashSaleService = {
 
     return flashSale;
   },
-
-  updateFlashSale: async (id, { name, startDate, endDate, isActive }) => {
-    const existing = await flashSaleRepository.findBasicById(id);
+  updateFlashSale: async (
+    id,
+    { name, startDate, endDate, isActive },
+    adminId
+  ) => {
+    const existing =
+      await flashSaleRepository.findBasicById(id);
 
     if (!existing) {
-      throw new Error(MESSAGES.FLASH_SALE_NOT_FOUND);
+      throw new Error(
+        MESSAGES.FLASH_SALE_NOT_FOUND
+      );
     }
 
-const now = new Date();
+    const now = new Date();
 
-if (existing.endDate < now) {
-  throw new Error('Flash Sale đã kết thúc, không thể chỉnh sửa.');
-}
+    if (existing.endDate < now) {
+      throw new Error(
+        'Flash Sale đã kết thúc, không thể chỉnh sửa.'
+      );
+    }
 
-if (
-  existing.isActive &&
-  existing.startDate <= now &&
-  existing.endDate >= now
-) {
-  throw new Error('Không thể chỉnh sửa Flash Sale đang diễn ra.');
-}
+    if (
+      existing.isActive &&
+      existing.startDate <= now &&
+      existing.endDate >= now
+    ) {
+      throw new Error(
+        'Không thể chỉnh sửa Flash Sale đang diễn ra.'
+      );
+    }
 
     const data = {};
 
     if (name !== undefined) {
-      const duplicated = await flashSaleRepository.findByName(name, id);
+      const duplicated =
+        await flashSaleRepository.findByName(
+          name,
+          id
+        );
 
       if (duplicated) {
-        throw new Error('Tên chương trình Flash Sale đã tồn tại.');
+        throw new Error(
+          'Tên chương trình Flash Sale đã tồn tại.'
+        );
       }
 
       data.name = name;
     }
 
-    const newStartDate = startDate ?? existing.startDate;
-    const newEndDate = endDate ?? existing.endDate;
+    const newStartDate =
+      startDate ?? existing.startDate;
 
-    if (new Date(newEndDate) <= new Date(newStartDate)) {
-      throw new Error(MESSAGES.INVALID_DATE);
+    const newEndDate =
+      endDate ?? existing.endDate;
+
+    if (
+      new Date(newEndDate) <=
+      new Date(newStartDate)
+    ) {
+      throw new Error(
+        MESSAGES.INVALID_DATE
+      );
     }
 
-    const overlap = await flashSaleRepository.findOverlap(newStartDate, newEndDate, id);
+    const overlap =
+      await flashSaleRepository.findOverlap(
+        newStartDate,
+        newEndDate,
+        id
+      );
 
     if (overlap) {
-      throw new Error(MESSAGES.FLASH_SALE_OVERLAP);
+      throw new Error(
+        MESSAGES.FLASH_SALE_OVERLAP
+      );
     }
 
-    if (startDate !== undefined) data.startDate = new Date(startDate);
-    if (endDate !== undefined) data.endDate = new Date(endDate);
-    if (isActive !== undefined) data.isActive = isActive;
+    if (startDate !== undefined) {
+      data.startDate = new Date(startDate);
+    }
 
-    return await flashSaleRepository.update(id, data);
+    if (endDate !== undefined) {
+      data.endDate = new Date(endDate);
+    }
+
+    if (isActive !== undefined) {
+      data.isActive = isActive;
+    }
+
+    const updatedFlashSale =
+      await flashSaleRepository.update(
+        id,
+        data
+      );
+
+    await auditLogService.createAuditLog({
+      userId: adminId,
+      action: 'UPDATE',
+      entityName: 'FlashSale',
+      entityId: id,
+      oldValues: existing,
+      newValues: updatedFlashSale
+    });
+
+    return updatedFlashSale;
   },
 
-  disableFlashSale: async (id) => {
-    const existing = await flashSaleRepository.findBasicById(id);
+ disableFlashSale: async (id, adminId) => {
+    const existing =
+      await flashSaleRepository.findBasicById(id);
 
     if (!existing) {
-      throw new Error(MESSAGES.FLASH_SALE_NOT_FOUND);
+      throw new Error(
+        MESSAGES.FLASH_SALE_NOT_FOUND
+      );
     }
 
-    return await flashSaleRepository.disable(id);
+    const flashSale =
+      await flashSaleRepository.disable(id);
+
+    await auditLogService.createAuditLog({
+      userId: adminId,
+      action: 'DEACTIVATE',
+      entityName: 'FlashSale',
+      entityId: id,
+      oldValues: {
+        isActive: existing.isActive
+      },
+      newValues: {
+        isActive: flashSale.isActive
+      }
+    });
+
+    return flashSale;
   },
+  
   getActiveFlashSale: async () => {
   const flashSale = await flashSaleRepository.findActiveFlashSale();
 

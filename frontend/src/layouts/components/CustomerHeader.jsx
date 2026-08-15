@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../features/auth/store/authContext';
 import { categoryApi } from '../../features/category/api/categoryApi';
 import { useCart } from '../../features/cart/hooks/CartContext';
 import { storeSettingApi } from '../../features/storeSetting/api/storeSettingApi';
+import SearchBox from '../../features/search/components/SearchBox';
 
 const CustomerHeader = () => {
   const navigate = useNavigate();
@@ -13,15 +14,9 @@ const CustomerHeader = () => {
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
   const [categories, setCategories] = useState([]);
 
-const [searchParams, setSearchParams] = useSearchParams();
-  const [keyword, setKeyword] = useState(searchParams.get('search') || '');
   const [store, setStore] = useState({
   storeName: 'FashionHub',
   logoUrl: ''});
-
-  useEffect(() => {
-    setKeyword(searchParams.get('search') || '');
-  }, [searchParams]);
 
   useEffect(() => {
   const fetchStore = async () => {
@@ -40,21 +35,6 @@ const [searchParams, setSearchParams] = useSearchParams();
 
   fetchStore();
 }, []);
-
-  const handleSearchSubmit = (e) => {
-    e.preventDefault();
-    console.log("👉 HEADER: Đã bấm tìm kiếm! Từ khóa đang gõ là:", keyword);
-    
-    if (keyword.trim()) {
-      const searchUrl = `/products?search=${encodeURIComponent(keyword.trim())}`;
-      console.log("👉 HEADER: Đang chuyển hướng sang URL:", searchUrl);
-      
-      navigate(searchUrl); 
-    } else {
-      console.log("👉 HEADER: Từ khóa rỗng, đẩy về trang products gốc.");
-      navigate('/products');
-    }
-  };
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -120,22 +100,8 @@ const [searchParams, setSearchParams] = useSearchParams();
       </p>
   </div>
 </Link>
-        <div className="flex-1 max-w-4xl">
-        <form onSubmit={handleSearchSubmit} className="flex h-11 w-full items-center rounded-sm border-2 border-[#ee4d2d] bg-white overflow-hidden shadow-sm">
-        <input
-          type="text"
-          value={keyword} 
-          onChange={(e) => setKeyword(e.target.value)} 
-          placeholder="Tìm kiếm áo thun, quần jean, voucher giảm 50%..."
-          className="h-full flex-1 bg-transparent px-4 text-sm text-gray-700 outline-none"
-        />
-        <button
-          type="submit"
-          className="flex h-full px-8 items-center justify-center bg-[#ee4d2d] text-white hover:bg-[#d74123] transition-colors font-medium"
-        >
-          Tìm Kiếm
-        </button>
-      </form>
+      <div className="flex-1 max-w-4xl">
+      <SearchBox />
         </div>
         <div className="flex items-center gap-8 shrink-0">
           <Link to="/cart" className="relative cursor-pointer group flex items-center">

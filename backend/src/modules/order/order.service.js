@@ -4,6 +4,7 @@ const { ORDER_MESSAGES, ORDER_STATUS, ORDER_CANCELLED_BY  } = require('./order.c
 const paginationHelper = require('../../utils/pagination');
 const prisma = require('../../config/database');
 const { PAYMENT_METHOD, PAYMENT_MESSAGES, PAYMENT_STATUS} = require('../payment/payment.constants');
+const auditLogService = require('../auditLog/auditLog.service');
 
 const ORDER_EXPIRE_MINUTES =
   Number(process.env.ORDER_EXPIRE_MINUTES) || 30;
@@ -127,7 +128,7 @@ previewOrder: async (userId, payload) => {
     };
   },
 
-  createOrder: async (userId, payload) => {
+ createOrder: async (userId, payload) => {
   const {
     cartItemIds,
     province,
@@ -138,17 +139,20 @@ previewOrder: async (userId, payload) => {
     note
   } = payload;
 
- const paymentMethod = payload.paymentMethod?.trim().toUpperCase();
+  const paymentMethod = payload.paymentMethod?.trim().toUpperCase();
 
-if (!paymentMethod) {
-  throw new Error(PAYMENT_MESSAGES.INVALID_PAYMENT_METHOD);
-}
+  if (!paymentMethod) {
+    throw new Error(PAYMENT_MESSAGES.INVALID_PAYMENT_METHOD);
+  }
 
-if (!Object.values(PAYMENT_METHOD).includes(paymentMethod)) {
-  throw new Error(PAYMENT_MESSAGES.INVALID_PAYMENT_METHOD);
-}
+  if (!Object.values(PAYMENT_METHOD).includes(paymentMethod)) {
+    throw new Error(PAYMENT_MESSAGES.INVALID_PAYMENT_METHOD);
+  }
 
-  const calcData = await orderService.calculateOrderData(userId, payload);
+  const calcData = await orderService.calculateOrderData(
+    userId,
+    payload
+  );
 
   const orderNumber = `ORD-${Math.floor(Date.now() / 1000)}`;
 
@@ -176,6 +180,20 @@ if (!Object.values(PAYMENT_METHOD).includes(paymentMethod)) {
     couponId: calcData.appliedCouponId,
     userId,
     paymentMethod
+  });
+
+  await auditLogService.createAuditLog({
+    userId,
+    action: 'CREATE',
+    entityName: 'Order',
+    entityId: order.id,
+    oldValues: null,
+    newValues: {
+      orderNumber: order.orderNumber,
+      status: order.status,
+      totalAmount: order.totalAmount,
+      paymentMethod
+    }
   });
 
   return {
@@ -220,6 +238,11 @@ cancelOrder: async (
     );
   }
 
+  const oldValues = {
+    status: order.status,
+    paymentStatus: order.payment?.status
+  };
+
   await orderRepository.restoreOrderResourcesTransaction(
     order.id
   );
@@ -229,13 +252,30 @@ cancelOrder: async (
       ? PAYMENT_STATUS.REFUNDED
       : PAYMENT_STATUS.CANCELLED;
 
+  const reason =
+    cancelReason.trim() ||
+    'Khách hàng hủy đơn.';
+
   await orderRepository.cancelOrderTransaction({
     orderId: order.id,
     paymentId: order.payment.id,
     paymentStatus,
     cancelledBy: ORDER_CANCELLED_BY.CUSTOMER,
-    cancelReason:
-      cancelReason.trim() || 'Khách hàng hủy đơn.'
+    cancelReason: reason
+  });
+
+  await auditLogService.createAuditLog({
+    userId,
+    action: 'CANCEL',
+    entityName: 'Order',
+    entityId: order.id,
+    oldValues,
+    newValues: {
+      status: ORDER_STATUS.CANCELLED,
+      paymentStatus,
+      cancelledBy: ORDER_CANCELLED_BY.CUSTOMER,
+      cancelReason: reason
+    }
   });
 
   return {
@@ -340,7 +380,7 @@ getOrdersForAdmin: async (query) => {
     return order;
   },
 
-  updateOrderStatusByAdmin: async (orderId, status) => {
+updateOrderStatusByAdmin: async ( adminId, orderId, status ) => {
   if (!Object.values(ORDER_STATUS).includes(status)) {
     throw new Error(`Trạng thái [${status}] không hợp lệ!`);
   }
@@ -362,6 +402,10 @@ getOrdersForAdmin: async (query) => {
   const items = existingOrder.items || [];
 
   try {
+      const oldValues = {
+      status: existingOrder.status,
+      paymentStatus: existingOrder.payment?.status
+    };
     const result = await prisma.$transaction(async tx => {
 
       const updated = await tx.order.update({
@@ -450,6 +494,21 @@ getOrdersForAdmin: async (query) => {
 
       return updated;
     });
+    await auditLogService.createAuditLog({
+    userId: adminId,
+    action: 'UPDATE_STATUS',
+    entityName: 'Order',
+    entityId: orderId,
+    oldValues,
+    newValues: {
+      status: result.status,
+      paymentStatus:
+        status === ORDER_STATUS.COMPLETED &&
+        existingOrder.payment?.paymentMethod === PAYMENT_METHOD.COD
+          ? PAYMENT_STATUS.SUCCESS
+          : existingOrder.payment?.status
+    }
+  });
 
     return result;
 
@@ -460,6 +519,7 @@ getOrdersForAdmin: async (query) => {
 },
 
 cancelOrderByAdmin: async (
+  adminId,
   orderId,
   cancelReason = ''
 ) => {
@@ -488,6 +548,11 @@ cancelOrderByAdmin: async (
     );
   }
 
+  const oldValues = {
+    status: order.status,
+    paymentStatus: order.payment?.status
+  };
+
   await orderRepository.restoreOrderResourcesTransaction(
     order.id
   );
@@ -497,13 +562,30 @@ cancelOrderByAdmin: async (
       ? PAYMENT_STATUS.REFUNDED
       : PAYMENT_STATUS.CANCELLED;
 
+  const reason =
+    cancelReason.trim() ||
+    'Quản trị viên hủy đơn.';
+
   await orderRepository.cancelOrderTransaction({
     orderId: order.id,
     paymentId: order.payment.id,
     paymentStatus,
     cancelledBy: ORDER_CANCELLED_BY.ADMIN,
-    cancelReason:
-      cancelReason.trim() || 'Quản trị viên hủy đơn.'
+    cancelReason: reason
+  });
+
+  await auditLogService.createAuditLog({
+    userId: adminId,
+    action: 'CANCEL',
+    entityName: 'Order',
+    entityId: order.id,
+    oldValues,
+    newValues: {
+      status: ORDER_STATUS.CANCELLED,
+      paymentStatus,
+      cancelledBy: ORDER_CANCELLED_BY.ADMIN,
+      cancelReason: reason
+    }
   });
 
   return {

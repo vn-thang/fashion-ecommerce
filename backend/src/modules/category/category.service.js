@@ -2,6 +2,7 @@ const categoryRepository = require('./category.repository');
 const { MESSAGES } = require('./category.constants');
 const slugify = require('slugify');
 const paginationHelper = require('../../utils/pagination');
+const auditLogService = require('../auditLog/auditLog.service');
 
 const validateMaxDepth = async parentId => {
   if (!parentId) return;
@@ -30,17 +31,17 @@ const validateMaxDepth = async parentId => {
 };
 
 const categoryService = {
-  createCategory: async ({
-    name,
-    parentId,
-    description
-  }) => {
+ createCategory: async (
+    { name, parentId, description },
+    userId
+  ) => {
     const slug = slugify(name, {
       lower: true,
       strict: true
     });
 
-    const existed = await categoryRepository.findBySlug(slug);
+    const existed =
+      await categoryRepository.findBySlug(slug);
 
     if (existed) {
       throw new Error(MESSAGES.SLUG_EXISTED);
@@ -50,13 +51,23 @@ const categoryService = {
       await validateMaxDepth(parentId);
     }
 
-    return categoryRepository.create({
+    const category = await categoryRepository.create({
       name,
       slug,
       parentId,
       description,
       status: 'ACTIVE'
     });
+
+    await auditLogService.createAuditLog({
+      userId,
+      action: 'CREATE',
+      entityName: 'Category',
+      entityId: category.id,
+      newValues: category
+    });
+
+    return category;
   },
 
   getAllCategories: async query => {
@@ -101,18 +112,35 @@ const categoryService = {
 
   updateCategory: async (
     id,
-    { name, parentId, description }
+    { name, parentId, description },
+    userId
   ) => {
+    const oldCategory =
+      await categoryRepository.findById(id);
+
+    if (!oldCategory) {
+      throw new Error(MESSAGES.CATEGORY_NOT_FOUND);
+    }
+
     const data = {
       description
     };
 
     if (name) {
-      data.name = name;
-      data.slug = slugify(name, {
+      const slug = slugify(name, {
         lower: true,
         strict: true
       });
+
+      const existed =
+        await categoryRepository.findBySlug(slug);
+
+      if (existed && existed.id !== id) {
+        throw new Error(MESSAGES.SLUG_EXISTED);
+      }
+
+      data.name = name;
+      data.slug = slug;
     }
 
     if (parentId !== undefined) {
@@ -129,44 +157,82 @@ const categoryService = {
       data.parentId = parentId;
     }
 
-    return categoryRepository.update(id, data);
+    const updatedCategory =
+      await categoryRepository.update(id, data);
+
+    await auditLogService.createAuditLog({
+      userId,
+      action: 'UPDATE',
+      entityName: 'Category',
+      entityId: id,
+      oldValues: oldCategory,
+      newValues: updatedCategory
+    });
+
+    return updatedCategory;
   },
 
-  deactivateCategory: async id => {
-    const category = await categoryRepository.findById(id);
+ deactivateCategory: async (id, userId) => {
+    const category =
+      await categoryRepository.findById(id);
 
     if (!category) {
       throw new Error(MESSAGES.CATEGORY_NOT_FOUND);
     }
 
-    return categoryRepository.deactivate(id);
+    const updatedCategory =
+      await categoryRepository.deactivate(id);
+
+    await auditLogService.createAuditLog({
+      userId,
+      action: 'DEACTIVATE',
+      entityName: 'Category',
+      entityId: id,
+      oldValues: category,
+      newValues: updatedCategory
+    });
+
+    return updatedCategory;
   },
 
-activateCategory: async id => {
-  const category = await categoryRepository.findById(id);
+ activateCategory: async (id, userId) => {
+    const category =
+      await categoryRepository.findById(id);
 
-  if (!category) {
-    throw new Error(MESSAGES.CATEGORY_NOT_FOUND);
-  }
-
-  if (category.status === 'ACTIVE') {
-    return category;
-  }
-
-  if (category.parentId) {
-    const parent = await categoryRepository.findById(
-      category.parentId
-    );
-
-    if (parent?.status === 'INACTIVE') {
-      throw new Error(
-        'Không thể kích hoạt danh mục con khi danh mục cha đang bị ẩn!'
-      );
+    if (!category) {
+      throw new Error(MESSAGES.CATEGORY_NOT_FOUND);
     }
-  }
 
-  return categoryRepository.activate(id);
-}
+    if (category.status === 'ACTIVE') {
+      return category;
+    }
+
+    if (category.parentId) {
+      const parent =
+        await categoryRepository.findById(
+          category.parentId
+        );
+
+      if (parent?.status === 'INACTIVE') {
+        throw new Error(
+          'Không thể kích hoạt danh mục con khi danh mục cha đang bị ẩn!'
+        );
+      }
+    }
+     const updatedCategory =
+      await categoryRepository.activate(id);
+
+    await auditLogService.createAuditLog({
+      userId,
+      action: 'ACTIVATE',
+      entityName: 'Category',
+      entityId: id,
+      oldValues: category,
+      newValues: updatedCategory
+    });
+
+    return updatedCategory;
+  },
 };
 
 module.exports = categoryService;

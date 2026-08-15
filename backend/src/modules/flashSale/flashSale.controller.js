@@ -4,7 +4,7 @@ const { sendSuccess, sendError } = require('../../utils/response');
 const flashSaleController = {
   create: async (req, res) => {
     try {
-      const result = await flashSaleService.createFlashSale(req.body);
+      const result = await flashSaleService.createFlashSale(req.body, req.user.userId);
       return sendSuccess(res, 201, 'Tạo chương trình Flash Sale thành công!', result);
     } catch (err) {
       return sendError(res, 400, err.message);
@@ -31,7 +31,7 @@ const flashSaleController = {
 
   update: async (req, res) => {
     try {
-      const result = await flashSaleService.updateFlashSale(req.params.id, req.body);
+      const result = await flashSaleService.updateFlashSale(req.params.id, req.body, req.user.userId);
       return sendSuccess(res, 200, 'Cập nhật Flash Sale thành công!', result);
     } catch (err) {
       return sendError(res, 400, err.message);
@@ -40,7 +40,7 @@ const flashSaleController = {
 
   disable: async (req, res) => {
     try {
-      await flashSaleService.disableFlashSale(req.params.id);
+      await flashSaleService.disableFlashSale(req.params.id, req.user.userId);
       return sendSuccess(res, 200, 'Ngừng kích hoạt Flash Sale thành công!');
     } catch (err) {
       return sendError(res, 400, err.message);
