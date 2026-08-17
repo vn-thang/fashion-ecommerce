@@ -126,7 +126,61 @@ deactivate: async id => {
       isActive: false
     }
   });
-}
+},
+
+
+  findCouponsReadyForNotification: async () => {
+    const now = new Date();
+
+    return await prisma.coupon.findMany({
+      where: {
+        isActive: true,
+
+        notificationSent: false,
+
+        startDate: {
+          lte: now
+        },
+
+        endDate: {
+          gt: now
+        },
+
+        // Coupon vẫn còn lượt sử dụng
+        usageLimit: {
+          gt: 0
+        }
+      }
+    });
+  },
+
+  findEligibleUserIdsForNotification: async couponId => {
+    return await prisma.user.findMany({
+      where: {
+        isActive: true,
+        usages: {
+          none: {
+            couponId
+          }
+        }
+      },
+
+      select: {
+        id: true
+      }
+    });
+  },
+
+  markNotificationSent: async id => {
+  return await prisma.coupon.update({
+    where: {
+      id
+    },
+    data: {
+      notificationSent: true
+    }
+  });
+},
 };
 
 module.exports = couponRepository;

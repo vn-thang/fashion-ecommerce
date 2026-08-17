@@ -30,3 +30,5 @@ pnpm-debug.log*
 # Thư mục cấu hình riêng của các IDE như VS Code hoặc WebStorm
 .vscode/
 .idea/
+
+firebase-service-account

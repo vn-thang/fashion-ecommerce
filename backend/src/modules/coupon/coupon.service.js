@@ -2,6 +2,10 @@ const couponRepository = require('./coupon.repository');
 const { MESSAGES } = require('./coupon.constants');
 const { getPagination, getPaginationMetadata } = require('../../utils/pagination');
 const auditLogService = require('../auditLog/auditLog.service');
+const notificationService = require('../notification/notification.service');
+const NOTIFICATION_CONSTANTS = require('../notification/notification.constants');
+
+const { formatCurrency, formatDiscount } = require('./coupon.utils');
 
 const couponService = {
  createCoupon: async (data, adminId) => {
@@ -196,7 +200,75 @@ const couponService = {
     });
 
     return updatedCoupon;
+  },
+
+sendCouponNotifications: async () => {
+  const coupons = await couponRepository.findCouponsReadyForNotification();
+  if (!coupons.length) {
+    return;
   }
+  for (const coupon of coupons) {
+    try {
+      const users = await couponRepository.findEligibleUserIdsForNotification(
+          coupon.id
+        );
+      if (!users.length) {
+        console.log(
+          `[COUPON] No eligible users for coupon ${coupon.code}`
+        );
+        await couponRepository.markNotificationSent(
+          coupon.id
+        );
+        continue;
+      }
+      const discountText =
+        formatDiscount(coupon);
+      const minOrderAmount =
+        formatCurrency(coupon.minOrderAmount);
+      const content =
+        NOTIFICATION_CONSTANTS.COUPON.AVAILABLE_CONTENT({
+          discountText,
+          minOrderAmount
+        });
+
+      const results = await Promise.allSettled(
+        users.map(user =>
+          notificationService.createNotification({
+            userId: user.id,
+            title: NOTIFICATION_CONSTANTS.COUPON.AVAILABLE_TITLE,
+            content,
+            type: NOTIFICATION_CONSTANTS.TYPE.COUPON,
+            data: {
+              couponId: coupon.id
+            }
+          })
+        )
+      );
+      const successCount =
+        results.filter(
+          result => result.status === 'fulfilled'
+        ).length;
+
+      const failedCount = results.filter(
+          result => result.status === 'rejected'
+        ).length;
+      console.log(
+        `[COUPON] ${coupon.code}: ${successCount} notifications sent, ${failedCount} failed`
+      );
+      await couponRepository.markNotificationSent(
+        coupon.id
+      );
+      console.log(
+        `[COUPON] Notification completed: ${coupon.code}`
+      );
+    } catch (error) {
+      console.error(
+        `[COUPON] Failed to notify coupon ${coupon.id}:`,
+        error
+      );
+    }
+  }
+},
 };
 
 module.exports = couponService;

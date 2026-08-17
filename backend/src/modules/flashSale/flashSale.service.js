@@ -2,6 +2,8 @@ const flashSaleRepository = require('./flashSale.repository');
 const { MESSAGES } = require('./flashSale.constants');
 const { getPagination, getPaginationMetadata } = require('../../utils/pagination');
 const auditLogService = require('../auditLog/auditLog.service');
+const notificationService = require('../notification/notification.service');
+const NOTIFICATION_CONSTANTS = require('../notification/notification.constants');
 
 const flashSaleService = {
  createFlashSale: async (
@@ -53,6 +55,43 @@ const flashSaleService = {
     return flashSale;
   },
 
+sendFlashSaleNotifications: async () => {
+  const flashSales =
+    await flashSaleRepository.findFlashSalesReadyForNotification();
+
+  if (!flashSales.length) {
+    return;
+  }
+
+  for (const flashSale of flashSales) {
+    try {
+      await notificationService.notifyAllUsers({
+        title: NOTIFICATION_CONSTANTS.FLASH_SALE.STARTED_TITLE,
+        content:
+          NOTIFICATION_CONSTANTS.FLASH_SALE.STARTED_CONTENT(
+            flashSale.name
+          ),
+        type: NOTIFICATION_CONSTANTS.TYPE.FLASH_SALE,
+        data: {
+          flashSaleId: flashSale.id
+        }
+      });
+
+      await flashSaleRepository.markNotificationSent(
+        flashSale.id
+      );
+
+      console.log(
+        `[FLASH SALE] Notification sent: ${flashSale.name}`
+      );
+    } catch (error) {
+      console.error(
+        `[FLASH SALE] Failed to notify ${flashSale.name}:`,
+        error
+      );
+    }
+  }
+},
 
   getAllFlashSales: async (queryParams = {}) => {
     const { search, page: rawPage, limit: rawLimit } = queryParams;
@@ -113,15 +152,15 @@ const flashSaleService = {
       );
     }
 
-    if (
-      existing.isActive &&
-      existing.startDate <= now &&
-      existing.endDate >= now
-    ) {
-      throw new Error(
-        'Không thể chỉnh sửa Flash Sale đang diễn ra.'
-      );
-    }
+    // if (
+    //   existing.isActive &&
+    //   existing.startDate <= now &&
+    //   existing.endDate >= now
+    // ) {
+    //   throw new Error(
+    //     'Không thể chỉnh sửa Flash Sale đang diễn ra.'
+    //   );
+    // }
 
     const data = {};
 

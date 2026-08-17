@@ -7,6 +7,8 @@ const { ORDER_STATUS } = require('../../constants/orderStatus.constant');
 const { PAYMENT_STATUS } = require('../../constants/paymentStatus.constant');
 const orderRepository = require('../order/order.repository');
 const paginationHelper = require('../../utils/pagination');
+const notificationService = require('../notification/notification.service');
+const NOTIFICATION_CONSTANTS = require('../notification/notification.constants');
 
 const {
   PAYMENT_MESSAGES,
@@ -61,40 +63,34 @@ const paymentService = {
 },
 
 handleReturn: async query => {
-  if (!paymentUtils.verifySecureHash(query))
+  if (!paymentUtils.verifySecureHash(query)) {
     throw new Error(PAYMENT_MESSAGES.INVALID_SIGNATURE);
-
+  }
   const txnRef = query.vnp_TxnRef;
   const responseCode = query.vnp_ResponseCode;
   const transactionNo = query.vnp_TransactionNo || null;
-
   const order = await paymentRepository.findOrderByOrderNumber(txnRef);
-
-  if (
-    order.payment.status !== PAYMENT_STATUS.PENDING
-) {
+  if (!order) {
+    throw new Error(PAYMENT_MESSAGES.ORDER_NOT_FOUND);
+  }
+  if (!order.payment) {
+    throw new Error(PAYMENT_MESSAGES.PAYMENT_NOT_FOUND);
+  }
+  if (order.payment.status !== PAYMENT_STATUS.PENDING) {
     return {
-        success: order.payment.status === PAYMENT_STATUS.SUCCESS,
-        orderId: order.id,
-        orderNumber: order.orderNumber,
-        paymentStatus: order.payment.status,
-        message: 'Đơn hàng đã được xử lý.'
-    };
-}
-
-  if (!order) throw new Error(PAYMENT_MESSAGES.ORDER_NOT_FOUND);
-  if (!order.payment) throw new Error(PAYMENT_MESSAGES.PAYMENT_NOT_FOUND);
-  if (Number(query.vnp_Amount) / 100 !== Number(order.totalAmount))
-    throw new Error(PAYMENT_MESSAGES.INVALID_AMOUNT);
-
-  if (order.payment.status === PAYMENT_STATUS.SUCCESS) {
-    return {
-      success: true,
+      success: order.payment.status === PAYMENT_STATUS.SUCCESS,
       orderId: order.id,
       orderNumber: order.orderNumber,
-      paymentStatus: PAYMENT_STATUS.SUCCESS,
-      message: PAYMENT_MESSAGES.PAYMENT_SUCCESS
+      paymentStatus: order.payment.status,
+      message: 'Đơn hàng đã được xử lý.'
     };
+  }
+
+  if (
+    Number(query.vnp_Amount) / 100 !==
+    Number(order.totalAmount)
+  ) {
+    throw new Error(PAYMENT_MESSAGES.INVALID_AMOUNT);
   }
 
   const paymentStatus =
@@ -118,15 +114,103 @@ handleReturn: async query => {
       transactionRef: txnRef,
       transactionNo,
       gatewayResponseCode: responseCode,
-      paidAt: paymentStatus === PAYMENT_STATUS.SUCCESS ? new Date() : null
+      paidAt:
+        paymentStatus === PAYMENT_STATUS.SUCCESS
+          ? new Date()
+          : null
     }
   });
 
   if (paymentStatus === PAYMENT_STATUS.SUCCESS) {
     await orderRepository.deleteCartItemsByOrder(order.id);
-} else {
-    await orderRepository.restoreOrderResourcesTransaction(order.id);
-}
+  } else {
+    await orderRepository.restoreOrderResourcesTransaction(
+      order.id
+    );
+  }
+  try {
+    if (paymentStatus === PAYMENT_STATUS.SUCCESS) {
+      await notificationService.createNotification({
+        userId: order.userId,
+        title: 'Thanh toán thành công',
+        content: `Thanh toán đơn hàng ${order.orderNumber} thành công.`,
+        type: NOTIFICATION_CONSTANTS.TYPE.PAYMENT_SUCCESS,
+        data: {
+          orderId: order.id,
+          orderNumber: order.orderNumber
+        }
+      });
+
+       await notificationService.notifyAdmins({
+      title: NOTIFICATION_CONSTANTS.ADMIN.PAYMENT_SUCCESS_TITLE,
+      content:
+        NOTIFICATION_CONSTANTS.ADMIN.PAYMENT_SUCCESS_CONTENT(
+          order.orderNumber
+        ),
+      type: NOTIFICATION_CONSTANTS.TYPE.ADMIN_PAYMENT_SUCCESS,
+      data: {
+        orderId: order.id,
+        orderNumber: order.orderNumber,
+        paymentStatus
+      }
+    });
+    } else if (paymentStatus === PAYMENT_STATUS.CANCELLED) {
+      await notificationService.createNotification({
+        userId: order.userId,
+        title: 'Thanh toán đã bị hủy',
+        content: `Thanh toán đơn hàng ${order.orderNumber} đã bị hủy.`,
+        type: NOTIFICATION_CONSTANTS.TYPE.PAYMENT_FAILED,
+        data: {
+          orderId: order.id,
+          orderNumber: order.orderNumber
+        }
+      });
+
+       await notificationService.notifyAdmins({
+      title: NOTIFICATION_CONSTANTS.ADMIN.PAYMENT_CANCELLED_TITLE,
+      content:
+        NOTIFICATION_CONSTANTS.ADMIN.PAYMENT_CANCELLED_CONTENT(
+          order.orderNumber
+        ),
+      type: NOTIFICATION_CONSTANTS.TYPE.ADMIN_PAYMENT_CANCELLED,
+      data: {
+        orderId: order.id,
+        orderNumber: order.orderNumber,
+        paymentStatus
+      }
+    });
+    } else {
+      await notificationService.createNotification({
+        userId: order.userId,
+        title: 'Thanh toán thất bại',
+        content: `Thanh toán đơn hàng ${order.orderNumber} không thành công.`,
+        type: NOTIFICATION_CONSTANTS.TYPE.PAYMENT_FAILED,
+        data: {
+          orderId: order.id,
+          orderNumber: order.orderNumber
+        }
+      });
+
+        await notificationService.notifyAdmins({
+      title: NOTIFICATION_CONSTANTS.ADMIN.PAYMENT_FAILED_TITLE,
+      content:
+        NOTIFICATION_CONSTANTS.ADMIN.PAYMENT_FAILED_CONTENT(
+          order.orderNumber
+        ),
+      type: NOTIFICATION_CONSTANTS.TYPE.ADMIN_PAYMENT_FAILED,
+      data: {
+        orderId: order.id,
+        orderNumber: order.orderNumber,
+        paymentStatus
+      }
+    });
+    }
+  } catch (notificationError) {
+    console.error(
+      '[NOTIFICATION] Payment notification failed:',
+      notificationError
+    );
+  }
 
   return paymentStatus === PAYMENT_STATUS.SUCCESS
     ? {
@@ -151,30 +235,47 @@ handleReturn: async query => {
 },
 
 handleIpn: async query => {
-  if (!paymentUtils.verifySecureHash(query))
-    return { RspCode: '97', Message: 'Invalid Checksum' };
-
+  if (!paymentUtils.verifySecureHash(query)) {
+    return {
+      RspCode: '97',
+      Message: 'Invalid Checksum'
+    };
+  }
   const txnRef = query.vnp_TxnRef;
   const responseCode = query.vnp_ResponseCode;
   const transactionNo = query.vnp_TransactionNo || null;
-  const order = await paymentRepository.findOrderByOrderNumber(txnRef);
+  const order =
+    await paymentRepository.findOrderByOrderNumber(txnRef);
+
+  if (!order) {
+    return {
+      RspCode: '01',
+      Message: 'Order not Found'
+    };
+  }
+
+  if (!order.payment) {
+    return {
+      RspCode: '01',
+      Message: 'Payment not Found'
+    };
+  }
+  if (order.payment.status !== PAYMENT_STATUS.PENDING) {
+    return {
+      RspCode: '00',
+      Message: 'Confirm Success'
+    };
+  }
 
   if (
-    order.payment.status !== PAYMENT_STATUS.PENDING
-) {
+    Number(query.vnp_Amount) / 100 !==
+    Number(order.totalAmount)
+  ) {
     return {
-        RspCode: '00',
-        Message: 'Confirm Success'
+      RspCode: '04',
+      Message: 'Invalid Amount'
     };
-}
-
-  if (!order) return { RspCode: '01', Message: 'Order not Found' };
-  if (!order.payment) return { RspCode: '01', Message: 'Payment not Found' };
-  if (order.payment.status === PAYMENT_STATUS.SUCCESS)
-    return { RspCode: '00', Message: 'Confirm Success' };
-
-  if (Number(query.vnp_Amount) / 100 !== Number(order.totalAmount))
-    return { RspCode: '04', Message: 'Invalid Amount' };
+  }
 
   const paymentStatus =
     responseCode === VNPAY_RESPONSE_CODE.SUCCESS
@@ -197,17 +298,108 @@ handleIpn: async query => {
       transactionRef: txnRef,
       transactionNo,
       gatewayResponseCode: responseCode,
-      paidAt: paymentStatus === PAYMENT_STATUS.SUCCESS ? new Date() : null
+      paidAt:
+        paymentStatus === PAYMENT_STATUS.SUCCESS
+          ? new Date()
+          : null
     }
   });
 
   if (paymentStatus === PAYMENT_STATUS.SUCCESS) {
     await orderRepository.deleteCartItemsByOrder(order.id);
-} else {
-    await orderRepository.restoreOrderResourcesTransaction(order.id);
-}
+  } else {
+    await orderRepository.restoreOrderResourcesTransaction(
+      order.id
+    );
+  }
+  try {
+    if (paymentStatus === PAYMENT_STATUS.SUCCESS) {
+      await notificationService.createNotification({
+        userId: order.userId,
+        title: 'Thanh toán thành công',
+        content: `Thanh toán đơn hàng ${order.orderNumber} thành công.`,
+        type: NOTIFICATION_CONSTANTS.TYPE.PAYMENT_SUCCESS,
+        data: {
+          orderId: order.id,
+          orderNumber: order.orderNumber
+        }
+      });
 
-  return { RspCode: '00', Message: 'Confirm Success' };
+       await notificationService.notifyAdmins({
+      title: NOTIFICATION_CONSTANTS.ADMIN.PAYMENT_SUCCESS_TITLE,
+      content:
+        NOTIFICATION_CONSTANTS.ADMIN.PAYMENT_SUCCESS_CONTENT(
+          order.orderNumber
+        ),
+      type: NOTIFICATION_CONSTANTS.TYPE.ADMIN_PAYMENT_SUCCESS,
+      data: {
+        orderId: order.id,
+        orderNumber: order.orderNumber,
+        paymentStatus
+      }
+    });
+    } else if (paymentStatus === PAYMENT_STATUS.CANCELLED) {
+      await notificationService.createNotification({
+        userId: order.userId,
+        title: 'Thanh toán đã bị hủy',
+        content: `Thanh toán đơn hàng ${order.orderNumber} đã bị hủy.`,
+        type: NOTIFICATION_CONSTANTS.TYPE.PAYMENT_FAILED,
+        data: {
+          orderId: order.id,
+          orderNumber: order.orderNumber
+        }
+      });
+
+       await notificationService.notifyAdmins({
+      title: NOTIFICATION_CONSTANTS.ADMIN.PAYMENT_CANCELLED_TITLE,
+      content:
+        NOTIFICATION_CONSTANTS.ADMIN.PAYMENT_CANCELLED_CONTENT(
+          order.orderNumber
+        ),
+      type: NOTIFICATION_CONSTANTS.TYPE.ADMIN_PAYMENT_CANCELLED,
+      data: {
+        orderId: order.id,
+        orderNumber: order.orderNumber,
+        paymentStatus
+      }
+    }); 
+    } else {
+      await notificationService.createNotification({
+        userId: order.userId,
+        title: 'Thanh toán thất bại',
+        content: `Thanh toán đơn hàng ${order.orderNumber} không thành công.`,
+        type: NOTIFICATION_CONSTANTS.TYPE.PAYMENT_FAILED,
+        data: {
+          orderId: order.id,
+          orderNumber: order.orderNumber
+        }
+      });
+
+        await notificationService.notifyAdmins({
+      title: NOTIFICATION_CONSTANTS.ADMIN.PAYMENT_FAILED_TITLE,
+      content:
+        NOTIFICATION_CONSTANTS.ADMIN.PAYMENT_FAILED_CONTENT(
+          order.orderNumber
+        ),
+      type: NOTIFICATION_CONSTANTS.TYPE.ADMIN_PAYMENT_FAILED,
+      data: {
+        orderId: order.id,
+        orderNumber: order.orderNumber,
+        paymentStatus
+      }
+    });
+    }
+  } catch (notificationError) {
+    console.error(
+      '[NOTIFICATION] Payment notification failed:',
+      notificationError
+    );
+  }
+
+  return {
+    RspCode: '00',
+    Message: 'Confirm Success'
+  };
 },
 
 getPayments: async (query) => {

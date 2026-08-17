@@ -9,6 +9,8 @@ const mailService = require('../../services/email.service');
 const {
   generatePasswordResetToken
 } = require('../../utils/passwordResetToken');
+const notificationService = require('../notification/notification.service');
+const NOTIFICATION_CONSTANTS = require('../notification/notification.constants');
 
 // Các hàm helper nội bộ để ký Token
 const signAccessToken = (userId, role) => {
@@ -236,6 +238,24 @@ changePassword: async (userId, oldPassword, newPassword) => {
     entityName: 'User',
     entityId: userId
   });
+
+try {
+  await notificationService.createNotification({
+    userId,
+    title: NOTIFICATION_CONSTANTS.ACCOUNT.PASSWORD_CHANGED_TITLE,
+    content:
+      NOTIFICATION_CONSTANTS.ACCOUNT.PASSWORD_CHANGED_CONTENT,
+    type: NOTIFICATION_CONSTANTS.TYPE.PASSWORD_CHANGED,
+    data: {
+      type: NOTIFICATION_CONSTANTS.TYPE.PASSWORD_CHANGED
+    }
+  });
+} catch (error) {
+  console.error(
+    '[NOTIFICATION] Password changed notification failed:',
+    error.message
+  );
+}
 
   return {
     message: 'Đổi mật khẩu thành công! Vui lòng đăng nhập lại.'

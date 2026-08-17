@@ -72,8 +72,16 @@ const orderRepository = {
     });
   },
 
-  createOrderTransaction: async ({ orderData, orderItemsData, cartItemIds, couponId, userId, paymentMethod }) => {
-    return await prisma.$transaction(async tx => {
+  createOrderTransaction: async ({
+  orderData,
+  orderItemsData,
+  cartItemIds,
+  couponId,
+  userId,
+  paymentMethod
+}) => {
+  return await prisma.$transaction(async tx => {
+    const lowStockVariants = [];
 
     for (const item of orderItemsData) {
       const variant = await tx.productVariant.findUnique({
@@ -83,24 +91,33 @@ const orderRepository = {
       });
 
       if (!variant || variant.status !== 'ACTIVE') {
-        throw new Error(`Sản phẩm [${item.productName}] hiện tại không còn tồn tại hoặc đã ngừng bán!`);
+        throw new Error(
+          `Sản phẩm [${item.productName}] hiện tại không còn tồn tại hoặc đã ngừng bán!`
+        );
       }
 
       if (variant.stockQuantity < item.quantity) {
         throw new Error(
-          `Sản phẩm [${item.productName}] (Màu: ${item.color || 'N/A'}, Size: ${item.size || 'N/A'}) chỉ còn ${variant.stockQuantity} sản phẩm trong kho. Không đủ đáp ứng số lượng bạn yêu cầu!`
+          `Sản phẩm [${item.productName}] (Màu: ${
+            item.color || 'N/A'
+          }, Size: ${item.size || 'N/A'}) chỉ còn ${
+            variant.stockQuantity
+          } sản phẩm trong kho. Không đủ đáp ứng số lượng bạn yêu cầu!`
         );
       }
 
       if (item.flashSaleVariantId) {
-        const flashSaleVariant = await tx.flashSaleVariant.findUnique({
-          where: {
-            id: item.flashSaleVariantId
-          }
-        });
+        const flashSaleVariant =
+          await tx.flashSaleVariant.findUnique({
+            where: {
+              id: item.flashSaleVariantId
+            }
+          });
 
         if (!flashSaleVariant) {
-          throw new Error(`Flash Sale của sản phẩm [${item.productName}] không tồn tại!`);
+          throw new Error(
+            `Flash Sale của sản phẩm [${item.productName}] không tồn tại!`
+          );
         }
 
         if (flashSaleVariant.flashSaleStock < item.quantity) {
@@ -120,6 +137,9 @@ const orderRepository = {
           }
         });
       }
+
+      const remainingStock =
+        variant.stockQuantity - item.quantity;
 
       await tx.productVariant.update({
         where: {
@@ -141,6 +161,22 @@ const orderRepository = {
           createdBy: userId
         }
       });
+
+    const LOW_STOCK_THRESHOLD = 5;
+
+    if (
+      variant.stockQuantity > LOW_STOCK_THRESHOLD &&
+      remainingStock <= LOW_STOCK_THRESHOLD
+    ) {
+      lowStockVariants.push({
+        productId: variant.productId,
+        variantId: variant.id,
+        productName: item.productName,
+        color: item.color,
+        size: item.size,
+        stockQuantity: remainingStock
+      });
+    }
     }
 
     const order = await tx.order.create({
@@ -173,7 +209,10 @@ const orderRepository = {
       }
     });
 
-    if (paymentMethod === PAYMENT_METHOD.COD && cartItemIds?.length) {
+    if (
+      paymentMethod === PAYMENT_METHOD.COD &&
+      cartItemIds?.length
+    ) {
       await tx.cartItem.deleteMany({
         where: {
           id: {
@@ -204,7 +243,7 @@ const orderRepository = {
       });
     }
 
-    return await tx.order.findUnique({
+    const createdOrder = await tx.order.findUnique({
       where: {
         id: order.id
       },
@@ -212,8 +251,14 @@ const orderRepository = {
         payment: true
       }
     });
+
+    return {
+      order: createdOrder,
+      lowStockVariants
+    };
   });
 },
+
 findOrdersByUserId: async (userId, skip, limit, status) => {
     const whereCondition = { userId: userId };
     if (status && status.trim() !== '') {

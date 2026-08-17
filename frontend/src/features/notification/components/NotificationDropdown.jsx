@@ -1,0 +1,80 @@
+import React, { useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
+
+import Button from '../../../shared/components/Button';
+import NotificationList from './NotificationList';
+
+import { useNotification } from '../hooks/useNotification';
+import { NotificationContext } from '../context/NotificationContext';
+
+const NotificationDropdown = ({ onClose }) => {
+  const navigate = useNavigate();
+
+  const {
+    loading,
+    notifications,
+    unreadCount,
+    markAsRead,
+    markAllAsRead
+  } = useNotification();
+
+const {
+  openNotification
+} = useContext(NotificationContext);
+
+  const handleViewAll = () => {
+    onClose();
+    navigate('/admin/notifications');
+  };
+
+  const handleOpenNotification = notification => {
+    openNotification(notification);
+  };
+
+  return (
+    <div className="absolute right-0 top-12 z-50 w-[380px] overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-xl shadow-gray-900/10">
+      <div className="flex items-center justify-between border-b border-gray-100 bg-white px-5 py-4">
+        <div>
+          <h2 className="text-base font-bold text-gray-900">
+            Thông báo
+          </h2>
+
+          {unreadCount > 0 && (
+            <p className="mt-0.5 text-xs text-gray-500">
+              {unreadCount} thông báo chưa đọc
+            </p>
+          )}
+        </div>
+
+        {unreadCount > 0 && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={markAllAsRead}
+          >
+            Đọc tất cả
+          </Button>
+        )}
+      </div>
+      <div className="max-h-[420px] overflow-y-auto">
+        <NotificationList
+          notifications={notifications.slice(0, 5)}
+          loading={loading}
+          onRead={markAsRead}
+          onOpen={handleOpenNotification}
+        />
+      </div>
+      <div className="border-t border-gray-100 bg-gray-50/70 p-3">
+        <button
+          type="button"
+          onClick={handleViewAll}
+          className="w-full rounded-lg py-2.5 text-center text-sm font-semibold text-indigo-600 transition-colors hover:bg-indigo-50"
+        >
+          Xem tất cả thông báo
+        </button>
+      </div>
+    </div>
+  );
+};
+
+export default NotificationDropdown;

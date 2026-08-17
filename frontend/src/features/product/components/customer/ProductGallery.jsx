@@ -7,10 +7,6 @@ const ProductGallery = ({
   setActiveImage
 }) => {
   const [isZoomOpen, setIsZoomOpen] = useState(false);
-
-  // =========================
-  // PRODUCT IMAGES
-  // =========================
   const productImages =
     product.images
       ?.slice()
@@ -27,22 +23,15 @@ const ProductGallery = ({
     ...productImages
   ].filter(Boolean);
 
-  // =========================
-  // IMAGE ĐANG HIỂN THỊ
-  // =========================
   const currentImage =
     activeImage || allImages[0];
 
-  // =========================
-  // ĐẢM BẢO ACTIVE IMAGE HỢP LỆ
-  // =========================
   useEffect(() => {
     if (!activeImage && allImages.length > 0) {
       setActiveImage(allImages[0]);
     }
   }, [activeImage, allImages, setActiveImage]);
 
-  // Không có ảnh
   if (!allImages.length) {
     return (
       <div className="w-full md:w-[50%]">
@@ -65,14 +54,7 @@ const ProductGallery = ({
 
   return (
     <>
-      {/* =====================================
-          GALLERY CONTAINER
-      ====================================== */}
       <div className="w-full md:w-[50%] min-w-0">
-
-        {/* =====================================
-            MAIN IMAGE
-        ====================================== */}
         <div
           className="
             relative
@@ -98,8 +80,6 @@ const ProductGallery = ({
               duration-300
             "
           />
-
-          {/* Overlay khi hover */}
           <div
             className="
               absolute
@@ -110,8 +90,6 @@ const ProductGallery = ({
               pointer-events-none
             "
           />
-
-          {/* Nút / icon Zoom */}
           <div
             className="
               absolute
@@ -132,10 +110,6 @@ const ProductGallery = ({
             🔍 Phóng to
           </div>
         </div>
-
-        {/* =====================================
-            THUMBNAILS
-        ====================================== */}
         <div
           className="
             flex
@@ -187,10 +161,6 @@ const ProductGallery = ({
           })}
         </div>
       </div>
-
-      {/* =====================================
-          ZOOM MODAL
-      ====================================== */}
       {isZoomOpen && (
         <ProductImageZoom
           image={currentImage}
