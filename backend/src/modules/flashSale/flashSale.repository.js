@@ -165,7 +165,34 @@ findById: async (id) => {
             isActive:true
         }
     });
-}
+},
+
+findFlashSalesReadyForNotification: async () => {
+  const now = new Date();
+
+  return await prisma.flashSale.findMany({
+    where: {
+      isActive: true,
+      notificationSent: false,
+      startDate: {
+        lte: now
+      },
+      endDate: {
+        gt: now
+      }
+    }
+  });
+},
+markNotificationSent: async id => {
+  return await prisma.flashSale.update({
+    where: {
+      id
+    },
+    data: {
+      notificationSent: true
+    }
+  });
+},
 };
 
 module.exports = flashSaleRepository;

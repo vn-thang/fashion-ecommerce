@@ -5,6 +5,8 @@ const {
   getPaginationMetadata
 } = require('../../utils/pagination');
 const auditLogService = require('../auditLog/auditLog.service');
+const notificationService = require('../notification/notification.service');
+const NOTIFICATION_CONSTANTS = require('../notification/notification.constants');
 
 const userService = {
 
@@ -186,10 +188,30 @@ updateUserStatus: async (adminId, userId, isActive) => {
       isActive: updatedUser.isActive
     }
   });
+  if (isActive) {
+    await notificationService.createNotification({
+      userId,
+      title: NOTIFICATION_CONSTANTS.ACCOUNT.ACTIVATED_TITLE,
+      content: NOTIFICATION_CONSTANTS.ACCOUNT.ACTIVATED_CONTENT,
+      type: NOTIFICATION_CONSTANTS.TYPE.ACCOUNT_ACTIVATED,
+      data: {
+        type: NOTIFICATION_CONSTANTS.TYPE.ACCOUNT_ACTIVATED
+      }
+    });
+  } else {
+    await notificationService.createNotification({
+      userId,
+      title: NOTIFICATION_CONSTANTS.ACCOUNT.LOCKED_TITLE,
+      content: NOTIFICATION_CONSTANTS.ACCOUNT.LOCKED_CONTENT,
+      type: NOTIFICATION_CONSTANTS.TYPE.ACCOUNT_LOCKED,
+      data: {
+        type: NOTIFICATION_CONSTANTS.TYPE.ACCOUNT_LOCKED
+      }
+    });
+  }
 
   return updatedUser;
-}
-
+},
 };
 
 module.exports = userService;

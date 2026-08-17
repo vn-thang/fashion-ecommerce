@@ -97,14 +97,20 @@ const dashboardRepository = {
       }),
 
       // Sắp hết hàng
-      prisma.productVariant.count({
-        where: {
+   prisma.product.count({
+    where: {
+      status: 'ACTIVE',
+      variants: {
+        some: {
           status: 'ACTIVE',
           stockQuantity: {
+            gt: 0,
             lte: LOW_STOCK_THRESHOLD
           }
         }
-      })
+      }
+    }
+  })
     ]);
 
     return {

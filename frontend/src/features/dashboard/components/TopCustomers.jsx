@@ -88,7 +88,7 @@ const TopCustomers = ({
             <button
               key={customer.id}
               onClick={() =>
-                navigate(`/admin/customers/${customer.id}`)
+                navigate(`/admin/users`)
               }
               className="group flex w-full items-center gap-4 border-b border-gray-100 py-4 text-left transition last:border-none hover:bg-gray-50"
             >

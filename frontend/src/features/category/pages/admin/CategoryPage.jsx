@@ -34,7 +34,7 @@ const CategoryPage = () => {
     handleActivate,
 
     handlePageChange,
-    handleSearchInput,    // thêm dòng này
+    handleSearchInput,   
     handleSearch
   } = useCategory();
 

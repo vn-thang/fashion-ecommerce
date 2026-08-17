@@ -293,6 +293,7 @@ model Coupon {
   startDate         DateTime      @db.Timestamp
   endDate           DateTime      @db.Timestamp
   isActive          Boolean       @default(true)
+  notificationSent Boolean @default(false)
 
   usages            CouponUsage[]
 }
@@ -429,6 +430,7 @@ model FlashSale {
   startDate         DateTime           @db.Timestamp
   endDate           DateTime           @db.Timestamp
   isActive          Boolean            @default(true)
+  notificationSent Boolean @default(false)
   createdAt        DateTime       @default(now()) @db.Timestamp
   updatedAt        DateTime       @updatedAt @db.Timestamp
   flashSaleVariants FlashSaleVariant[]

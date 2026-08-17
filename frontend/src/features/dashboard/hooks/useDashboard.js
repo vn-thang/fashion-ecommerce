@@ -26,7 +26,7 @@ export const useDashboard = () => {
       setLoading(true);
 
       const res = await dashboardApi.getDashboard(currentFilters);
-
+console.log(res.data)
       if (res.success) {
         const data = res.data;
 

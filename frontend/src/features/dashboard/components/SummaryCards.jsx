@@ -47,7 +47,7 @@ const cards = [
     title: 'Chờ xác nhận',
     icon: Clock3,
     color: 'bg-yellow-100 text-yellow-600',
-    path: '/admin/orders',
+    path: '/admin/sales/orders',
     state: {
       status: 'PENDING'
     }
@@ -57,7 +57,7 @@ const cards = [
     title: 'Đang giao',
     icon: Truck,
     color: 'bg-cyan-100 text-cyan-600',
-    path: '/admin/orders',
+    path: '/admin/sales/orders',
     state: {
       status: 'SHIPPING'
     }
@@ -67,7 +67,7 @@ const cards = [
     title: 'Đã hủy',
     icon: XCircle,
     color: 'bg-red-100 text-red-600',
-    path: '/admin/orders',
+    path: '/admin/sales/orders',
     state: {
       status: 'CANCELLED'
     }

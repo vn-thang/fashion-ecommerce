@@ -354,7 +354,6 @@ findProductByIdClient: async id => {
     }
   });
 },
-  // --- CREATE ---
   createProduct: async (data) => {
     return await prisma.product.create({ data });
   },
@@ -375,7 +374,6 @@ findProductByIdClient: async id => {
     });
   },
 
-  // --- UPDATE ---
   updateProduct: async (id, data) => {
     return await prisma.product.update({
       where: { id },
@@ -389,8 +387,6 @@ findProductByIdClient: async id => {
       data
     });
   },
-
-// --- DELETE / DEACTIVATE ---
 
 deactivateProduct: async id => {
   return prisma.product.update({

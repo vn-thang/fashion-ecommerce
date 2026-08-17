@@ -75,26 +75,6 @@ const HomePage = () => {
       )}
 
       <RecentlyViewed />
-
-      <section className="rounded-xl border border-gray-100 bg-white p-8 shadow-sm">
-        <h2 className="text-2xl font-bold text-gray-800">
-          📂 Danh mục nổi bật
-        </h2>
-
-        <p className="mt-2 text-gray-500">
-          (Sẽ phát triển sau)
-        </p>
-      </section>
-
-      <section className="rounded-xl border border-gray-100 bg-white p-8 shadow-sm">
-        <h2 className="text-2xl font-bold text-gray-800">
-          ❤️ Gợi ý cho bạn
-        </h2>
-
-        <p className="mt-2 text-gray-500">
-          (Sẽ phát triển sau)
-        </p>
-      </section>
     </div>
   );
 };

@@ -5,6 +5,7 @@ import { categoryApi } from '../../features/category/api/categoryApi';
 import { useCart } from '../../features/cart/hooks/CartContext';
 import { storeSettingApi } from '../../features/storeSetting/api/storeSettingApi';
 import SearchBox from '../../features/search/components/SearchBox';
+import NotificationBell from '../../features/notification/components/NotificationBell';
 
 const CustomerHeader = () => {
   const navigate = useNavigate();
@@ -114,6 +115,8 @@ const CustomerHeader = () => {
         )}
       </Link>
 
+      {user && <NotificationBell />}
+
 {user ? (
   <div className="group relative flex cursor-pointer items-center gap-2 pb-2">
     <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 text-gray-600 font-bold">
@@ -122,22 +125,40 @@ const CustomerHeader = () => {
     <span className="text-sm font-medium text-gray-700 group-hover:text-[#ee4d2d] transition-colors">
       {user.fullName || user.username}
     </span>
-    <div className="absolute right-0 top-full z-50 hidden pt-2 group-hover:block">
-      <div className="flex w-48 flex-col rounded-md bg-white py-1 text-gray-700 shadow-lg border border-gray-100">
-        <Link to="/account/profile" className="px-4 py-2 text-sm hover:bg-gray-50 hover:text-[#ee4d2d]">
-          Tài khoản của tôi
-        </Link>
-        
-        <Link to="/account/orders" className="px-4 py-2 text-sm hover:bg-gray-50 hover:text-[#ee4d2d]">
-          Đơn mua
-        </Link>
-        
-        <button onClick={handleLogout} className="text-left px-4 py-2 text-sm hover:bg-gray-50 hover:text-[#ee4d2d]">
-          Đăng xuất
-        </button>
-      </div>
+  <div className="absolute right-0 top-full z-50 hidden pt-2 group-hover:block">
+  <div className="flex w-48 flex-col rounded-md border border-gray-100 bg-white py-1 text-gray-700 shadow-lg">
 
-    </div>
+    <Link
+      to="/account/profile"
+      className="px-4 py-2 text-sm hover:bg-gray-50 hover:text-[#ee4d2d]"
+    >
+      Tài khoản của tôi
+    </Link>
+
+    <Link
+      to="/account/orders"
+      className="px-4 py-2 text-sm hover:bg-gray-50 hover:text-[#ee4d2d]"
+    >
+      Đơn mua
+    </Link>
+    {user?.role === 'Admin' && (
+      <Link
+        to="/admin/dashboard"
+        className="border-t border-gray-100 px-4 py-2 text-sm font-medium text-indigo-600 hover:bg-indigo-50"
+      >
+        Trang quản trị
+      </Link>
+    )}
+
+    <button
+      onClick={handleLogout}
+      className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 hover:text-[#ee4d2d]"
+    >
+      Đăng xuất
+    </button>
+
+  </div>
+</div>
   </div>
 ) : (
   <div className="flex items-center gap-3">

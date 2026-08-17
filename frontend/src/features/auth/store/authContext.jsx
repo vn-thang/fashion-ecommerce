@@ -1,49 +1,74 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
-  
   const [isAuthLoading, setIsAuthLoading] = useState(true);
 
   useEffect(() => {
-    const checkLoginStatus = () => {
-      const storedToken = localStorage.getItem('accessToken');
-      const storedUser = localStorage.getItem('user'); // Lấy thông tin user
-      const isLoggedIn = localStorage.getItem('isLoggedIn');
+    const restoreSession = () => {
+      try {
+        const storedToken =
+          localStorage.getItem('accessToken');
 
-      if (isLoggedIn === 'true' && storedToken) {
-        setToken(storedToken);
-        if (storedUser) {
-          setUser(JSON.parse(storedUser)); 
+        const storedUser =
+          localStorage.getItem('user');
+
+        const isLoggedIn =
+          localStorage.getItem('isLoggedIn');
+
+        if (
+          isLoggedIn === 'true' &&
+          storedToken &&
+          storedUser
+        ) {
+          setToken(storedToken);
+          setUser(JSON.parse(storedUser));
         }
+      } catch (error) {
+        console.error(
+          'Restore auth session error:',
+          error
+        );
+
+        localStorage.removeItem('isLoggedIn');
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('user');
+      } finally {
+        setIsAuthLoading(false);
       }
-      
-      setIsAuthLoading(false);
     };
 
-    checkLoginStatus();
-  }, []); 
+    restoreSession();
+  }, []);
 
   const loginSuccess = (userData, accessToken) => {
     setUser(userData);
     setToken(accessToken);
 
-    localStorage.setItem('isLoggedIn', 'true');
-    localStorage.setItem('accessToken', accessToken); 
-    
-    localStorage.setItem('user', JSON.stringify(userData));
-  };
+    localStorage.setItem(
+      'isLoggedIn',
+      'true'
+    );
 
+    localStorage.setItem(
+      'accessToken',
+      accessToken
+    );
+
+    localStorage.setItem(
+      'user',
+      JSON.stringify(userData)
+    );
+  };
   const logout = () => {
     setUser(null);
     setToken(null);
 
     localStorage.removeItem('isLoggedIn');
-    localStorage.removeItem('accessToken'); 
-    
+    localStorage.removeItem('accessToken');
     localStorage.removeItem('user');
   };
 
@@ -54,13 +79,13 @@ export const AuthProvider = ({ children }) => {
         token,
         loginSuccess,
         logout,
-        isAuthLoading,
+        isAuthLoading
       }}
     >
       {!isAuthLoading ? (
         children
       ) : (
-        <div className="h-screen flex items-center justify-center text-gray-500">
+        <div className="flex h-screen items-center justify-center text-gray-500">
           Đang tải dữ liệu người dùng...
         </div>
       )}
@@ -68,4 +93,5 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () =>
+  useContext(AuthContext);

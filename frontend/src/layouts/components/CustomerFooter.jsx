@@ -1,123 +1,282 @@
+import React from 'react';
 import { Link } from 'react-router-dom';
+import {
+  FaFacebookF,
+  FaInstagram,
+  FaTiktok,
+  FaPhoneAlt,
+  FaEnvelope,
+  FaMapMarkerAlt,
+  FaClock
+} from 'react-icons/fa';
+import { useStoreSetting } from '../../features/storeSetting/hooks/useStoreSetting';
 
 const CustomerFooter = () => {
+  const { form, loading } = useStoreSetting();
   const currentYear = new Date().getFullYear();
 
+  const {
+    storeName,
+    description,
+    hotline,
+    email,
+    zalo,
+    address,
+    openingHours
+  } = form;
+
+  if (loading) {
+    return (
+      <footer className="border-t border-gray-200 bg-white">
+        <div className="mx-auto h-64 w-[95%] max-w-[1400px] animate-pulse py-12">
+          <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
+            {[...Array(4)].map((_, index) => (
+              <div key={index} className="space-y-4">
+                <div className="h-4 w-32 rounded bg-gray-200" />
+                <div className="h-3 w-full rounded bg-gray-200" />
+                <div className="h-3 w-4/5 rounded bg-gray-200" />
+                <div className="h-3 w-3/5 rounded bg-gray-200" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </footer>
+    );
+  }
+
   return (
-    <footer className="bg-white border-t-4 border-[#ee4d2d] text-xs text-gray-500 pt-12">
-      <div className="w-[95%] max-w-[1600px] mx-auto px-4 grid grid-cols-2 md:grid-cols-5 gap-8 pb-12 border-b border-gray-200">
-        
+    <footer className="border-t border-gray-200 bg-white text-base text-gray-500">
+      <div className="mx-auto grid w-[95%] max-w-[1400px] gap-10 py-12 md:grid-cols-2 lg:grid-cols-4">
+
+        {/* Store */}
         <div>
-          <h3 className="mb-4 font-bold text-gray-700 uppercase tracking-wider">Chăm sóc khách hàng</h3>
-          <ul className="space-y-2.5">
-            <li><Link to="/help" className="hover:text-[#ee4d2d] transition-colors">Trung Tâm Trợ Giúp</Link></li>
-            <li><Link to="/blog" className="hover:text-[#ee4d2d] transition-colors">FashionHub Blog</Link></li>
-            <li><Link to="/how-to-buy" className="hover:text-[#ee4d2d] transition-colors">Hướng Dẫn Mua Hàng</Link></li>
-            <li><Link to="/returns" className="hover:text-[#ee4d2d] transition-colors">Trả Hàng & Hoàn Tiền</Link></li>
-            <li><Link to="/contact" className="hover:text-[#ee4d2d] transition-colors">Chăm Sóc Khách Hàng</Link></li>
-            <li><Link to="/warranty" className="hover:text-[#ee4d2d] transition-colors">Chính Sách Bảo Hành</Link></li>
-          </ul>
-        </div>
-        <div>
-          <h3 className="mb-4 font-bold text-gray-700 uppercase tracking-wider">Về FashionHub</h3>
-          <ul className="space-y-2.5">
-            <li><Link to="/about" className="hover:text-[#ee4d2d] transition-colors">Giới Thiệu Về FashionHub</Link></li>
-            <li><Link to="/careers" className="hover:text-[#ee4d2d] transition-colors">Tuyển Dụng</Link></li>
-            <li><Link to="/terms" className="hover:text-[#ee4d2d] transition-colors">Điều Khoản FashionHub</Link></li>
-            <li><Link to="/privacy" className="hover:text-[#ee4d2d] transition-colors">Chính Sách Bảo Mật</Link></li>
-            <li><Link to="/mall" className="hover:text-[#ee4d2d] transition-colors">Chính Hãng</Link></li>
-            <li><Link to="/media" className="hover:text-[#ee4d2d] transition-colors">Kênh Truyền Thông</Link></li>
-          </ul>
-        </div>
-        <div>
-          <h3 className="mb-3 font-bold text-gray-700 uppercase tracking-wider">Thanh toán</h3>
-          <div className="grid grid-cols-3 gap-2 mb-6">
-            <div className="h-7 border border-gray-200 rounded-sm bg-white shadow-xs flex items-center justify-center font-semibold text-[10px] text-blue-800 tracking-tighter">VISA</div>
-            <div className="h-7 border border-gray-200 rounded-sm bg-white shadow-xs flex items-center justify-center font-semibold text-[10px] text-orange-600">COD</div>
-            <div className="h-7 border border-gray-200 rounded-sm bg-white shadow-xs flex items-center justify-center font-semibold text-[10px] text-blue-600">ATM</div>
-          </div>
-          
-          <h3 className="mb-3 font-bold text-gray-700 uppercase tracking-wider">Đơn vị vận chuyển</h3>
-          <div className="grid grid-cols-3 gap-2">
-            <div className="h-7 border border-gray-200 rounded-sm bg-white shadow-xs flex items-center justify-center font-bold text-[10px] text-green-600">GHTK</div>
-            <div className="h-7 border border-gray-200 rounded-sm bg-white shadow-xs flex items-center justify-center font-bold text-[10px] text-orange-500">GHN</div>
-            <div className="h-7 border border-gray-200 rounded-sm bg-white shadow-xs flex items-center justify-center font-bold text-[10px] text-red-600">SPX</div>
+          <h3 className="mb-5 text-sm font-bold uppercase tracking-wide text-gray-900">
+            {storeName || 'FashionHub'}
+          </h3>
+
+          <p className="mb-5 max-w-sm leading-6">
+            {description ||
+              'Thời trang chất lượng, phong cách hiện đại và trải nghiệm mua sắm tiện lợi dành cho bạn.'}
+          </p>
+
+          <div className="space-y-3">
+            {address && (
+              <div className="flex items-start gap-3">
+                <FaMapMarkerAlt className="mt-1 shrink-0 text-[#ee4d2d]" />
+                <span className="leading-5">{address}</span>
+              </div>
+            )}
+
+            {openingHours && (
+              <div className="flex items-start gap-3">
+                <FaClock className="mt-1 shrink-0 text-[#ee4d2d]" />
+                <span>{openingHours}</span>
+              </div>
+            )}
           </div>
         </div>
 
+        {/* Customer Support */}
         <div>
-          <h3 className="mb-4 font-bold text-gray-700 uppercase tracking-wider">Theo dõi chúng tôi</h3>
-          <ul className="space-y-2.5">
+          <h3 className="mb-5 text-sm font-bold uppercase tracking-wide text-gray-900">
+            Hỗ trợ khách hàng
+          </h3>
+
+          <ul className="space-y-3">
             <li>
-              <a href="https://facebook.com" target="_blank" rel="noreferrer" className="flex items-center gap-2 hover:text-[#ee4d2d] transition-colors">
-                <span className="text-sm">📘</span> Facebook
-              </a>
+              <Link
+                to="/help"
+                className="transition hover:text-[#ee4d2d]"
+              >
+                Trung tâm trợ giúp
+              </Link>
             </li>
+
             <li>
-              <a href="https://instagram.com" target="_blank" rel="noreferrer" className="flex items-center gap-2 hover:text-[#ee4d2d] transition-colors">
-                <span className="text-sm">📸</span> Instagram
-              </a>
+              <Link
+                to="/account/orders"
+                className="transition hover:text-[#ee4d2d]"
+              >
+                Đơn mua
+              </Link>
             </li>
+
             <li>
-              <a href="https://linkedin.com" target="_blank" rel="noreferrer" className="flex items-center gap-2 hover:text-[#ee4d2d] transition-colors">
-                <span className="text-sm">💼</span> LinkedIn
-              </a>
+              <Link
+                to="/shipping-policy"
+                className="transition hover:text-[#ee4d2d]"
+              >
+                Chính sách vận chuyển
+              </Link>
+            </li>
+
+            <li>
+              <Link
+                to="/refund-policy"
+                className="transition hover:text-[#ee4d2d]"
+              >
+                Trả hàng & hoàn tiền
+              </Link>
+            </li>
+
+            <li>
+              <Link
+                to="/privacy"
+                className="transition hover:text-[#ee4d2d]"
+              >
+                Chính sách bảo mật
+              </Link>
             </li>
           </ul>
         </div>
+
+        {/* Contact */}
         <div>
-          <h3 className="mb-4 font-bold text-gray-700 uppercase tracking-wider">Tải ứng dụng FashionHub</h3>
+          <h3 className="mb-5 text-sm font-bold uppercase tracking-wide text-gray-900">
+            Liên hệ
+          </h3>
+
+          <div className="space-y-4">
+            {hotline && (
+              <a
+                href={`tel:${hotline}`}
+                className="flex items-center gap-3 transition hover:text-[#ee4d2d]"
+              >
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-orange-50 text-[#ee4d2d]">
+                  <FaPhoneAlt size={13} />
+                </div>
+
+                <div>
+                  <p className="text-xs text-gray-400">
+                    Hotline
+                  </p>
+                  <p className="font-semibold text-gray-700">
+                    {hotline}
+                  </p>
+                </div>
+              </a>
+            )}
+
+            {email && (
+              <a
+                href={`mailto:${email}`}
+                className="flex items-center gap-3 transition hover:text-[#ee4d2d]"
+              >
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-orange-50 text-[#ee4d2d]">
+                  <FaEnvelope size={13} />
+                </div>
+
+                <div className="min-w-0">
+                  <p className="text-xs text-gray-400">
+                    Email
+                  </p>
+                  <p className="truncate font-medium text-gray-700">
+                    {email}
+                  </p>
+                </div>
+              </a>
+            )}
+
+            {zalo && (
+              <a
+                href={`https://zalo.me/${zalo}`}
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center gap-3 transition hover:text-[#ee4d2d]"
+              >
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-orange-50 text-sm font-bold text-[#ee4d2d]">
+                  Z
+                </div>
+
+                <div>
+                  <p className="text-xs text-gray-400">
+                    Zalo
+                  </p>
+                  <p className="font-medium text-gray-700">
+                    {zalo}
+                  </p>
+                </div>
+              </a>
+            )}
+          </div>
+        </div>
+
+        {/* Social */}
+        <div>
+          <h3 className="mb-5 text-sm font-bold uppercase tracking-wide text-gray-900">
+            Kết nối với chúng tôi
+          </h3>
+
+          <p className="mb-5 leading-6">
+            Theo dõi {storeName || 'FashionHub'} để cập nhật sản phẩm và
+            chương trình ưu đãi mới nhất.
+          </p>
+
           <div className="flex gap-3">
-            <div className="h-20 w-20 border border-gray-200 rounded-sm p-1 bg-white flex items-center justify-center shrink-0 shadow-xs">
-              <span className="text-[10px] text-center text-gray-400 font-mono">QR CODE APP</span>
-            </div>
-            <div className="flex flex-col justify-between py-0.5">
-              <div className="h-6 w-24 border border-gray-200 rounded-sm bg-white px-1.5 flex items-center gap-1 shadow-xs cursor-pointer hover:border-gray-400">
-                <span className="text-[10px]">🤖</span>
-                <span className="text-[8px] font-bold leading-none text-gray-700">Google Play</span>
-              </div>
-              <div className="h-6 w-24 border border-gray-200 rounded-sm bg-white px-1.5 flex items-center gap-1 shadow-xs cursor-pointer hover:border-gray-400">
-                <span className="text-[10px]">🍏</span>
-                <span className="text-[8px] font-bold leading-none text-gray-700">App Store</span>
-              </div>
-              <div className="h-6 w-24 border border-gray-200 rounded-sm bg-white px-1.5 flex items-center gap-1 shadow-xs cursor-pointer hover:border-gray-400">
-                <span className="text-[10px]">🌌</span>
-                <span className="text-[8px] font-bold leading-none text-gray-700">AppGallery</span>
-              </div>
-            </div>
-          </div>
-        </div>
+            <a
+              href="#"
+              aria-label="Facebook"
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 transition hover:border-[#ee4d2d] hover:bg-[#ee4d2d] hover:text-white"
+            >
+              <FaFacebookF size={15} />
+            </a>
 
+            <a
+              href="#"
+              aria-label="Instagram"
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 transition hover:border-[#ee4d2d] hover:bg-[#ee4d2d] hover:text-white"
+            >
+              <FaInstagram size={17} />
+            </a>
+
+            <a
+              href="#"
+              aria-label="TikTok"
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 transition hover:border-[#ee4d2d] hover:bg-[#ee4d2d] hover:text-white"
+            >
+              <FaTiktok size={15} />
+            </a>
+          </div>
+
+        
+        </div>
       </div>
 
-      <div className="bg-[#f5f5f5] py-10 text-center text-gray-500 border-t border-gray-200">
-        <div className="w-[95%] max-w-[1600px] mx-auto px-4 space-y-6">
-          
-          <div className="flex justify-center items-center gap-6 text-gray-600 font-medium uppercase text-[11px]">
-            <Link to="/privacy" className="hover:text-[#ee4d2d]">Chính sách bảo mật</Link>
-            <span className="h-3 w-[1px] bg-gray-300"></span>
-            <Link to="/terms" className="hover:text-[#ee4d2d]">Quy chế hoạt động</Link>
-            <span className="h-3 w-[1px] bg-gray-300"></span>
-            <Link to="/shipping-policy" className="hover:text-[#ee4d2d]">Chính sách vận chuyển</Link>
-            <span className="h-3 w-[1px] bg-gray-300"></span>
-            <Link to="/refund-policy" className="hover:text-[#ee4d2d]">Chính sách trả hàng và hoàn tiền</Link>
-          </div>
+      {/* Bottom */}
+      <div className="border-t border-gray-200 bg-gray-50">
+        <div className="mx-auto flex w-[95%] max-w-[1400px] flex-col gap-4 py-6 md:flex-row md:items-center md:justify-between">
+          <p className="text-base text-gray-400">
+            © {currentYear} {storeName || 'FashionHub'}. All rights reserved.
+          </p>
 
-          <div className="flex justify-center items-center gap-4">
-            <div className="border border-red-300 text-red-500 font-bold px-3 py-1.5 rounded-sm tracking-tighter text-[10px] uppercase bg-red-50 select-none">
-              ✓ Đã Đăng Ký Bộ Công Thương
-            </div>
-            <div className="border border-red-300 text-red-500 font-bold px-3 py-1.5 rounded-sm tracking-tighter text-[10px] uppercase bg-red-50 select-none">
-              🛡 Chính Hãng 100%
-            </div>
-          </div>
+          <div className="flex flex-wrap gap-x-5 gap-y-2 text-base">
+            <Link
+              to="/terms"
+              className="transition hover:text-[#ee4d2d]"
+            >
+              Điều khoản sử dụng
+            </Link>
 
-          <div className="text-[11px] text-gray-400 space-y-1.5 leading-relaxed">
-            <p className="font-semibold text-gray-600 text-xs">Công ty TNHH E-Commerce FashionHub Việt Nam</p>
-            <p>Địa chỉ: Tầng 28, Tòa nhà Trung tâm Tài chính ABC, số 123 Đường Lê Lợi, Phường Bến Nghé, Quận 1, Thành phố Hồ Chí Minh, Việt Nam.</p>
-            <p>Mã số doanh nghiệp: 0123456789 do Sở Kế hoạch & Đầu tư TP.HCM cấp lần đầu ngày 01/01/2025.</p>
-            <p>Chịu Trách Nhiệm Quản Lý Nội Dung: Nguyễn Văn A - Điện thoại liên hệ: 028 7300 1234</p>
-            <p>Email hỗ trợ: cskh@fashionhub.com.vn - Hotline: 1900 6789 (Hỗ trợ 24/7) - © {currentYear} FashionHub</p>
+            <Link
+              to="/privacy"
+              className="transition hover:text-[#ee4d2d]"
+            >
+              Chính sách bảo mật
+            </Link>
+
+            <Link
+              to="/shipping-policy"
+              className="transition hover:text-[#ee4d2d]"
+            >
+              Vận chuyển
+            </Link>
+
+            <Link
+              to="/refund-policy"
+              className="transition hover:text-[#ee4d2d]"
+            >
+              Đổi trả & hoàn tiền
+            </Link>
           </div>
         </div>
       </div>

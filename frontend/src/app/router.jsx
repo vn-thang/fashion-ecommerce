@@ -36,6 +36,8 @@ import InventoryPage from '../features/inventory/pages/admin/InventoryPage';
 import UserPage from '../features/profile/pages/admin/UserPage';
 import DashBoardPage from '../features/dashboard/pages/DashboardPage';
 import AuditLogPage from '../features/auditLog/pages/admin/AuditLogPage';
+import NotificationPage from '../features/notification/pages/customer/NotificationPage';
+import AdminNotificationPage from '../features/notification/pages/admin/AdminNotificationPage';
 
 const ProtectedRoute = ({ children }) => {
   const { token } = useAuth();
@@ -75,6 +77,10 @@ export const router = createBrowserRouter([
       {
         path: 'cart',
         element: <CartPage />
+      },
+   {
+        path: 'notifications',
+        element: <NotificationPage />
       },
       {
         path: 'checkout',
@@ -206,6 +212,11 @@ export const router = createBrowserRouter([
         path: 'inventory',
         element: <InventoryPage />,
         },
+        {
+        path: 'notifications',
+        element: <AdminNotificationPage />,
+        },
+
         {
         path: 'audit-logs',
         element: <AuditLogPage />,
