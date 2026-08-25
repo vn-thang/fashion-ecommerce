@@ -5,14 +5,14 @@ import { notificationApi } from '../api/notificationApi';
 
 const VAPID_KEY = import.meta.env.VITE_FIREBASE_VAPID_KEY;
 
-export const useFCM = enabled => {
+export const useFCM = userId  => {
   const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const registerToken = useCallback(async () => {
-    if (!enabled || !messaging) {
-      return null;
-    }
+   if (!userId || !messaging) {
+  return null;
+}
 
     if (!VAPID_KEY) {
       console.error(
@@ -37,6 +37,7 @@ export const useFCM = enabled => {
 
     try {
       setLoading(true);
+
       const permission =
         await Notification.requestPermission();
 
@@ -47,23 +48,26 @@ export const useFCM = enabled => {
 
         return null;
       }
+
       const registration =
         await navigator.serviceWorker.register(
           '/firebase-messaging-sw.js'
         );
 
       let activeRegistration = registration;
-      if (!registration.active) {
 
+      if (!registration.active) {
         activeRegistration =
           await navigator.serviceWorker.ready;
       }
+
       if (!activeRegistration.active) {
         console.error(
           '[FCM] Service Worker chưa active.'
         );
         return null;
       }
+
       const currentToken = await getToken(
         messaging,
         {
@@ -72,6 +76,7 @@ export const useFCM = enabled => {
             activeRegistration
         }
       );
+
       if (!currentToken) {
         console.warn(
           '[FCM] getToken() không trả về token.'
@@ -79,11 +84,13 @@ export const useFCM = enabled => {
 
         return null;
       }
+
       const response =
         await notificationApi.registerDeviceToken({
           token: currentToken,
           deviceType: 'WEB'
         });
+
       if (!response?.success) {
         console.error(
           '[FCM] Backend không đăng ký được device token:',
@@ -91,68 +98,94 @@ export const useFCM = enabled => {
         );
         return null;
       }
+
       setToken(currentToken);
       return currentToken;
     } catch (error) {
       console.error(
         '[FCM] Registration failed.'
       );
+
       if (error?.response) {
         console.error(
           '[FCM] Backend response:',
           error.response.data
         );
       }
+
       return null;
     } finally {
       setLoading(false);
     }
-  }, [enabled]);
+  }, [userId]);
+
   useEffect(() => {
-    if (!enabled) {
+    if (!userId) {
       setToken(null);
       return;
     }
+
     registerToken();
-  }, [enabled, registerToken]);
+  }, [userId, registerToken]);
 
   useEffect(() => {
-  console.log('[FCM] Foreground effect:', {
-    enabled,
-    messaging: !!messaging
-  });
+    console.log('[FCM] Foreground effect:', {
+      userId,
+      messaging: !!messaging
+    });
 
-  if (!enabled || !messaging) {
-    return;
-  }
-
-  const unsubscribe = onMessage(
-    messaging,
-    payload => {
-      console.log('[FCM] Foreground payload:', payload);
-
-      const data = payload.data || {};
-
-      const title = data.title || 'FashionHub';
-      const body = data.body || '';
-
-      if (Notification.permission !== 'granted') {
-        console.warn(
-          '[FCM] Notification permission chưa được granted'
-        );
-        return;
-      }
-
-      new Notification(title, {
-        body,
-        icon: '/favicon.ico',
-        data
-      });
+    if (!userId || !messaging) {
+      return;
     }
-  );
 
-  return unsubscribe;
-}, [enabled]);
+    const unsubscribe = onMessage(
+      messaging,
+      payload => {
+        console.log(
+          '[FCM] Foreground payload:',
+          payload
+        );
+
+        const data = payload.data || {};
+
+        const title =
+          data.title || 'FashionHub';
+
+        const body =
+          data.body || '';
+
+        if (Notification.permission !== 'granted') {
+          console.warn(
+            '[FCM] Notification permission chưa được granted'
+          );
+          return;
+        }
+
+        const notification =
+          new Notification(title, {
+            body,
+            icon: '/favicon.ico',
+            data
+          });
+
+        notification.onclick = () => {
+          const conversationId =
+            data.conversationId;
+
+          if (!conversationId) {
+            return;
+          }
+
+          window.focus();
+
+          window.location.href =
+            `/chat?conversationId=${conversationId}`;
+        };
+      }
+    );
+
+    return unsubscribe;
+  }, [userId]);
 
   return {
     token,

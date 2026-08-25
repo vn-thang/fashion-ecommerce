@@ -14,6 +14,8 @@ const userRepository = {
         totalPoints: true,
         role: true,
         isActive: true,
+        isOnline: true,
+        lastSeenAt: true,
         createdAt: true
       }
     });
@@ -28,7 +30,74 @@ const userRepository = {
         email: true,
         fullName: true,
         phoneNumber: true,
-        avatarUrl: true
+        avatarUrl: true,
+        isOnline: true,
+        lastSeenAt: true
+      }
+    });
+  },
+
+  setOnline: async userId => {
+  return await prisma.user.update({
+    where: {
+      id: userId
+    },
+    data: {
+      isOnline: true
+    },
+    select: {
+      id: true,
+      isOnline: true,
+      lastSeenAt: true
+    }
+  });
+},
+
+setOffline: async userId => {
+  return await prisma.user.update({
+    where: {
+      id: userId
+    },
+    data: {
+      isOnline: false,
+      lastSeenAt: new Date()
+    },
+    select: {
+      id: true,
+      isOnline: true,
+      lastSeenAt: true
+    }
+  });
+},
+
+ updateOnlineStatus: async (userId, isOnline) => {
+    return await prisma.user.update({
+      where: {
+        id: userId
+      },
+      data: {
+        isOnline,
+        lastSeenAt: isOnline
+          ? null
+          : new Date()
+      },
+      select: {
+        id: true,
+        isOnline: true,
+        lastSeenAt: true
+      }
+    });
+  },
+
+  getPresenceByUserId: async userId => {
+    return await prisma.user.findUnique({
+      where: {
+        id: userId
+      },
+      select: {
+        id: true,
+        isOnline: true,
+        lastSeenAt: true
       }
     });
   },

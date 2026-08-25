@@ -4,11 +4,13 @@ const orderController = require('./order.controller');
 const orderValidation = require('./order.validation');
 
 const authenticate = require('../../middlewares/auth.middleware'); 
+const { createOrderRateLimiter } = require('../../middlewares/rateLimit.middleware');
+
 router.use(authenticate);
 
 router.post('/preview', orderValidation.validatePreview, orderController.previewCheckout);
 
-router.post('/create', orderValidation.validateCreateOrder, orderController.createOrder);
+router.post('/create',createOrderRateLimiter, orderValidation.validateCreateOrder, orderController.createOrder);
 
 router.get('/', orderController.getMyOrders);
 
