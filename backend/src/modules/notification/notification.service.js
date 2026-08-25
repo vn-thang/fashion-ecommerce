@@ -27,7 +27,6 @@ const notificationService = {
     });
 
     const devices = await notificationRepository.findDevicesByUserId(userId);
-
     await Promise.allSettled(
       devices.map(async device => {
         try {

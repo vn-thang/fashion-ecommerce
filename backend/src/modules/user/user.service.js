@@ -212,6 +212,39 @@ updateUserStatus: async (adminId, userId, isActive) => {
 
   return updatedUser;
 },
+
+setOnline: async userId => {
+  const user = await userRepository.getUserById(userId);
+
+  if (!user) {
+    throw new Error(MESSAGES.USER_NOT_FOUND);
+  }
+
+  return await userRepository.setOnline(userId);
+},
+
+setOffline: async userId => {
+  const user = await userRepository.getUserById(userId);
+
+  if (!user) {
+    throw new Error(MESSAGES.USER_NOT_FOUND);
+  }
+
+  return await userRepository.setOffline(userId);
+},
+
+setOnlineStatus: async (userId, isOnline) => {
+  return await userRepository.updateOnlineStatus(
+    userId,
+    isOnline
+  );
+},
+
+getPresence: async userId => {
+  return await userRepository.getPresenceByUserId(
+    userId
+  );
+},
 };
 
 module.exports = userService;

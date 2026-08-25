@@ -6,10 +6,12 @@ import NotificationList from './NotificationList';
 
 import { useNotification } from '../hooks/useNotification';
 import { NotificationContext } from '../context/NotificationContext';
+import { useAuth } from '../../auth/store/authContext';
 
 const NotificationDropdown = ({ onClose }) => {
   const navigate = useNavigate();
 
+  const { user } = useAuth();
   const {
     loading,
     notifications,
@@ -22,10 +24,16 @@ const {
   openNotification
 } = useContext(NotificationContext);
 
-  const handleViewAll = () => {
-    onClose();
+const handleViewAll = () => {
+  onClose();
+
+  if (user?.role?.toUpperCase() === 'ADMIN') {
     navigate('/admin/notifications');
-  };
+    return;
+  }
+
+  navigate('/notifications');
+};
 
   const handleOpenNotification = notification => {
     openNotification(notification);
@@ -58,7 +66,7 @@ const {
       </div>
       <div className="max-h-[420px] overflow-y-auto">
         <NotificationList
-          notifications={notifications.slice(0, 5)}
+          notifications={notifications.slice(0, 15)}
           loading={loading}
           onRead={markAsRead}
           onOpen={handleOpenNotification}

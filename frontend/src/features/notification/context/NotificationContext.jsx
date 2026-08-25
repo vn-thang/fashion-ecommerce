@@ -3,6 +3,7 @@ import toast from 'react-hot-toast';
 import { notificationApi } from '../api/notificationApi';
 import { useFCM } from '../hooks/useFCM';
 import NotificationDetailModal from '../components/NotificationDetailModal';
+import { useAuth } from '../../auth/store/authContext';
 
 const DEFAULT_PAGINATION = {
   currentPage: 1,
@@ -14,6 +15,8 @@ const DEFAULT_PAGINATION = {
 export const NotificationContext = createContext(null);
 
 export const NotificationProvider = ({ children }) => {
+   const { user } = useAuth();
+
   const [loading, setLoading] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -29,7 +32,7 @@ export const NotificationProvider = ({ children }) => {
   const [selectedNotification, setSelectedNotification] =
     useState(null);
 
-  const { token: fcmToken, loading: fcmLoading, registerToken } = useFCM(true);
+  const { token: fcmToken, loading: fcmLoading, registerToken } = useFCM(user?.id);
   const loadNotifications = useCallback(
     async (customFilters = filters) => {
       try {
@@ -80,13 +83,33 @@ export const NotificationProvider = ({ children }) => {
     }
   }, []);
 
-  useEffect(() => {
-    loadNotifications();
-  }, [loadNotifications]);
+ useEffect(() => {
+  if (!user?.id) {
+    setNotifications([]);
+    setUnreadCount(0);
+    setPagination(DEFAULT_PAGINATION);
+    setSelectedNotification(null);
+    return;
+  }
 
-  useEffect(() => {
-    loadUnreadCount();
-  }, [loadUnreadCount]);
+  setFilters({
+    page: 1,
+    limit: 10
+  });
+}, [user?.id]);
+
+useEffect(() => {
+  if (!user?.id) {
+    return;
+  }
+
+  loadNotifications();
+  loadUnreadCount();
+}, [
+  user?.id,
+  loadNotifications,
+  loadUnreadCount
+]);
 
   const markAsRead = useCallback(
     async id => {

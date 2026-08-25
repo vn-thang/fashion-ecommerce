@@ -18,6 +18,8 @@ model User {
   totalPoints         Int                  @default(0)
   role                String               @default("Customer") @db.VarChar(20) // Admin, Customer
   isActive            Boolean              @default(true)
+  isOnline            Boolean              @default(false)
+  lastSeenAt          DateTime?            @db.Timestamp
   createdAt           DateTime             @default(now()) @db.Timestamp
   updatedAt           DateTime             @updatedAt @db.Timestamp
   
@@ -31,8 +33,9 @@ model User {
   reviews             Review[]
   notifications       Notification[]
   devices             UserDevice[]
-  conversations       Conversation[]
-  messages            Message[]
+  customerConversations    Conversation[]            @relation("CustomerConversations")
+  conversationParticipants ConversationParticipant[]
+  sentMessages             Message[]                 @relation("SentMessages")
   loyaltyTransactions LoyaltyTransaction[]
   auditLogs           AuditLog[]
   passwordResetTokens PasswordResetToken[]
@@ -390,25 +393,60 @@ model UserDevice {
 
 // 22. Conversations
 model Conversation {
-  id         String    @id @default(uuid()) @db.Uuid
-  customerId String    @db.Uuid
-  createdAt  DateTime  @default(now()) @db.Timestamp
+  id            String    @id @default(uuid()) @db.Uuid
+  customerId String @unique @db.Uuid
+  status        String    @default("OPEN") @db.VarChar(20)
+  lastMessageAt DateTime? @db.Timestamp
+  closedAt      DateTime? @db.Timestamp
+  createdAt     DateTime  @default(now()) @db.Timestamp
+  updatedAt     DateTime  @updatedAt @db.Timestamp
 
-  customer   User      @relation(fields: [customerId], references: [id], onDelete: Cascade)
-  messages   Message[]
+  customer      User      @relation("CustomerConversations", fields: [customerId], references: [id], onDelete: Cascade)
+  messages      Message[]
+  participants  ConversationParticipant[]
+  
+  @@index([status])
+  @@index([lastMessageAt])
 }
 
-// 23. Messages
+// 23. Conversation Participants
+model ConversationParticipant {
+  id             String       @id @default(uuid()) @db.Uuid
+  conversationId String       @db.Uuid
+  userId         String       @db.Uuid
+  joinedAt       DateTime     @default(now()) @db.Timestamp
+  lastReadAt     DateTime?    @db.Timestamp
+  isActive       Boolean      @default(true)
+
+  conversation   Conversation @relation( fields: [conversationId], references: [id], onDelete: Cascade)
+  user           User         @relation( fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([conversationId, userId])
+  @@index([conversationId])
+  @@index([userId])
+}
+
+
+// 24. Messages
 model Message {
   id             String       @id @default(uuid()) @db.Uuid
   conversationId String       @db.Uuid
   senderId       String       @db.Uuid
-  message        String       @db.Text
-  isRead         Boolean      @default(false)
+  type           String       @default("TEXT") @db.VarChar(20)
+  content        String?      @db.Text
+  status         String       @default("SENT") @db.VarChar(20)
+  attachmentUrl  String?      @db.Text
+  attachmentName String?      @db.VarChar(255)
+  isDeleted      Boolean      @default(false)
+  deletedAt      DateTime?    @db.Timestamp
   createdAt      DateTime     @default(now()) @db.Timestamp
+  updatedAt      DateTime     @updatedAt @db.Timestamp
 
-  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
-  sender         User         @relation(fields: [senderId], references: [id])
+  conversation   Conversation @relation( fields: [conversationId], references: [id], onDelete: Cascade)
+  sender         User         @relation( "SentMessages", fields: [senderId], references: [id])
+
+  @@index([conversationId, createdAt])
+  @@index([senderId])
 }
 
 // 24. LoyaltyTransactions

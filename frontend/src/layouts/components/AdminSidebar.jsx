@@ -13,6 +13,11 @@ title: 'Tổng quan',
 path: '/admin/dashboard',
 icon: '📊',
 },
+ {
+    title: 'Hỗ trợ khách hàng',
+    path: '/admin/chat',
+    icon: '💬'
+  },
 {
 title: 'Quản lý Danh mục',
 path: '/admin/categories',

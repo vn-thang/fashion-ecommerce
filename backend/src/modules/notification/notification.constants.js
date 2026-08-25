@@ -22,6 +22,8 @@ const NOTIFICATION_CONSTANTS = {
     FLASH_SALE: 'FLASH_SALE',
     COUPON: 'COUPON',
 
+     CHAT_MESSAGE: 'CHAT_MESSAGE',
+
     SYSTEM: 'SYSTEM',
 
     ADMIN_NEW_ORDER: 'ADMIN_NEW_ORDER',
@@ -106,12 +108,19 @@ COUPON: {
     `Giảm ${discountText} cho đơn hàng từ ${minOrderAmount}. Mua ngay để nhận ưu đãi hấp dẫn từ FashionHub!`
 },
 
+  CHAT: {
+    MESSAGE_TITLE: senderName => `Tin nhắn từ ${senderName}`,
+    MESSAGE_CONTENT: content =>
+      content || 'Bạn nhận được một tin nhắn mới.',
+    IMAGE_CONTENT: 'Bạn nhận được một hình ảnh mới.',
+    FILE_CONTENT: 'Bạn nhận được một tập tin mới.'
+  },
+
 ADMIN: {
   NEW_ORDER_TITLE: 'Có đơn hàng mới',
   NEW_ORDER_CONTENT: orderNumber => `Khách hàng vừa đặt đơn hàng ${orderNumber}.`,
   ORDER_CANCELLED_TITLE: 'Đơn hàng bị hủy',
   ORDER_CANCELLED_CONTENT: orderNumber => `Đơn hàng ${orderNumber} vừa được khách hàng hủy.`,
-  PAYMENT_SUCCESS_TITLE: 'Thanh toán thành công',
   PAYMENT_SUCCESS_TITLE: 'Thanh toán thành công',
   PAYMENT_SUCCESS_CONTENT: orderNumber => `Đơn hàng ${orderNumber} đã được thanh toán thành công.`,
   PAYMENT_CANCELLED_TITLE: 'Thanh toán bị hủy',

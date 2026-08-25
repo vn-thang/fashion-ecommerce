@@ -38,6 +38,7 @@ import DashBoardPage from '../features/dashboard/pages/DashboardPage';
 import AuditLogPage from '../features/auditLog/pages/admin/AuditLogPage';
 import NotificationPage from '../features/notification/pages/customer/NotificationPage';
 import AdminNotificationPage from '../features/notification/pages/admin/AdminNotificationPage';
+import ChatAdminPage from '../features/chat/pages/admin/ChatAdminPage';
 
 const ProtectedRoute = ({ children }) => {
   const { token } = useAuth();
@@ -78,7 +79,7 @@ export const router = createBrowserRouter([
         path: 'cart',
         element: <CartPage />
       },
-   {
+      {
         path: 'notifications',
         element: <NotificationPage />
       },
@@ -215,6 +216,10 @@ export const router = createBrowserRouter([
         {
         path: 'notifications',
         element: <AdminNotificationPage />,
+        },
+        {
+        path: 'chat',
+        element: <ChatAdminPage />,
         },
 
         {

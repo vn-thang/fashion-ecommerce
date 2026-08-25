@@ -26,3 +26,41 @@ messaging.onBackgroundMessage(payload => {
     data
   });
 });
+
+self.addEventListener(
+  'notificationclick',
+  event => {
+    event.notification.close();
+
+    const data =
+      event.notification.data || {};
+
+    const conversationId =
+      data.conversationId;
+
+    if (!conversationId) {
+      return;
+    }
+
+    const chatUrl =
+      `/chat?conversationId=${conversationId}`;
+
+    event.waitUntil(
+      clients.matchAll({
+        type: 'window',
+        includeUncontrolled: true
+      }).then(clientList => {
+        for (const client of clientList) {
+          if ('focus' in client) {
+            client.navigate(chatUrl);
+            return client.focus();
+          }
+        }
+
+        if (clients.openWindow) {
+          return clients.openWindow(chatUrl);
+        }
+      })
+    );
+  }
+);

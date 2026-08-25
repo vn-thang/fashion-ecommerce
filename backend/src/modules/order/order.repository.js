@@ -72,7 +72,7 @@ const orderRepository = {
     });
   },
 
-  createOrderTransaction: async ({
+createOrderTransaction: async ({
   orderData,
   orderItemsData,
   cartItemIds,
@@ -95,8 +95,22 @@ const orderRepository = {
           `Sản phẩm [${item.productName}] hiện tại không còn tồn tại hoặc đã ngừng bán!`
         );
       }
+      const stockUpdate = await tx.productVariant.updateMany({
+        where: {
+          id: item.productVariantId,
+          status: 'ACTIVE',
+          stockQuantity: {
+            gte: item.quantity
+          }
+        },
+        data: {
+          stockQuantity: {
+            decrement: item.quantity
+          }
+        }
+      });
 
-      if (variant.stockQuantity < item.quantity) {
+      if (stockUpdate.count === 0) {
         throw new Error(
           `Sản phẩm [${item.productName}] (Màu: ${
             item.color || 'N/A'
@@ -120,37 +134,30 @@ const orderRepository = {
           );
         }
 
-        if (flashSaleVariant.flashSaleStock < item.quantity) {
+        const flashSaleStockUpdate =
+          await tx.flashSaleVariant.updateMany({
+            where: {
+              id: item.flashSaleVariantId,
+              flashSaleStock: {
+                gte: item.quantity
+              }
+            },
+            data: {
+              flashSaleStock: {
+                decrement: item.quantity
+              }
+            }
+          });
+
+        if (flashSaleStockUpdate.count === 0) {
           throw new Error(
             `Flash Sale của sản phẩm [${item.productName}] chỉ còn ${flashSaleVariant.flashSaleStock} sản phẩm.`
           );
         }
-
-        await tx.flashSaleVariant.update({
-          where: {
-            id: item.flashSaleVariantId
-          },
-          data: {
-            flashSaleStock: {
-              decrement: item.quantity
-            }
-          }
-        });
       }
 
       const remainingStock =
         variant.stockQuantity - item.quantity;
-
-      await tx.productVariant.update({
-        where: {
-          id: item.productVariantId
-        },
-        data: {
-          stockQuantity: {
-            decrement: item.quantity
-          }
-        }
-      });
 
       await tx.inventoryTransaction.create({
         data: {
@@ -162,21 +169,21 @@ const orderRepository = {
         }
       });
 
-    const LOW_STOCK_THRESHOLD = 5;
+      const LOW_STOCK_THRESHOLD = 5;
 
-    if (
-      variant.stockQuantity > LOW_STOCK_THRESHOLD &&
-      remainingStock <= LOW_STOCK_THRESHOLD
-    ) {
-      lowStockVariants.push({
-        productId: variant.productId,
-        variantId: variant.id,
-        productName: item.productName,
-        color: item.color,
-        size: item.size,
-        stockQuantity: remainingStock
-      });
-    }
+      if (
+        variant.stockQuantity > LOW_STOCK_THRESHOLD &&
+        remainingStock <= LOW_STOCK_THRESHOLD
+      ) {
+        lowStockVariants.push({
+          productId: variant.productId,
+          variantId: variant.id,
+          productName: item.productName,
+          color: item.color,
+          size: item.size,
+          stockQuantity: remainingStock
+        });
+      }
     }
 
     const order = await tx.order.create({
