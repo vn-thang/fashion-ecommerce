@@ -101,10 +101,6 @@ export const useFlashSaleForm = ({
       onClose?.();
 
     } catch (error) {
-
-       console.log('STATUS:', error.response?.status);
-  console.log('DATA:', error.response?.data);
-  console.log('REQUEST:', error.config?.data);
       console.error(error);
       toast.error(
         error.response?.data?.message ||

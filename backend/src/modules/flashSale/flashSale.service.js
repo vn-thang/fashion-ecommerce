@@ -151,17 +151,6 @@ sendFlashSaleNotifications: async () => {
         'Flash Sale đã kết thúc, không thể chỉnh sửa.'
       );
     }
-
-    // if (
-    //   existing.isActive &&
-    //   existing.startDate <= now &&
-    //   existing.endDate >= now
-    // ) {
-    //   throw new Error(
-    //     'Không thể chỉnh sửa Flash Sale đang diễn ra.'
-    //   );
-    // }
-
     const data = {};
 
     if (name !== undefined) {

@@ -23,33 +23,35 @@ const FlashSalePage = () => {
     handlePageChange
   } = useFlashSaleCustomer();
 
-  return (
-    <div className="w-full mx-auto px-4 lg:px-6 py-6">
+ return (
+  <div className="w-full px-3 sm:px-4 lg:px-6 py-4 sm:py-6">
+    <div className="mx-auto w-full max-w-[1600px]">
       <FlashSaleBanner flashSale={flashSale} />
 
-     <FlashSaleToolbar
-    totalProducts={totalItems}
-    sortBy={sortBy}
-    onSort={handleSort}
-/>
+      <FlashSaleToolbar
+        totalProducts={totalItems}
+        sortBy={sortBy}
+        onSort={handleSort}
+      />
+
       {loading ? (
         <FlashSaleSkeleton />
       ) : products.length === 0 ? (
         <FlashSaleEmpty />
       ) : (
-        <FlashSaleGrid
-          products={products}
-        />
+        <FlashSaleGrid products={products} />
       )}
 
-      <FlashSalePagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPageChange={handlePageChange}
-      />
-
+      <div className="mt-6 sm:mt-8 flex justify-center overflow-x-auto">
+        <FlashSalePagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+        />
+      </div>
     </div>
-  );
+  </div>
+);
 };
 
 export default FlashSalePage;

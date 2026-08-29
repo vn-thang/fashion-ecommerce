@@ -28,131 +28,123 @@ const CustomerHome = () => {
     setSearchParams
   } = useCustomerHome();
 
-  return (
+return (
   <div className="w-full">
-  <div className="flex flex-col md:flex-row gap-5">
-        <div className="flex flex-col md:flex-row gap-5">
-          <ProductFilter
-            categories={categories}
-            brands={brands}
-            selectedCategories={selectedCategories}
-            selectedBrands={selectedBrands}
-            priceRange={priceRange}
-            setPriceRange={setPriceRange}
-            handleCategoryChange={handleCategoryChange}
-            handleBrandChange={handleBrandChange}
-            handleApplyFilter={handleApplyFilter}
-            handleClearFilters={handleClearFilters}
-            urlCategory={urlCategory}
-            activeParentId={activeParentId}
-            setSearchParams={setSearchParams}
-          />
+    <div className="flex flex-col gap-5 md:flex-row">
+      <ProductFilter
+        categories={categories}
+        brands={brands}
+        selectedCategories={selectedCategories}
+        selectedBrands={selectedBrands}
+        priceRange={priceRange}
+        setPriceRange={setPriceRange}
+        handleCategoryChange={handleCategoryChange}
+        handleBrandChange={handleBrandChange}
+        handleApplyFilter={handleApplyFilter}
+        handleClearFilters={handleClearFilters}
+        urlCategory={urlCategory}
+        activeParentId={activeParentId}
+        setSearchParams={setSearchParams}
+      />
 
-          <main className="flex-1 min-w-0">
-            <div className="bg-[#ededed] rounded-sm px-5 py-4 mb-6 flex flex-col sm:flex-row justify-between items-center gap-4 shadow-sm">
-              <div className="flex items-center gap-3 text-sm text-gray-600 w-full sm:w-auto">
-                <span className="hidden md:inline font-medium">
-                  Sắp xếp theo
-                </span>
+      <main className="min-w-0 flex-1">
+        <div className="mb-6 rounded-sm bg-[#ededed] px-3 py-3 shadow-sm sm:px-5 sm:py-4">
+          <div className="flex w-full flex-col gap-3 sm:flex-row sm:items-center">
+            <span className="hidden shrink-0 text-sm font-medium text-gray-600 md:inline">
+              Sắp xếp theo
+            </span>
 
-                <div className="flex gap-2 w-full sm:w-auto">
-                  <button
-                    onClick={() => handleSortToggle('newest')}
-                    className={`px-5 py-2 rounded-sm flex-1 sm:flex-none transition-colors ${
-                      sortBy === 'newest'
-                        ? 'bg-[#ee4d2d] text-white shadow-sm'
-                        : 'bg-white text-gray-800 hover:bg-gray-50'
-                    }`}
-                  >
-                    Mới nhất
-                  </button>
+            <div className="grid w-full grid-cols-3 gap-2 sm:flex sm:w-auto">
+              <button
+                onClick={() => handleSortToggle('newest')}
+                className={`rounded-sm px-2 py-2 text-xs transition-colors sm:px-5 sm:text-sm ${
+                  sortBy === 'newest'
+                    ? 'bg-[#ee4d2d] text-white shadow-sm'
+                    : 'bg-white text-gray-800 hover:bg-gray-50'
+                }`}
+              >
+                Mới nhất
+              </button>
 
-                  <button
-                    onClick={() => handleSortToggle('bestSeller')}
-                    className={`px-5 py-2 rounded-sm flex-1 sm:flex-none transition-colors ${
-                      sortBy === 'bestSeller'
-                        ? 'bg-[#ee4d2d] text-white shadow-sm'
-                        : 'bg-white text-gray-800 hover:bg-gray-50'
-                    }`}
-                  >
-                    Bán chạy nhất
-                  </button>
+              <button
+                onClick={() => handleSortToggle('bestSeller')}
+                className={`rounded-sm px-2 py-2 text-xs transition-colors sm:px-5 sm:text-sm ${
+                  sortBy === 'bestSeller'
+                    ? 'bg-[#ee4d2d] text-white shadow-sm'
+                    : 'bg-white text-gray-800 hover:bg-gray-50'
+                }`}
+              >
+                <span className="sm:hidden">Bán chạy</span>
+                <span className="hidden sm:inline">Bán chạy nhất</span>
+              </button>
 
-                  <select
-                    value={
-                      sortBy === 'price_asc' ||
-                      sortBy === 'price_desc'
-                        ? sortBy
-                        : 'default'
-                    }
-                    onChange={e =>
-                      handleSortToggle(e.target.value)
-                    }
-                    className={`border rounded-sm px-4 py-2 outline-none cursor-pointer flex-1 sm:flex-none transition-colors ${
-                      sortBy === 'price_asc' ||
-                      sortBy === 'price_desc'
-                        ? 'bg-[#ee4d2d] text-white border-[#ee4d2d]'
-                        : 'bg-white text-gray-800 border-transparent'
-                    }`}
-                  >
-                    <option
-                      value="default"
-                      className="bg-white text-black"
-                    >
-                      Giá (Mặc định)
-                    </option>
-                    <option
-                      value="price_asc"
-                      className="bg-white text-black"
-                    >
-                      Giá: Thấp đến Cao
-                    </option>
-                    <option
-                      value="price_desc"
-                      className="bg-white text-black"
-                    >
-                      Giá: Cao đến Thấp
-                    </option>
-                  </select>
-                </div>
-              </div>
+               <button
+              onClick={() => handleSortToggle('highestRated')}
+              className={`rounded-sm px-2 py-2 text-xs transition-colors sm:px-5 sm:text-sm ${
+                sortBy === 'highestRated'
+                  ? 'bg-[#ee4d2d] text-white shadow-sm'
+                  : 'bg-white text-gray-800 hover:bg-gray-50'
+              }`}
+              >
+                <span className="sm:hidden">Đánh giá</span>
+                <span className="hidden sm:inline">Đánh giá cao</span>
+              </button>
+
+              <select
+                value={
+                  sortBy === 'price_asc' || sortBy === 'price_desc'
+                    ? sortBy
+                    : 'default'
+                }
+                onChange={e => handleSortToggle(e.target.value)}
+                className={`min-w-0 rounded-sm border px-2 py-2 text-xs outline-none transition-colors sm:px-4 sm:text-sm ${
+                  sortBy === 'price_asc' || sortBy === 'price_desc'
+                    ? 'border-[#ee4d2d] bg-[#ee4d2d] text-white'
+                    : 'border-transparent bg-white text-gray-800'
+                }`}
+              >
+                <option value="default">Giá</option>
+                <option value="price_asc">Thấp → Cao</option>
+                <option value="price_desc">Cao → Thấp</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        {isLoading ? (
+          <div className="flex h-64 items-center justify-center">
+            <div className="h-10 w-10 animate-spin rounded-full border-b-2 border-[#ee4d2d]" />
+          </div>
+        ) : products.length === 0 ? (
+          <div className="flex flex-col items-center rounded-sm bg-white p-8 text-center shadow-sm sm:p-16">
+            <p className="text-sm text-gray-500 sm:text-lg">
+              Không tìm thấy sản phẩm nào phù hợp.
+            </p>
+          </div>
+        ) : (
+          <>
+            <div className="mb-10 grid grid-cols-2 gap-3 sm:grid-cols-2 sm:gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+              {products.map(product => (
+                <ProductCard
+                  key={product.id || product._id}
+                  product={product}
+                />
+              ))}
             </div>
 
-            {isLoading ? (
-              <div className="flex justify-center items-center h-64">
-                <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#ee4d2d]" />
-              </div>
-            ) : products.length === 0 ? (
-              <div className="bg-white rounded-sm shadow-sm p-16 text-center flex flex-col items-center">
-                <p className="text-gray-500 text-lg">
-                  Không tìm thấy sản phẩm nào phù hợp.
-                </p>
-              </div>
-            ) : (
-              <>
-                <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4 mb-10">
-                  {products.map(product => (
-                    <ProductCard
-                      key={product.id || product._id}
-                      product={product}
-                    />
-                  ))}
-                </div>
-
-                <div className="flex justify-center mt-6">
-                  <Pagination
-                    currentPage={currentPage}
-                    totalPages={totalPages}
-                    onPageChange={setCurrentPage}
-                  />
-                </div>
-              </>
-            )}
-          </main>
-        </div>
-      </div>
+            <div className="mt-6 flex justify-center overflow-x-auto">
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+              />
+            </div>
+          </>
+        )}
+      </main>
     </div>
-  );
+  </div>
+);
 };
 
 export default CustomerHome;

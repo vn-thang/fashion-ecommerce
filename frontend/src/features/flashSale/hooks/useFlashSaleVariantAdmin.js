@@ -118,8 +118,6 @@ setAvailableVariants(data.products || []);
       setAvailableTotalItems(data.pagination?.totalItems || 0);
     }catch (error) {
   console.error(error);
-  console.log(error.response);
-  console.log(error.response?.data);
 
   toast.error(
     error.response?.data?.message || 'Không thể tải danh sách sản phẩm'

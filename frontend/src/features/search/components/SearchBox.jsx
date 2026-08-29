@@ -4,6 +4,7 @@ import useSearchHistory from '../hooks/useSearchHistory';
 import SearchHistory from './SearchHistory';
 import useSearchAutocomplete from '../hooks/useSearchAutocomplete';
 import SearchAutocomplete from './SearchAutocomplete';
+import { Search } from 'lucide-react';
 
 const SearchBox = () => {
   const navigate = useNavigate();
@@ -124,27 +125,32 @@ const SearchBox = () => {
           "
         />
 
-        <button
-          type="submit"
-          className="
-            absolute
-            right-0
-            top-0
-            flex
-            h-11
-            w-12
-            items-center
-            justify-center
-            rounded-r-md
-            bg-[#ee4d2d]
-            text-white
-            transition-colors
-            hover:bg-[#d74123]
-          "
-          aria-label="Tìm kiếm"
-        >
-          🔍
-        </button>
+      <button
+  type="submit"
+  className="
+    absolute
+    right-0
+    top-0
+    flex
+    h-11
+    w-12
+    items-center
+    justify-center
+    rounded-r-md
+    bg-[#C97C7C]
+    text-white
+    transition-all
+    duration-200
+    hover:bg-[#B86B6B]
+    active:scale-95
+  "
+  aria-label="Tìm kiếm"
+>
+  <Search
+    className="h-[19px] w-[19px]"
+    strokeWidth={1.7}
+  />
+</button>
       </form>
 {isFocused && (
   <>

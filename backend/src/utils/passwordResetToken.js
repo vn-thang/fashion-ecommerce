@@ -1,6 +1,6 @@
 const crypto = require('crypto');
 
-const generatePasswordResetToken = () => {
+const generateToken = () => {
   const token = crypto.randomBytes(32).toString('hex');
 
   const tokenHash = crypto
@@ -14,6 +14,15 @@ const generatePasswordResetToken = () => {
   };
 };
 
+const generatePasswordResetToken = () => {
+  return generateToken();
+};
+
+const generateEmailVerificationToken = () => {
+  return generateToken();
+};
+
 module.exports = {
-  generatePasswordResetToken
+  generatePasswordResetToken,
+  generateEmailVerificationToken
 };

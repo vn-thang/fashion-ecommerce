@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
 
-const authenticate = require('../../middlewares/auth.middleware');
-const checkRole = require('../../middlewares/role.middleware');
-const couponValidation = require('./coupon.validation');
+const authenticate = require('../../../middlewares/auth.middleware');
+const checkRole = require('../../../middlewares/role.middleware');
+const couponValidation = require('../coupon.validation');
 const couponAdminController = require('./coupon.admin.controller');
 
 router.post(

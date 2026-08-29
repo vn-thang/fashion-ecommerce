@@ -56,6 +56,7 @@ const ProductTable = ({
           
           <tbody className="divide-y divide-gray-150">
             {products.map((item) => {
+              const isActive = item.status === 'ACTIVE';
               const activeVariants = (item.variants || []).filter(v => v.status === 'ACTIVE');
               const variantCount = activeVariants.length;
               const totalStock = activeVariants.reduce((sum, v) => sum + Number(v.stockQuantity || 0), 0);
@@ -67,16 +68,38 @@ const ProductTable = ({
 
               return (
                 <React.Fragment key={item.id}>
-                  <tr className={`hover:bg-slate-50/60 transition-colors duration-150 group ${isExpanded ? 'bg-slate-50/40' : ''}`}>
+                 <tr
+                      className={`
+                        transition-colors duration-150 group
+                        ${isActive
+                          ? 'hover:bg-slate-50/60'
+                          : 'bg-gray-50/80 opacity-60'
+                        }
+                        ${isExpanded && isActive ? 'bg-slate-50/40' : ''}
+                      `}
+                    >
                     
-                    <td className="px-4 py-4.5 text-center">
-                      <button
-                        onClick={() => toggleRow(item.id)}
-                        className={`w-7 h-7 inline-flex items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-500 shadow-sm hover:text-indigo-600 hover:border-indigo-200 transition-all ${isExpanded ? 'rotate-90 text-indigo-600 bg-indigo-50/50' : ''}`}
-                      >
-                        ▶
-                      </button>
-                    </td>
+                   <td className="px-4 py-4.5 text-center">
+                  {isActive && (
+                    <button
+                      onClick={() => toggleRow(item.id)}
+                      className={`
+                        w-7 h-7 inline-flex items-center justify-center
+                        rounded-lg border border-gray-200 bg-white
+                        text-gray-500 shadow-sm
+                        hover:text-indigo-600 hover:border-indigo-200
+                        transition-all
+                        ${isExpanded
+                          ? 'rotate-90 text-indigo-600 bg-indigo-50/50'
+                          : ''
+                        }
+                      `}
+                      title="Xem biến thể"
+                    >
+                      ▶
+                    </button>
+                  )}
+                </td>
 
                     <td className="px-6 py-4.5">
                       <div className="flex items-center gap-4">
@@ -122,36 +145,102 @@ const ProductTable = ({
                       </span>
                     </td>
 
-                    <td className="px-6 py-4.5 text-center">
-                      <div className="flex justify-center items-center gap-2">
-                        <Button 
-                          size="sm" 
-                          variant="outline" 
-                          className="border-gray-200 text-sky-600 hover:border-sky-500 hover:text-sky-700 shadow-sm bg-white" 
+                  <td className="px-6 py-4.5 text-center">
+                  <div className="flex justify-center items-center gap-2">
+
+                    {/* Sản phẩm ACTIVE */}
+                    {isActive ? (
+                      <>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="
+                            border-gray-200
+                            text-sky-600
+                            hover:border-sky-500
+                            hover:text-sky-700
+                            shadow-sm
+                            bg-white
+                          "
                           onClick={() => onManageImages(item)}
                         >
                           📸 Album
                         </Button>
 
-                        <Button 
-                          size="sm" 
-                          variant="outline" 
-                          className="border-gray-200 text-amber-600 hover:border-amber-500 hover:text-amber-700 shadow-sm bg-white" 
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="
+                            border-gray-200
+                            text-amber-600
+                            hover:border-amber-500
+                            hover:text-amber-700
+                            shadow-sm
+                            bg-white
+                          "
                           onClick={() => onManageVariants(item)}
                         >
                           📦 Phân loại
                         </Button>
 
-                        <div className="w-px h-6 bg-gray-200 mx-1"></div>
+                        <div className="w-px h-6 bg-gray-200 mx-1" />
 
-                        <Button size="sm" variant="outline" className="border-gray-200 text-slate-600 hover:border-indigo-500 hover:text-indigo-600 shadow-sm bg-white" onClick={() => onEdit(item)}>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="
+                            border-gray-200
+                            text-slate-600
+                            hover:border-indigo-500
+                            hover:text-indigo-600
+                            shadow-sm
+                            bg-white
+                          "
+                          onClick={() => onEdit(item)}
+                        >
                           ✏️ Sửa
                         </Button>
-                        <Button size="sm" variant="danger" className="bg-rose-50 border border-rose-200 text-rose-600 hover:bg-rose-600 hover:text-white shadow-sm" onClick={() => onDelete(item.id)}>
+
+                        <Button
+                          size="sm"
+                          variant="danger"
+                          className="
+                            bg-rose-50
+                            border border-rose-200
+                            text-rose-600
+                            hover:bg-rose-600
+                            hover:text-white
+                            shadow-sm
+                          "
+                          onClick={() => onDelete(item.id)}
+                        >
                           🗑️ Ẩn
                         </Button>
-                      </div>
-                    </td>
+                      </>
+                    ) : (
+
+                      /* Sản phẩm INACTIVE */
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="
+                          border-indigo-200
+                          bg-indigo-50
+                          text-indigo-600
+                          hover:border-indigo-500
+                          hover:bg-indigo-600
+                          hover:text-white
+                          shadow-sm
+                        "
+                        onClick={() => onEdit(item)}
+                      >
+                        ✏️ Kích hoạt lại
+                      </Button>
+
+                    )}
+
+                  </div>
+                </td>
                   </tr>
                   {isExpanded && (
                     <tr className="bg-slate-50/50 border-l-4 border-l-indigo-500 transition-all duration-300">

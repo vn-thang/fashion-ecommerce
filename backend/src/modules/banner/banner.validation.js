@@ -11,13 +11,6 @@ const bannerValidation = {
       });
     }
 
-    if (title !== undefined && title.trim() === '') {
-      return res.status(400).json({
-        success: false,
-        message: MESSAGES.TITLE_REQUIRED
-      });
-    }
-
     if (
       displayOrder !== undefined &&
       (isNaN(displayOrder) || Number(displayOrder) < 0)
@@ -33,13 +26,6 @@ const bannerValidation = {
 
   validateUpdate: (req, res, next) => {
     const { title, displayOrder } = req.body;
-
-    if (title !== undefined && title.trim() === '') {
-      return res.status(400).json({
-        success: false,
-        message: MESSAGES.TITLE_REQUIRED
-      });
-    }
 
     if (
       displayOrder !== undefined &&

@@ -10,8 +10,8 @@ import { useAuth } from '../../auth/store/authContext';
 
 const NotificationDropdown = ({ onClose }) => {
   const navigate = useNavigate();
-
   const { user } = useAuth();
+
   const {
     loading,
     notifications,
@@ -20,35 +20,33 @@ const NotificationDropdown = ({ onClose }) => {
     markAllAsRead
   } = useNotification();
 
-const {
-  openNotification
-} = useContext(NotificationContext);
+  const { openNotification } = useContext(NotificationContext);
 
-const handleViewAll = () => {
-  onClose();
+  const handleViewAll = () => {
+    onClose();
 
-  if (user?.role?.toUpperCase() === 'ADMIN') {
-    navigate('/admin/notifications');
-    return;
-  }
+    if (user?.role?.toUpperCase() === 'ADMIN') {
+      navigate('/admin/notifications');
+      return;
+    }
 
-  navigate('/notifications');
-};
+    navigate('/notifications');
+  };
 
   const handleOpenNotification = notification => {
     openNotification(notification);
   };
 
   return (
-    <div className="absolute right-0 top-12 z-50 w-[380px] overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-xl shadow-gray-900/10">
-      <div className="flex items-center justify-between border-b border-gray-100 bg-white px-5 py-4">
-        <div>
+    <div className="fixed inset-x-2 top-[60px] z-50 overflow-hidden rounded-xl border border-gray-100 bg-white shadow-xl shadow-gray-900/10 sm:absolute sm:inset-x-auto sm:right-0 sm:top-12 sm:w-[380px] sm:rounded-2xl">
+      <div className="flex items-center justify-between gap-3 border-b border-gray-100 px-4 py-3 sm:px-5 sm:py-4">
+        <div className="min-w-0">
           <h2 className="text-base font-bold text-gray-900">
             Thông báo
           </h2>
 
           {unreadCount > 0 && (
-            <p className="mt-0.5 text-xs text-gray-500">
+            <p className="mt-0.5 truncate text-xs text-gray-500">
               {unreadCount} thông báo chưa đọc
             </p>
           )}
@@ -59,12 +57,14 @@ const handleViewAll = () => {
             variant="ghost"
             size="sm"
             onClick={markAllAsRead}
+            className="shrink-0 whitespace-nowrap"
           >
             Đọc tất cả
           </Button>
         )}
       </div>
-      <div className="max-h-[420px] overflow-y-auto">
+
+      <div className="max-h-[calc(100vh-160px)] overflow-y-auto sm:max-h-[420px]">
         <NotificationList
           notifications={notifications.slice(0, 15)}
           loading={loading}
@@ -72,7 +72,8 @@ const handleViewAll = () => {
           onOpen={handleOpenNotification}
         />
       </div>
-      <div className="border-t border-gray-100 bg-gray-50/70 p-3">
+
+      <div className="border-t border-gray-100 bg-gray-50/70 p-2.5 sm:p-3">
         <button
           type="button"
           onClick={handleViewAll}

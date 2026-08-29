@@ -142,11 +142,14 @@ createOrderTransaction: async ({
                 gte: item.quantity
               }
             },
-            data: {
-              flashSaleStock: {
-                decrement: item.quantity
-              }
-            }
+           data: {
+        flashSaleStock: {
+          decrement: item.quantity
+        },
+        soldCount: {
+          increment: item.quantity
+        }
+      }
           });
 
         if (flashSaleStockUpdate.count === 0) {
@@ -229,26 +232,26 @@ createOrderTransaction: async ({
       });
     }
 
-    if (couponId) {
-      await tx.couponUsage.create({
-        data: {
-          couponId,
-          userId,
-          orderId: order.id
-        }
-      });
-
-      await tx.coupon.update({
-        where: {
-          id: couponId
-        },
-        data: {
-          usageLimit: {
-            decrement: 1
-          }
-        }
-      });
+if (couponId) {
+  await tx.couponUsage.create({
+    data: {
+      couponId,
+      userId,
+      orderId: order.id
     }
+  });
+
+  await tx.coupon.update({
+    where: {
+      id: couponId
+    },
+    data: {
+      usedCount: {
+        increment: 1
+      }
+    }
+  });
+}
 
     const createdOrder = await tx.order.findUnique({
       where: {
@@ -509,11 +512,11 @@ restoreOrderResourcesTransaction: async (orderId) => {
           where: {
             id: usage.couponId
           },
-          data: {
-            usageLimit: {
-              increment: 1
-            }
-          }
+       data: {
+  usedCount: {
+    decrement: 1
+  }
+}
         });
 
         await tx.couponUsage.delete({

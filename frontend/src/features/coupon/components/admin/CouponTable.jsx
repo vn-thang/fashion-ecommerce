@@ -101,8 +101,7 @@ const CouponTable = ({
           <tbody className="divide-y divide-gray-100">
             {coupons.map(item => {
               const status = getStatus(item);
-              const usedCount =
-                item._count?.usages || item.usedCount || 0;
+            const usedCount = item.usedCount || 0;
 
               return (
                 <tr
@@ -132,11 +131,13 @@ const CouponTable = ({
                   </td>
 
                   <td className="px-5 py-4 text-sm">
-                    <span className="font-semibold text-slate-700">
+                   <span className="font-semibold text-slate-700">
                       {usedCount}
                     </span>
+
                     <span className="text-gray-400">
-                      {' / '}{item.usageLimit}
+                      {' / '}
+                      {item.usageLimit}
                     </span>
                   </td>
 

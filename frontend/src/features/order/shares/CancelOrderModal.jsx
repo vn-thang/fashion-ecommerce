@@ -113,23 +113,8 @@ const CancelOrderModal = ({
           <div className="mt-4 border-t border-amber-200 pt-3">
 
             <p className="text-sm text-amber-800 leading-6">
-              Sau khi hủy đơn:
+            Sau khi xác nhận, đơn hàng sẽ không thể khôi phục.
             </p>
-
-            <ul className="mt-2 space-y-1 text-sm text-gray-700 list-disc pl-5">
-
-              <li>Sản phẩm sẽ được hoàn lại kho.</li>
-
-              <li>
-                Nếu đơn chưa thanh toán, mã giảm giá sẽ được hoàn lại
-                (nếu có).
-              </li>
-
-              <li>
-                Sau khi xác nhận, đơn hàng sẽ không thể khôi phục.
-              </li>
-
-            </ul>
 
           </div>
 

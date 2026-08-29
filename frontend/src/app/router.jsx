@@ -39,6 +39,8 @@ import AuditLogPage from '../features/auditLog/pages/admin/AuditLogPage';
 import NotificationPage from '../features/notification/pages/customer/NotificationPage';
 import AdminNotificationPage from '../features/notification/pages/admin/AdminNotificationPage';
 import ChatAdminPage from '../features/chat/pages/admin/ChatAdminPage';
+import ChangePasswordPage from '../features/auth/pages/ChangePasswordPage';
+import VerifyEmailPage from '../features/auth/pages/VerifyEmailPage';
 
 const ProtectedRoute = ({ children }) => {
   const { token } = useAuth();
@@ -144,7 +146,10 @@ export const router = createBrowserRouter([
     path: '/register',
     element: <RegisterPage />,
   },
-
+ {
+    path: '/verify-email',
+    element: <VerifyEmailPage />,
+  },
   {
     path: '/forgot-password',
     element: <ForgotPasswordPage />,
@@ -162,6 +167,10 @@ export const router = createBrowserRouter([
       {
         path: 'dashboard',
         element: <DashBoardPage />,
+      },
+     {
+      path: "change-password",
+      element: <ChangePasswordPage />
       },
       {
        path: 'categories',

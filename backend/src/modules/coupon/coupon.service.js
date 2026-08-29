@@ -38,62 +38,75 @@ const couponService = {
     return coupon;
   },
 
- getAllCoupons: async (queryParams = {}, userId = null) => {
+getAllCoupons: async (
+  queryParams = {},
+  userId = null
+) => {
+  const {
+    search,
+    discountType,
+    status,
+    fromDate,
+    toDate,
+    isActive,
+    page: rawPage,
+    limit: rawLimit
+  } = queryParams;
+
+  const {
+    page,
+    limit,
+    skip
+  } = getPagination(
+    rawPage,
+    rawLimit
+  );
+
+  const {
+    coupons,
+    totalItems
+  } = await couponRepository.findAllPaginated({
+    search,
+    discountType,
+    status,
+    fromDate,
+    toDate,
+    isActive,
+    skip,
+    take: limit,
+    userId
+  });
+
+  const processedCoupons = coupons.map(coupon => {
+    const isUsed = userId
+      ? coupon.usages?.length > 0
+      : undefined;
+
     const {
-      search,
-      discountType,
-      status,
-      fromDate,
-      toDate,
-      isActive,
-      page: rawPage,
-      limit: rawLimit
-    } = queryParams;
-
-    const { page, limit, skip } = getPagination(
-      rawPage,
-      rawLimit
-    );
-
-    const { coupons, totalItems } =
-      await couponRepository.findAllPaginated({
-        search,
-        discountType,
-        status,
-        fromDate,
-        toDate,
-        isActive,
-        skip,
-        take: limit,
-        userId
-      });
-
-    let processedCoupons = coupons;
-
-    if (userId) {
-      processedCoupons = coupons.map(coupon => {
-        const isUsed =
-          coupon.usages?.length > 0;
-
-        const { usages, ...restData } = coupon;
-
-        return {
-          ...restData,
-          isUsed,
-          isOutOfStock: restData.usageLimit <= 0
-        };
-      });
-    }
+      usages,
+      ...restData
+    } = coupon;
 
     return {
-      coupons: processedCoupons,
-      pagination: getPaginationMetadata(
-        totalItems,
-        page,
-        limit
-      )
+      ...restData,
+      usedCount: restData.usedCount,
+      ...(userId && {
+        isUsed
+      }),
+      isOutOfStock:
+        restData.usedCount >= restData.usageLimit
     };
-  },
+  });
+
+  return {
+    coupons: processedCoupons,
+    pagination: getPaginationMetadata(
+      totalItems,
+      page,
+      limit
+    )
+  };
+},
 
   getCouponById: async id => {
     const coupon = await couponRepository.findById(id);

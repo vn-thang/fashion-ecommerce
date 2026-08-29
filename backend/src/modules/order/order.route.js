@@ -10,7 +10,9 @@ router.use(authenticate);
 
 router.post('/preview', orderValidation.validatePreview, orderController.previewCheckout);
 
-router.post('/create',createOrderRateLimiter, orderValidation.validateCreateOrder, orderController.createOrder);
+router.post('/create',
+  createOrderRateLimiter,
+  orderValidation.validateCreateOrder, orderController.createOrder);
 
 router.get('/', orderController.getMyOrders);
 

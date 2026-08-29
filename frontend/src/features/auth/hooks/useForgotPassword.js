@@ -7,7 +7,7 @@ export const useForgotPassword = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleForgotPassword = async (e) => {
+  const handleForgotPassword = async e => {
     e.preventDefault();
 
     setError('');
@@ -21,17 +21,21 @@ export const useForgotPassword = () => {
     setLoading(true);
 
     try {
-      const data = await authApi.forgotPassword(email.trim());
+      const data = await authApi.forgotPassword(
+        email.trim()
+      );
 
       setMessage(
         data?.message ||
-        'Link đặt lại mật khẩu đã được gửi vào Email của bạn!'
+          'Link đặt lại mật khẩu đã được gửi vào Email của bạn!'
       );
     } catch (err) {
-      setError(
+      const message =
+        err.response?.data?.message ||
         err.message ||
-        'Có lỗi xảy ra, vui lòng thử lại!'
-      );
+        'Có lỗi xảy ra, vui lòng thử lại.';
+
+      setError(message);
     } finally {
       setLoading(false);
     }

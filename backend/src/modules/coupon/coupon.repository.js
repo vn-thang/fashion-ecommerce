@@ -6,94 +6,119 @@ const couponRepository = {
   },
 
   findAllPaginated: async ({
-    search,
-    discountType,
-    status,
-    fromDate,
-    toDate,
-    isActive,
-    skip,
-    take,
-    userId
-  }) => {
-    const now = new Date();
-    const where = {};
+  search,
+  discountType,
+  status,
+  fromDate,
+  toDate,
+  isActive,
+  skip,
+  take,
+  userId
+}) => {
+  const now = new Date();
+  const where = {};
 
-    if (search?.trim()) {
-      where.code = {
-        contains: search.trim(),
-        mode: 'insensitive'
-      };
-    }
+  if (search?.trim()) {
+    where.code = {
+      contains: search.trim(),
+      mode: 'insensitive'
+    };
+  }
 
-    if (discountType) {
-      where.discountType = discountType;
-    }
+  if (discountType) {
+    where.discountType = discountType;
+  }
 
-    if (isActive !== undefined) {
-      where.isActive = isActive === true || isActive === 'true';
-    }
+  if (isActive !== undefined) {
+    where.isActive =
+      isActive === true || isActive === 'true';
+  }
 
-    if (status) {
-      if (status === 'ACTIVE') {
-        where.isActive = true;
-        where.startDate = { lte: now };
-        where.endDate = { gte: now };
-      }
-
-      if (status === 'UPCOMING') {
-        where.isActive = true;
-        where.startDate = { gt: now };
-      }
-
-      if (status === 'EXPIRED') {
-        where.isActive = true;
-        where.endDate = { lt: now };
-      }
-
-      if (status === 'INACTIVE') {
-        where.isActive = false;
-      }
-    }
-
-    if (fromDate || toDate) {
+  if (status) {
+    if (status === 'ACTIVE') {
+      where.isActive = true;
       where.startDate = {
-        ...(where.startDate || {}),
-        ...(fromDate ? { gte: new Date(fromDate) } : {})
+        lte: now
       };
-
-      if (toDate) {
-        const endDate = new Date(toDate);
-        endDate.setHours(23, 59, 59, 999);
-
-        where.endDate = {
-          ...(where.endDate || {}),
-          lte: endDate
-        };
-      }
+      where.endDate = {
+        gte: now
+      };
     }
 
-    const includeConfig = userId
-      ? {
-          usages: {
-            where: { userId }
+    if (status === 'UPCOMING') {
+      where.isActive = true;
+      where.startDate = {
+        gt: now
+      };
+    }
+
+    if (status === 'EXPIRED') {
+      where.isActive = true;
+      where.endDate = {
+        lt: now
+      };
+    }
+
+    if (status === 'INACTIVE') {
+      where.isActive = false;
+    }
+  }
+
+  if (fromDate || toDate) {
+    where.startDate = {
+      ...(where.startDate || {}),
+      ...(fromDate
+        ? { gte: new Date(fromDate) }
+        : {})
+    };
+
+    if (toDate) {
+      const endDate = new Date(toDate);
+      endDate.setHours(23, 59, 59, 999);
+
+      where.endDate = {
+        ...(where.endDate || {}),
+        lte: endDate
+      };
+    }
+  }
+
+  const includeConfig = userId
+    ? {
+        usages: {
+          where: {
+            userId
+          },
+          select: {
+            id: true
           }
         }
-      : undefined;
+      }
+    : undefined;
 
-    const [coupons, totalItems] = await prisma.$transaction([
+  const [coupons, totalItems] =
+    await prisma.$transaction([
       prisma.coupon.findMany({
         where,
         skip,
         take,
-        orderBy: { startDate: 'desc' },
+        orderBy: {
+          startDate: 'desc'
+        },
         include: includeConfig
       }),
-      prisma.coupon.count({ where })
+
+      prisma.coupon.count({
+        where
+      })
     ]);
 
-    return { coupons, totalItems };
-  },
+  return {
+    coupons,
+    totalItems
+  };
+},
 
   findById: async id => {
     return prisma.coupon.findUnique({
@@ -145,8 +170,6 @@ deactivate: async id => {
         endDate: {
           gt: now
         },
-
-        // Coupon vẫn còn lượt sử dụng
         usageLimit: {
           gt: 0
         }
@@ -158,7 +181,7 @@ deactivate: async id => {
     return await prisma.user.findMany({
       where: {
         isActive: true,
-        usages: {
+        couponUsages: {
           none: {
             couponId
           }

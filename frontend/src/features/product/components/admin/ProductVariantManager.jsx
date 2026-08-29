@@ -77,56 +77,149 @@ const ProductVariantManager = ({ productId }) => {
       <div>
         <h4 className="text-sm font-bold text-slate-700 mb-3 uppercase tracking-wider">Danh sách phân loại ({variants.length})</h4>
 
-        <div className="border border-gray-200 rounded-xl overflow-hidden shadow-sm">
-          <table className="w-full text-left text-sm divide-y divide-gray-200 bg-white">
-            <thead className="bg-slate-100 text-xs font-semibold text-gray-600 uppercase">
-              <tr>
-                <th className="px-4 py-3">Mã SKU</th>
-                <th className="px-4 py-3">Màu sắc</th>
-                <th className="px-4 py-3">Kích cỡ</th>
-                <th className="px-4 py-3 text-right">Giá</th>
-                <th className="px-4 py-3 text-center">Tồn kho</th>
-                <th className="px-4 py-3 text-center">Thao tác</th>
-              </tr>
-            </thead>
+<div className="border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+  <div className="w-full overflow-x-auto">
+    <table className="w-full min-w-[850px] text-left text-sm divide-y divide-gray-200 bg-white">
+      <thead className="bg-slate-100 text-xs font-semibold text-gray-600 uppercase">
+        <tr>
+          <th className="px-4 py-3 whitespace-nowrap">Mã SKU</th>
+          <th className="px-4 py-3 whitespace-nowrap">Màu sắc</th>
+          <th className="px-4 py-3 whitespace-nowrap">Kích cỡ</th>
+          <th className="px-4 py-3 text-right whitespace-nowrap">Giá</th>
+          <th className="px-4 py-3 text-center whitespace-nowrap">Tồn kho</th>
+          <th className="px-4 py-3 text-center whitespace-nowrap">Thao tác</th>
+        </tr>
+      </thead>
 
-            <tbody className="divide-y divide-gray-100">
-              {variants.length === 0 ? (
-                <tr>
-                  <td colSpan="6" className="px-4 py-8 text-center text-gray-400 italic">Chưa có phân loại nào được tạo.</td>
-                </tr>
-              ) : (
-               variants.map(v => (
-  <tr key={v.id} className={`transition-colors ${v.status === 'INACTIVE' ? 'bg-slate-50' : editingId === v.id ? 'bg-amber-50/50' : 'hover:bg-slate-50'}`}>
-    <td className={`px-4 py-3 font-mono font-bold ${v.status === 'INACTIVE' ? 'opacity-50 text-slate-400' : 'text-indigo-600'}`}>
-      {v.sku}
-      {v.status === 'INACTIVE' && <span className="ml-2 font-sans text-[10px] text-rose-500 bg-rose-50 px-1.5 py-0.5 rounded">Đã ẩn</span>}
-    </td>
-    <td className={`px-4 py-3 ${v.status === 'INACTIVE' ? 'opacity-50 text-slate-400' : ''}`}>{v.color || '-'}</td>
-    <td className={`px-4 py-3 font-semibold ${v.status === 'INACTIVE' ? 'opacity-50 text-slate-400' : ''}`}>{v.size || '-'}</td>
-    <td className={`px-4 py-3 text-right text-emerald-600 font-semibold ${v.status === 'INACTIVE' ? 'opacity-50' : ''}`}>
-      {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(v.price)}
-    </td>
-    <td className={`px-4 py-3 text-center ${v.status === 'INACTIVE' ? 'opacity-50' : ''}`}>
-      <span className={`font-mono font-bold ${v.stockQuantity === 0 ? 'text-rose-600' : 'text-slate-700'}`}>{v.stockQuantity}</span>
-    </td>
-    <td className="px-4 py-3 text-center">
-      {v.status === 'ACTIVE' ? (
-        <div className="flex justify-center items-center gap-2">
-          <button type="button" onClick={() => openStockAdjustment(v)} className="text-indigo-600 hover:text-indigo-800 font-medium bg-indigo-50 px-2 py-1 rounded transition-colors">Điều chỉnh kho</button>
-          <button type="button" onClick={() => handleEditClick(v)} className="text-amber-600 hover:text-amber-800 font-medium bg-amber-50 px-2 py-1 rounded transition-colors">Sửa</button>
-          <button type="button" onClick={() => handleDeleteVariant(v.id)} className="text-rose-500 hover:text-rose-700 font-medium bg-rose-50 px-2 py-1 rounded transition-colors">Ẩn</button>
-        </div>
-      ) : (
-        <button type="button" onClick={() => handleActivateVariant(v.id)} className="text-emerald-700 hover:text-emerald-800 font-semibold bg-emerald-100 border border-emerald-200 px-3 py-1.5 rounded-lg transition-colors">Hiện lại</button>
-      )}
-    </td>
-  </tr>
-))
-                          )}
-                        </tbody>
-                      </table>
-                    </div>
+      <tbody className="divide-y divide-gray-100">
+        {variants.length === 0 ? (
+          <tr>
+            <td
+              colSpan="6"
+              className="px-4 py-8 text-center text-gray-400 italic"
+            >
+              Chưa có phân loại nào được tạo.
+            </td>
+          </tr>
+        ) : (
+          variants.map(v => (
+            <tr
+              key={v.id}
+              className={`transition-colors ${
+                v.status === 'INACTIVE'
+                  ? 'bg-slate-50'
+                  : editingId === v.id
+                    ? 'bg-amber-50/50'
+                    : 'hover:bg-slate-50'
+              }`}
+            >
+              <td
+                className={`px-4 py-3 font-mono font-bold whitespace-nowrap ${
+                  v.status === 'INACTIVE'
+                    ? 'opacity-50 text-slate-400'
+                    : 'text-indigo-600'
+                }`}
+              >
+                {v.sku}
+
+                {v.status === 'INACTIVE' && (
+                  <span className="ml-2 font-sans text-[10px] text-rose-500 bg-rose-50 px-1.5 py-0.5 rounded">
+                    Đã ẩn
+                  </span>
+                )}
+              </td>
+
+              <td
+                className={`px-4 py-3 whitespace-nowrap ${
+                  v.status === 'INACTIVE'
+                    ? 'opacity-50 text-slate-400'
+                    : ''
+                }`}
+              >
+                {v.color || '-'}
+              </td>
+
+              <td
+                className={`px-4 py-3 font-semibold whitespace-nowrap ${
+                  v.status === 'INACTIVE'
+                    ? 'opacity-50 text-slate-400'
+                    : ''
+                }`}
+              >
+                {v.size || '-'}
+              </td>
+
+              <td
+                className={`px-4 py-3 text-right text-emerald-600 font-semibold whitespace-nowrap ${
+                  v.status === 'INACTIVE' ? 'opacity-50' : ''
+                }`}
+              >
+                {new Intl.NumberFormat('vi-VN', {
+                  style: 'currency',
+                  currency: 'VND'
+                }).format(v.price)}
+              </td>
+
+              <td
+                className={`px-4 py-3 text-center whitespace-nowrap ${
+                  v.status === 'INACTIVE' ? 'opacity-50' : ''
+                }`}
+              >
+                <span
+                  className={`font-mono font-bold ${
+                    v.stockQuantity === 0
+                      ? 'text-rose-600'
+                      : 'text-slate-700'
+                  }`}
+                >
+                  {v.stockQuantity}
+                </span>
+              </td>
+
+              <td className="px-4 py-3 text-center whitespace-nowrap">
+                {v.status === 'ACTIVE' ? (
+                  <div className="flex justify-center items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => openStockAdjustment(v)}
+                      className="text-indigo-600 hover:text-indigo-800 font-medium bg-indigo-50 px-2 py-1 rounded transition-colors"
+                    >
+                      Điều chỉnh kho
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => handleEditClick(v)}
+                      className="text-amber-600 hover:text-amber-800 font-medium bg-amber-50 px-2 py-1 rounded transition-colors"
+                    >
+                      Sửa
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteVariant(v.id)}
+                      className="text-rose-500 hover:text-rose-700 font-medium bg-rose-50 px-2 py-1 rounded transition-colors"
+                    >
+                      Ẩn
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => handleActivateVariant(v.id)}
+                    className="text-emerald-700 hover:text-emerald-800 font-semibold bg-emerald-100 border border-emerald-200 px-3 py-1.5 rounded-lg transition-colors"
+                  >
+                    Hiện lại
+                  </button>
+                )}
+              </td>
+            </tr>
+          ))
+        )}
+      </tbody>
+    </table>
+  </div>
+</div>
                   </div>
 
 <VariantStockAdjustmentModal

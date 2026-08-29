@@ -14,6 +14,7 @@ const CustomerHeader = () => {
   
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
   const [categories, setCategories] = useState([]);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 
   const [store, setStore] = useState({
   storeName: 'FashionHub',
@@ -66,204 +67,282 @@ const CustomerHeader = () => {
     e.preventDefault();
   };
 
-  const handleLogout = () => {
+  const handleLogout = () => {  
     logout();
     navigate('/login');
   };
+ return (
+  <header className="sticky top-0 z-50 bg-white border-b border-gray-150 shadow-sm">
+    <div className="w-[95%] max-w-[1600px] mx-auto py-3 md:py-4">
+      <div className="flex flex-wrap items-center justify-between gap-3 md:flex-nowrap md:gap-8">
+        <Link
+          to="/"
+          className="flex items-center gap-2 md:gap-3 shrink-0"
+        >
+          {store.logoUrl ? (
+            <img
+              src={store.logoUrl}
+              alt={store.storeName}
+              className="w-10 h-10 md:w-14 md:h-14 rounded-full object-cover border border-gray-200"
+            />
+          ) : (
+            <div className="flex items-center justify-center w-10 h-10 md:w-14 md:h-14 rounded-full bg-gray-100 border border-gray-200 text-xl md:text-2xl">
+              🛍️
+            </div>
+          )}
 
+          <div>
+            <h1 className="text-base md:text-2xl font-extrabold text-[#ee4d2d]">
+              {store.storeName}
+            </h1>
 
-  return (
-    <header className="bg-white border-b border-gray-150 sticky top-0 z-50 shadow-sm">
-      <div className="w-[95%] max-w-[1600px] mx-auto flex items-center justify-between gap-8 py-4">
-      <Link
-  to="/"
-  className="flex items-center gap-3"
->
-  {store.logoUrl ? (
-  <img
-    src={store.logoUrl}
-    alt={store.storeName}
-    className="w-14 h-14 rounded-full object-cover border border-gray-200"
-  />
-) : (
-  <div className="w-14 h-14 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-2xl">
-    🛍️
-  </div>
-)}
-
-  <div>
-      <h1 className="text-2xl font-extrabold text-[#ee4d2d]">
-          {store.storeName}
-      </h1>
-
-      <p className="text-xs text-gray-500">
-          Official Store
-      </p>
-  </div>
-</Link>
-      <div className="flex-1 max-w-4xl">
-      <SearchBox />
+            <p className="hidden sm:block text-xs text-gray-500">
+              Official Store
+            </p>
+          </div>
+        </Link>
+        <div className="order-3 w-full md:order-none md:flex-1 md:max-w-4xl">
+          <SearchBox />
         </div>
-        <div className="flex items-center gap-8 shrink-0">
-          <Link to="/cart" className="relative cursor-pointer group flex items-center">
-        <span className="text-3xl text-gray-700 group-hover:text-[#ee4d2d] transition-colors">🛒</span>
-        
-        {cart?.totalItems > 0 && (
-          <span className="absolute -right-2 -top-1 flex h-5 w-6 items-center justify-center rounded-full border-2 border-white bg-[#ee4d2d] text-[11px] font-bold text-white">
-            {cart.totalItems > 99 ? '99+' : cart.totalItems}
-          </span>
-        )}
-      </Link>
+        <div className="flex items-center gap-3 md:gap-6 shrink-0">
+          <Link
+            to="/cart"
+            className="relative flex items-center group"
+          >
+            <span className="text-2xl md:text-3xl text-gray-700 group-hover:text-[#ee4d2d] transition-colors">
+              🛒
+            </span>
 
-      {user && <NotificationBell />}
+            {cart?.totalItems > 0 && (
+              <span className="absolute -right-2 -top-1 flex items-center justify-center w-5 h-5 text-[10px] md:text-[11px] font-bold text-white bg-[#ee4d2d] border-2 border-white rounded-full">
+                {cart.totalItems > 99 ? "99+" : cart.totalItems}
+              </span>
+            )}
+          </Link>
 
-{user ? (
-  <div className="group relative flex cursor-pointer items-center gap-2 pb-2">
-    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 text-gray-600 font-bold">
-      {user.fullName?.charAt(0) || user.username?.charAt(0) || 'U'}
-    </div>
-    <span className="text-sm font-medium text-gray-700 group-hover:text-[#ee4d2d] transition-colors">
-      {user.fullName || user.username}
-    </span>
-  <div className="absolute right-0 top-full z-50 hidden pt-2 group-hover:block">
-  <div className="flex w-48 flex-col rounded-md border border-gray-100 bg-white py-1 text-gray-700 shadow-lg">
-
-    <Link
-      to="/account/profile"
-      className="px-4 py-2 text-sm hover:bg-gray-50 hover:text-[#ee4d2d]"
-    >
-      Tài khoản của tôi
-    </Link>
-
-    <Link
-      to="/account/orders"
-      className="px-4 py-2 text-sm hover:bg-gray-50 hover:text-[#ee4d2d]"
-    >
-      Đơn mua
-    </Link>
-    {user?.role === 'Admin' && (
-      <Link
-        to="/admin/dashboard"
-        className="border-t border-gray-100 px-4 py-2 text-sm font-medium text-indigo-600 hover:bg-indigo-50"
-      >
-        Trang quản trị
-      </Link>
-    )}
-
+          {user && <NotificationBell />}
+          {user ? (
+  <div className="relative">
     <button
-      onClick={handleLogout}
-      className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 hover:text-[#ee4d2d]"
+      type="button"
+      onClick={() => setIsUserMenuOpen(prev => !prev)}
+      className="flex cursor-pointer items-center gap-2"
     >
-      Đăng xuất
+      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gray-200 font-bold text-gray-600">
+        {user.fullName?.charAt(0) || user.username?.charAt(0) || 'U'}
+      </div>
+
+      <span className="hidden max-w-[150px] truncate text-sm font-medium text-gray-700 md:inline">
+        {user.fullName || user.username}
+      </span>
     </button>
 
-  </div>
-</div>
+    {isUserMenuOpen && (
+      <div className="absolute right-0 top-full z-50 w-48 pt-2">
+        <div className="flex flex-col rounded-md border border-gray-100 bg-white py-1 text-gray-700 shadow-lg">
+          <Link
+            to="/account/profile"
+            onClick={() => setIsUserMenuOpen(false)}
+            className="px-4 py-2 text-sm hover:bg-gray-50 hover:text-[#ee4d2d]"
+          >
+            Tài khoản của tôi
+          </Link>
+
+          <Link
+            to="/account/orders"
+            onClick={() => setIsUserMenuOpen(false)}
+            className="px-4 py-2 text-sm hover:bg-gray-50 hover:text-[#ee4d2d]"
+          >
+            Đơn mua
+          </Link>
+
+          {user.role === 'Admin' && (
+            <Link
+              to="/admin/dashboard"
+              onClick={() => setIsUserMenuOpen(false)}
+              className="border-t border-gray-100 px-4 py-2 text-sm font-medium text-indigo-600 hover:bg-indigo-50"
+            >
+              Trang quản trị
+            </Link>
+          )}
+
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 hover:text-[#ee4d2d]"
+          >
+            Đăng xuất
+          </button>
+        </div>
+      </div>
+    )}
   </div>
 ) : (
-  <div className="flex items-center gap-3">
-    <Link to="/register" className="text-sm font-medium text-gray-600 hover:text-[#ee4d2d] transition-colors">Đăng ký</Link>
-    <span className="h-4 w-[1px] bg-gray-300"></span>
-    <Link to="/login" className="rounded-sm bg-[#ee4d2d] px-4 py-2 text-sm font-medium text-white hover:bg-[#d74123] transition-colors shadow-sm">Đăng nhập</Link>
+  <div className="flex items-center gap-2 md:gap-3">
+    <Link
+      to="/register"
+      className="hidden text-sm font-medium text-gray-600 hover:text-[#ee4d2d] sm:block"
+    >
+      Đăng ký
+    </Link>
+
+    <span className="hidden h-4 w-px bg-gray-300 sm:block" />
+
+    <Link
+      to="/login"
+      className="rounded-sm bg-[#ee4d2d] px-3 py-2 text-xs font-medium text-white shadow-sm hover:bg-[#d74123] md:px-4 md:text-sm"
+    >
+      Đăng nhập
+    </Link>
   </div>
 )}
         </div>
       </div>
-      <div className="bg-[#ee4d2d] text-white">
-        <div className="w-[95%] max-w-[1600px] px-4 mx-auto flex items-center">
-          
-          <div 
-            className="relative"
-            onMouseEnter={() => setIsCategoryOpen(true)}
-            onMouseLeave={() => setIsCategoryOpen(false)}
-          >
-            <div className="flex items-center gap-3 bg-[#d74123] px-6 py-3.5 font-semibold cursor-pointer w-64">
-              <span className="text-xl">☰</span> 
-              <span className="uppercase text-sm tracking-wide">Danh Mục Sản Phẩm</span>
-            </div>
-            {isCategoryOpen && (
-              <div className="absolute top-full left-0 w-64 bg-white shadow-xl border-x border-b border-gray-100 z-50 text-gray-800 rounded-b-sm">
-                
-                <ul className="flex flex-col py-1 max-h-[450px] overflow-y-auto custom-scrollbar">
-                  {categories.length === 0 ? (
-                    <li className="px-4 py-3 text-sm text-gray-400 italic text-center">
-                      Đang tải danh mục...
-                    </li>
-                  ) : (
-                    categories
-                      .filter((c) => !c.parentId)
-                      .map((parent) => {
-                        const parentId = parent._id || parent.id;
-                        const childs = categories.filter((c) => c.parentId === parentId);
+    </div>
+    <div className="bg-[#D5A6A6] text-white">
+      <div className="w-[95%] max-w-[1600px] mx-auto flex items-center">
+        <div
+          className="relative shrink-0"
+          onMouseEnter={() => setIsCategoryOpen(true)}
+          onMouseLeave={() => setIsCategoryOpen(false)}
+        >
+          <div className="flex items-center gap-2 md:gap-3 w-auto md:w-64 px-3 md:px-6 py-3 md:py-3.5 bg-[#C28D8D] cursor-pointer font-semibold hover:bg-[#B98282] transition-colors">
+            <span className="text-lg md:text-xl">☰</span>
 
-                        return (
-                          <li 
-                            key={parentId} 
-                            className="group border-b border-gray-50 last:border-none block w-full"
-                          >
-                            <Link 
-                              to={`/products?category=${parentId}`}
-                              onClick={() => setIsCategoryOpen(false)}
-                              className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 hover:text-[#ee4d2d] transition-colors text-sm font-normal text-gray-700"
-                            >
-                              <span className="flex items-center gap-2 truncate">
-                                📁 {parent.name}
-                              </span>
-                              
-                              {childs.length > 0 && (
-                                <svg 
-                                  className="w-3 h-3 text-gray-400 group-hover:text-[#ee4d2d] group-hover:translate-x-1 transition-all duration-300" 
-                                  fill="none" 
-                                  viewBox="0 0 24 24" 
-                                  stroke="currentColor"
-                                >
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                </svg>
-                              )}
-                            </Link>
-                            {childs.length > 0 && (
-                              <div className="absolute left-full top-0 hidden group-hover:block w-64 h-full z-[60] -ml-6 pl-6">
-                            
-                                <div className="bg-white shadow-2xl border-y border-r border-gray-100 h-full py-1">
-                                  <div className="px-4 py-2 bg-gray-50/50 border-b border-gray-100 text-xs font-bold text-gray-400 uppercase tracking-wider">
-                                    Nhóm {parent.name}
-                                  </div>
-                                  <ul className="flex flex-col max-h-[400px] overflow-y-auto custom-scrollbar">
-                                    {childs.map((child) => (
-                                      <li key={child._id || child.id} className="block w-full">
-                                        <Link
-                                          to={`/products?category=${child._id || child.id}`}
-                                          onClick={() => setIsCategoryOpen(false)}
-                                          className="block px-5 py-2.5 hover:bg-gray-50 hover:text-[#ee4d2d] text-sm text-gray-600 transition-colors font-normal border-l-2 border-transparent hover:border-[#ee4d2d]"
-                                        >
-                                          {child.name}
-                                        </Link>
-                                      </li>
-                                    ))}
-                                  </ul>
-                                </div>
-                              </div>
-                            )}
-                          </li>
-                        );
-                      })
-                  )}
-                </ul>
-              </div>
-            )}
+            <span className="text-xs md:text-sm uppercase tracking-wide whitespace-nowrap">
+              Danh Mục
+              <span className="hidden sm:inline"> Sản Phẩm</span>
+            </span>
           </div>
+          {isCategoryOpen && (
+            <div className="absolute left-0 top-full z-50 w-64 max-w-[90vw] bg-white text-gray-800 border-x border-b border-gray-100 rounded-b-sm shadow-xl">
 
-          <nav className="flex items-center gap-8 ml-8 font-medium text-[13px] uppercase tracking-wide">
-            <Link to="/" className="hover:text-white/80 transition-colors">Trang chủ</Link>
-            <Link to="/products" className="hover:text-white/80 transition-colors">Sản phẩm</Link>
-            <Link to="/flashSales" className="hover:text-white/80 transition-colors">⚡ Flash Sale</Link>
-            <Link to="/vouchers" className="hover:text-white/80 transition-colors">Mã Giảm Giá</Link>
-            <Link to="/news" className="hover:text-white/80 transition-colors">Tin tức Mới</Link>
-          </nav>
+              <ul className="flex flex-col py-1 max-h-[450px] overflow-y-auto custom-scrollbar">
+
+                {categories.length === 0 ? (
+                  <li className="px-4 py-3 text-sm text-gray-400 text-center italic">
+                    Đang tải danh mục...
+                  </li>
+                ) : (
+                  categories
+                    .filter(category => !category.parentId)
+                    .map(parent => {
+                      const parentId = parent._id || parent.id;
+
+                      const childs = categories.filter(
+                        category => category.parentId === parentId
+                      );
+
+                      return (
+                        <li
+                          key={parentId}
+                          className="relative group border-b border-gray-50 last:border-none"
+                        >
+
+                          <Link
+                            to={`/products?category=${parentId}`}
+                            onClick={() => setIsCategoryOpen(false)}
+                            className="flex items-center justify-between gap-2 px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#ee4d2d]"
+                          >
+                            <span className="flex items-center gap-2 truncate">
+                              📁 {parent.name}
+                            </span>
+
+                            {childs.length > 0 && (
+                              <svg
+                                className="w-3 h-3 shrink-0 text-gray-400 group-hover:text-[#ee4d2d]"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M9 5l7 7-7 7"
+                                />
+                              </svg>
+                            )}
+                          </Link>
+                          {childs.length > 0 && (
+                            <div className="absolute left-full top-0 hidden w-64 h-full pl-2 group-hover:block z-[60]">
+
+                              <div className="h-full py-1 bg-white border border-gray-100 shadow-2xl">
+
+                                <div className="px-4 py-2 text-xs font-bold text-gray-400 uppercase bg-gray-50 border-b border-gray-100">
+                                  Nhóm {parent.name}
+                                </div>
+
+                                <ul className="flex flex-col max-h-[400px] overflow-y-auto custom-scrollbar">
+
+                                  {childs.map(child => (
+                                    <li key={child._id || child.id}>
+                                      <Link
+                                        to={`/products?category=${child._id || child.id}`}
+                                        onClick={() => setIsCategoryOpen(false)}
+                                        className="block px-5 py-2.5 text-sm text-gray-600 border-l-2 border-transparent hover:border-[#ee4d2d] hover:bg-gray-50 hover:text-[#ee4d2d]"
+                                      >
+                                        {child.name}
+                                      </Link>
+                                    </li>
+                                  ))}
+
+                                </ul>
+                              </div>
+                            </div>
+                          )}
+
+                        </li>
+                      );
+                    })
+                )}
+
+              </ul>
+            </div>
+          )}
         </div>
+        <nav className="flex items-center gap-5 md:gap-8 ml-4 md:ml-8 overflow-x-auto whitespace-nowrap scrollbar-hide font-medium text-[11px] md:text-[13px] uppercase tracking-wide">
+
+          <Link
+            to="/"
+            className="shrink-0 hover:text-white/80 transition-colors"
+          >
+            Trang chủ
+          </Link>
+
+          <Link
+            to="/products"
+            className="shrink-0 hover:text-white/80 transition-colors"
+          >
+            Sản phẩm
+          </Link>
+
+          <Link
+            to="/flashSales"
+            className="shrink-0 hover:text-white/80 transition-colors"
+          >
+            ⚡ Flash Sale
+          </Link>
+
+          <Link
+            to="/vouchers"
+            className="shrink-0 hover:text-white/80 transition-colors"
+          >
+            Mã Giảm Giá
+          </Link>
+
+          <Link
+            to="/news"
+            className="shrink-0 hover:text-white/80 transition-colors"
+          >
+            Tin tức Mới
+          </Link>
+
+        </nav>
       </div>
-    </header>
-  );
+    </div>
+  </header>
+);
 };
 
 export default CustomerHeader;

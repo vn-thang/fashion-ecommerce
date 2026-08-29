@@ -63,11 +63,31 @@ createReview: async (userId, data) => {
 
  getProductReviews: async (productId, query) => {
   const page = parseInt(query.page) || 1;
-  const limit = parseInt(query.limit) || 5; 
+  const limit = parseInt(query.limit) || 5;
+
+  const rating = query.rating
+    ? parseInt(query.rating)
+    : null;
+
+  const hasComment =
+    query.hasComment === 'true'
+      ? true
+      : query.hasComment === 'false'
+        ? false
+        : null;
+
   const skip = (page - 1) * limit;
 
   const { reviews, total } =
-    await reviewRepository.getReviewsByProductId(productId, skip, limit);
+    await reviewRepository.getReviewsByProductId(
+      productId,
+      skip,
+      limit,
+      {
+        rating,
+        hasComment
+      }
+    );
 
   const totalPages = Math.ceil(total / limit);
 

@@ -46,71 +46,86 @@ callbacksRef.current = {
   onTypingStop
 ]);
 
-  useEffect(() => {
-    if (!token) {
-      socketRef.current?.disconnect();
+useEffect(() => {
+  if (!token) {
+
+    if (socketRef.current) {
+    
+      socketRef.current.disconnect();
       socketRef.current = null;
-      setIsConnected(false);
-      return;
     }
 
-    const socket = io(SOCKET_URL, {
-      auth: { token },
-      withCredentials: true,
-      transports: ['websocket', 'polling']
-    });
+    setIsConnected(false);
+    return;
+  }
 
-    socketRef.current = socket;
+  const socket = io(SOCKET_URL, {
+    auth: {
+      token
+    },
+    withCredentials: true,
+    transports: ['websocket', 'polling']
+  });
 
-    socket.on('connect', () => {
-      setIsConnected(true);
-      console.log('Chat socket connected:', socket.id);
-    });
+  socketRef.current = socket;
 
-    socket.on('connect_error', error => {
-      setIsConnected(false);
-      console.error('Chat socket connection error:', error.message);
-    });
+  socket.on('connect', () => {
+   
+    setIsConnected(true);
+  });
 
-    socket.on('message:new', message => {
-      callbacksRef.current.onNewMessage?.(message);
-    });
+  socket.on('disconnect', reason => {
+   
+    setIsConnected(false);
+  });
 
-    socket.on('message:read', data => {
-      callbacksRef.current.onRead?.(data);
-    });
+  socket.on('connect_error', error => {
+    console.error(
+      '[CHAT SOCKET] CONNECT ERROR:',
+      error.message
+    );
 
-    socket.on('message:status', data => {
-  callbacksRef.current.onMessageStatus?.(data);
-});
+    setIsConnected(false);
+  });
 
-    socket.on('user:online', data => {
-      callbacksRef.current.onUserOnline?.(data);
-    });
+  socket.on('message:new', message => {
+    callbacksRef.current.onNewMessage?.(message);
+  });
 
-    socket.on('user:offline', data => {
-      callbacksRef.current.onUserOffline?.(data);
-    });
- 
-    socket.on('typing:start', data => {  
-      callbacksRef.current.onTypingStart?.(data);
-    });
+  socket.on('message:read', data => {
+    callbacksRef.current.onRead?.(data);
+  });
 
-    socket.on('typing:stop', data => {
-      callbacksRef.current.onTypingStop?.(data);
-    });
+  socket.on('message:status', data => {
+    callbacksRef.current.onMessageStatus?.(data);
+  });
 
-    socket.on('disconnect', reason => {
-      setIsConnected(false);
-      console.log('Chat socket disconnected:', reason);
-    });
+  socket.on('user:online', data => {
+    callbacksRef.current.onUserOnline?.(data);
+  });
 
-    return () => {
-      socket.disconnect();
+  socket.on('user:offline', data => {
+    callbacksRef.current.onUserOffline?.(data);
+  });
+
+  socket.on('typing:start', data => {
+    callbacksRef.current.onTypingStart?.(data);
+  });
+
+  socket.on('typing:stop', data => {
+    callbacksRef.current.onTypingStop?.(data);
+  });
+
+  return () => {
+    socket.disconnect();
+
+    if (socketRef.current === socket) {
       socketRef.current = null;
-      setIsConnected(false);
-    };
-  }, [token]);
+    }
+
+    setIsConnected(false);
+  };
+}, [token]);
 
   const joinConversation = useCallback((conversationId, callback) => {
     const socket = socketRef.current;

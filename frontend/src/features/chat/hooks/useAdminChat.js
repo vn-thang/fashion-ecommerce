@@ -362,22 +362,12 @@ const handleNewMessage = useCallback(message => {
 useEffect(() => {
   if (!conversation?.id || !isConnected) return;
 
-  console.log(
-    '[AdminChat] Joining conversation:',
-    conversation.id
-  );
-
   setMessages([]);
   loadMessages(conversation.id);
 
   joinConversation(conversation.id);
 
   return () => {
-    console.log(
-      '[AdminChat] Leaving conversation:',
-      conversation.id
-    );
-
     stopTyping(conversation.id);
     leaveConversation(conversation.id);
   };

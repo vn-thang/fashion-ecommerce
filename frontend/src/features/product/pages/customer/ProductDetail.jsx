@@ -10,6 +10,13 @@ import useRecentlyViewed from '../../hooks/useRecentlyViewed';
 const ProductDetail = () => {
   const navigate = useNavigate();
 
+  useEffect(() => {
+  window.scrollTo({
+    top: 0,
+    behavior: 'instant'
+  });
+}, []);
+
     const {
   addRecentlyViewed
 } = useRecentlyViewed();
@@ -37,7 +44,6 @@ const ProductDetail = () => {
     loadingRelated
   } = useProductDetail();
 
-  console.log('PRODUCT DETAIL:', product);
 useEffect(() => {
   if (!product) {
     return;

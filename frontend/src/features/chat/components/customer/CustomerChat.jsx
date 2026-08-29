@@ -96,15 +96,21 @@ const CustomerChat = ({
               {conversation.store?.storeName || 'FashionHub'}
             </h3>
 
-            <div className="flex items-center gap-1.5">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+           <div className="flex items-center gap-1.5">
+            <span
+              className={`h-1.5 w-1.5 rounded-full ${
+                isAdminOnline
+                  ? 'bg-emerald-500'
+                  : 'bg-gray-300'
+              }`}
+            />
 
-             <p className="text-[11px] text-gray-400">
-  {isAdminOnline
-    ? 'Đang hoạt động'
-    : formatLastSeen(adminPresence?.lastSeenAt)}
-</p>
-            </div>
+            <p className="text-[11px] text-gray-400">
+              {isAdminOnline
+                ? 'Đang hoạt động'
+                : formatLastSeen(adminPresence?.lastSeenAt)}
+            </p>
+          </div>
           </div>
         </div>
 

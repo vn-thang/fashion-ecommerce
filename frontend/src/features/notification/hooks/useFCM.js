@@ -129,10 +129,6 @@ export const useFCM = userId  => {
   }, [userId, registerToken]);
 
   useEffect(() => {
-    console.log('[FCM] Foreground effect:', {
-      userId,
-      messaging: !!messaging
-    });
 
     if (!userId || !messaging) {
       return;
@@ -141,10 +137,6 @@ export const useFCM = userId  => {
     const unsubscribe = onMessage(
       messaging,
       payload => {
-        console.log(
-          '[FCM] Foreground payload:',
-          payload
-        );
 
         const data = payload.data || {};
 
