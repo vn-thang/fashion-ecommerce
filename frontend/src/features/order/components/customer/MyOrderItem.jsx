@@ -38,131 +38,134 @@ const MyOrderItem = ({ order, formatPrice, onCancel, onReviewClick }) => {
     }
   };
 
-  return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden mb-4">
-      <div className="flex justify-between items-center p-4 border-b border-gray-100">
-        <span className="text-sm font-semibold text-gray-800">
-          Mã đơn: {order.orderNumber || order.id}
-        </span>
+return (
+  <div className="mb-4 overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm">
+    <div className="flex flex-col gap-2 border-b border-gray-100 p-4 sm:flex-row sm:items-center sm:justify-between">
+      <span className="truncate text-sm font-semibold text-gray-800">
+        Mã đơn: {order.orderNumber || order.id}
+      </span>
 
-        <span
-          className={`text-sm font-bold uppercase ${statusConfig.color}`}
-        >
-          {statusConfig.label}
-        </span>
-      </div>
-      <div
-        className="p-4 cursor-pointer hover:bg-gray-50 transition-colors"
-        onClick={() => navigate(`/account/orders/${order.id}`)}
+      <span
+        className={`shrink-0 text-xs font-bold uppercase sm:text-sm ${statusConfig.color}`}
       >
-        {order.items?.map((item) => {
-          const variant = item.variant || {};
-          const product = variant.product || {};
+        {statusConfig.label}
+      </span>
+    </div>
 
-          const thumbnailUrl =
-            product.thumbnailUrl ||
-            'https://placehold.co/80x80?text=No+Image';
+    <div
+      className="cursor-pointer p-4 transition-colors hover:bg-gray-50"
+      onClick={() => navigate(`/account/orders/${order.id}`)}
+    >
+      {order.items?.map(item => {
+        const variant = item.variant || {};
+        const product = variant.product || {};
 
-          const originalPrice = Number(item.originalPrice || item.unitPrice);
-          const currentPrice = Number(item.unitPrice || 0);
+        const thumbnailUrl =
+          product.thumbnailUrl ||
+          'https://placehold.co/80x80?text=No+Image';
 
-          const isFlashSale =
-            item.originalPrice &&
-            Number(item.originalPrice) > Number(item.unitPrice);
+        const originalPrice = Number(
+          item.originalPrice || item.unitPrice
+        );
+        const currentPrice = Number(item.unitPrice || 0);
 
-          return (
-            <div
-              key={item.id}
-              className="flex gap-3 py-3 border-b border-gray-50 last:border-0"
-            >
-              <img
-                src={thumbnailUrl}
-                alt={item.productName || 'Sản phẩm'}
-                className="w-20 h-20 object-cover rounded-lg border border-gray-100 flex-shrink-0"
-              />
+        const isFlashSale =
+          item.originalPrice &&
+          Number(item.originalPrice) > Number(item.unitPrice);
 
-              <div className="flex-1 flex flex-col justify-between text-sm">
-                <div>
-                  <h4 className="font-medium text-gray-800 line-clamp-2">
-                    {item.productName || product.name || 'Sản phẩm'}
-                  </h4>
+        return (
+          <div
+            key={item.id}
+            className="flex gap-3 border-b border-gray-50 py-3 last:border-0 sm:gap-4"
+          >
+            <img
+              src={thumbnailUrl}
+              alt={item.productName || 'Sản phẩm'}
+              className="h-16 w-16 shrink-0 rounded-lg border border-gray-100 object-cover sm:h-20 sm:w-20"
+            />
 
-                  <p className="text-xs text-gray-500 mt-1">
-                    Phân loại: {item.color} - {item.size}
-                  </p>
-                </div>
+            <div className="flex min-w-0 flex-1 flex-col justify-between text-sm">
+              <div className="min-w-0">
+                <h4 className="line-clamp-2 font-medium text-gray-800">
+                  {item.productName || product.name || 'Sản phẩm'}
+                </h4>
 
-                <div className="flex justify-between items-center mt-2">
-                  <span className="text-gray-500">
-                    x{item.quantity}
-                  </span>
+                <p className="mt-1 truncate text-xs text-gray-500">
+                  Phân loại: {item.color} - {item.size}
+                </p>
+              </div>
 
-                  <div className="flex flex-col items-end">
-                    {isFlashSale && (
-                      <span className="text-xs text-gray-400 line-through">
-                        {formatPrice(originalPrice)}
-                      </span>
-                    )}
+              <div className="mt-2 flex items-end justify-between gap-3">
+                <span className="shrink-0 text-gray-500">
+                  x{item.quantity}
+                </span>
 
-                    <span className="font-semibold text-[#ee4d2d]">
-                      {formatPrice(currentPrice)}
+                <div className="flex min-w-0 flex-col items-end">
+                  {isFlashSale && (
+                    <span className="text-xs text-gray-400 line-through">
+                      {formatPrice(originalPrice)}
                     </span>
-                  </div>
+                  )}
+
+                  <span className="font-semibold text-[#ee4d2d]">
+                    {formatPrice(currentPrice)}
+                  </span>
                 </div>
               </div>
             </div>
-          );
-        })}
+          </div>
+        );
+      })}
+    </div>
+
+    <div className="flex flex-col gap-4 bg-gray-50/50 p-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex items-center justify-between gap-2 text-sm text-gray-600 sm:justify-start">
+        <span>Thành tiền:</span>
+
+        <span className="text-lg font-bold text-[#ee4d2d] sm:text-xl">
+          {formatPrice(order.totalAmount)}
+        </span>
       </div>
 
-      <div className="p-4 bg-gray-50/50 flex flex-col sm:flex-row justify-between items-end sm:items-center gap-4">
-        <div className="flex items-center gap-2 text-sm text-gray-600">
-          <span>Thành tiền:</span>
-
-          <span className="text-xl font-bold text-[#ee4d2d]">
-            {formatPrice(order.totalAmount)}
-          </span>
-        </div>
-
-        <div className="flex gap-2 w-full sm:w-auto">
-          {(order.status === 'PENDING' ||
-            order.status === 'PROCESSING') && (
-           <Button
+      <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
+        {(order.status === 'PENDING' ||
+          order.status === 'PROCESSING') && (
+          <Button
             variant="outline"
-            className="flex-1 sm:flex-none text-gray-600 border-gray-300 hover:bg-gray-100"
+            className="w-full border-gray-300 text-gray-600 hover:bg-gray-100 sm:w-auto"
             onClick={onCancel}
           >
             Hủy đơn
           </Button>
-          )}
+        )}
 
-          {order.status === 'COMPLETED' &&
-            (isAllReviewed ? (
-              <span className="flex-1 sm:flex-none text-xs text-gray-400 italic font-medium border border-gray-200 px-4 py-2 rounded-md bg-gray-50 flex items-center justify-center select-none">
-                Đã đánh giá
-              </span>
-            ) : (
-              <Button
-                onClick={handleReviewClick}
-                className="flex-1 sm:flex-none bg-[#ee4d2d] hover:bg-[#d74123] text-white"
-              >
-                {totalItems === 1
-                  ? 'Đánh giá'
-                  : 'Đánh giá sản phẩm'}
-              </Button>
-            ))}
+        {order.status === 'COMPLETED' &&
+          (isAllReviewed ? (
+            <span className="flex w-full items-center justify-center rounded-md border border-gray-200 bg-gray-50 px-4 py-2 text-xs font-medium italic text-gray-400 sm:w-auto">
+              Đã đánh giá
+            </span>
+          ) : (
+            <Button
+              onClick={handleReviewClick}
+              className="w-full bg-[#ee4d2d] text-white hover:bg-[#d74123] sm:w-auto"
+            >
+              {totalItems === 1
+                ? 'Đánh giá'
+                : 'Đánh giá sản phẩm'}
+            </Button>
+          ))}
 
-          <Button
-            variant="primary"
-            className="flex-1 sm:flex-none bg-slate-800 hover:bg-slate-700 text-white"
-            onClick={() => navigate(`/account/orders/${order.id}`)}
-          >
-            Xem chi tiết
-          </Button>
-        </div>
+        <Button
+          variant="primary"
+          className="w-full bg-slate-800 text-white hover:bg-slate-700 sm:w-auto"
+          onClick={() => navigate(`/account/orders/${order.id}`)}
+        >
+          Xem chi tiết
+        </Button>
       </div>
     </div>
-  );
+  </div>
+);
 };
 
 export default MyOrderItem;

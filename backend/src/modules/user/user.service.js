@@ -172,13 +172,27 @@ updateUserStatus: async (adminId, userId, isActive) => {
     throw new Error(MESSAGES.USER_NOT_FOUND);
   }
 
+if (adminId === userId) {
+  throw new Error('Bạn không thể thay đổi trạng thái tài khoản của chính mình.');
+}
+
+if (user.role === 'Admin') {
+  throw new Error('Không thể thay đổi trạng thái tài khoản Admin.');
+}
+
+  if (user.isActive === isActive) {
+    return user;
+  }
+
   const updatedUser = await userRepository.updateUser(userId, {
     isActive
   });
 
   await auditLogService.createAuditLog({
     userId: adminId,
-    action: isActive ? 'ACTIVATE_USER' : 'DEACTIVATE_USER',
+    action: isActive
+      ? 'ACTIVATE_USER'
+      : 'DEACTIVATE_USER',
     entityName: 'User',
     entityId: userId,
     oldValues: {
@@ -188,6 +202,7 @@ updateUserStatus: async (adminId, userId, isActive) => {
       isActive: updatedUser.isActive
     }
   });
+
   if (isActive) {
     await notificationService.createNotification({
       userId,

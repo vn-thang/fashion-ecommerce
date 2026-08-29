@@ -13,9 +13,5 @@ export const profileApi = {
     return axiosInstance.post('/users/profile/avatar', formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     });
-  },
-
-  changePassword: (data) => {
-    return axiosInstance.put('/users/profile/change-password', data);
   }
 };

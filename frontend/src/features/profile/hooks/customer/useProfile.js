@@ -27,7 +27,6 @@ export const useProfile = () => {
     try {
       await profileApi.updateProfile(formData);
       if (avatarFile) {
-        console.log("=== Phát hiện ảnh mới, đang upload lên Cloudinary ===");
         const imageFormData = new FormData();
         
         imageFormData.append('avatar', avatarFile); 

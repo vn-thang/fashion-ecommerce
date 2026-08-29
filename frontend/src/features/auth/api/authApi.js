@@ -35,6 +35,42 @@ export const authApi = {
     }
   },
 
+   verifyEmail: async token => {
+    try {
+      const data = await axiosInstance.get(
+        '/auth/verify-email',
+        {
+          params: { token }
+        }
+      );
+
+      return data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message ||
+          'Xác thực email thất bại!'
+      );
+    }
+  },
+
+  resendVerificationEmail: async email => {
+    try {
+      const data = await axiosInstance.post(
+        '/auth/resend-verification',
+        {
+          email
+        }
+      );
+
+      return data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message ||
+          'Không thể gửi lại email xác thực!'
+      );
+    }
+  },
+
   forgotPassword: async (email) => {
     try {
       const data = await axiosInstance.post('/auth/forgot-password', {
@@ -65,6 +101,25 @@ export const authApi = {
       );
     }
   },
+
+  changePassword: async (currentPassword, newPassword) => {
+  try {
+    const data = await axiosInstance.put(
+      '/auth/change-password',
+      {
+        currentPassword,
+        newPassword,
+      }
+    );
+
+    return data;
+  } catch (error) {
+    throw new Error(
+      error.response?.data?.message ||
+      'Đổi mật khẩu thất bại!'
+    );
+  }
+},
 
   logout: async () => {
     try {

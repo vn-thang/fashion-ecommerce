@@ -35,18 +35,39 @@ createReview: async (reviewData) => {
   });
 },
 
-getReviewsByProductId: async (productId, skip, limit) => {
+getReviewsByProductId: async (
+  productId,
+  skip,
+  limit,
+  filters = {}
+) => {
   const whereCondition = {
     productId,
     isHidden: false
   };
+
+  if (filters.rating) {
+    whereCondition.rating = filters.rating;
+  }
+
+  if (filters.hasComment === true) {
+    whereCondition.comment = {
+      not: null
+    };
+  }
+
+  if (filters.hasComment === false) {
+    whereCondition.comment = null;
+  }
 
   const [reviews, total] = await Promise.all([
     prisma.review.findMany({
       where: whereCondition,
       skip,
       take: limit,
-      orderBy: { createdAt: 'desc' },
+      orderBy: {
+        createdAt: 'desc'
+      },
       include: {
         user: {
           select: {
@@ -67,13 +88,18 @@ getReviewsByProductId: async (productId, skip, limit) => {
         }
       }
     }),
+
     prisma.review.count({
       where: whereCondition
     })
   ]);
 
-  return { reviews, total };
+  return {
+    reviews,
+    total
+  };
 },
+
 getAllReviewsForAdmin: async ({
   skip,
   limit,

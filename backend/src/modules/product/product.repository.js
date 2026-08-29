@@ -170,15 +170,27 @@ findProductsClient: async ({
     };
   }
 
-  let orderBy = { id: 'asc' };
+  let orderBy;
 
   switch (sortBy) {
     case 'newest':
       orderBy = { createdAt: 'desc' };
       break;
+
     case 'bestSeller':
       orderBy = { soldCount: 'desc' };
       break;
+
+    case 'highestRated':
+      orderBy = [
+        { rating: 'desc' },
+        { reviewCount: 'desc' },
+        { createdAt: 'desc' }
+      ];
+      break;
+
+    default:
+      orderBy = { id: 'asc' };
   }
 
   const [products, totalItems] = await prisma.$transaction([
@@ -758,7 +770,7 @@ findHighestRatedProducts: async (take = 10) => {
         status: 'ACTIVE'
       },
       reviewCount: {
-        gt: 0 //3
+        gt: 0 
       }
     },
     take,

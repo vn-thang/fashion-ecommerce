@@ -18,6 +18,7 @@ model User {
   totalPoints         Int                  @default(0)
   role                String               @default("Customer") @db.VarChar(20) // Admin, Customer
   isActive            Boolean              @default(true)
+  emailVerified Boolean @default(false)
   isOnline            Boolean              @default(false)
   lastSeenAt          DateTime?            @db.Timestamp
   createdAt           DateTime             @default(now()) @db.Timestamp
@@ -39,6 +40,9 @@ model User {
   loyaltyTransactions LoyaltyTransaction[]
   auditLogs           AuditLog[]
   passwordResetTokens PasswordResetToken[]
+  emailVerificationTokens    EmailVerificationToken[]
+
+  @@index([role])
 }
 
 // 2. RefreshTokens
@@ -67,6 +71,20 @@ model PasswordResetToken {
   @@index([expiresAt])
 }
 
+// Email verification tokens
+model EmailVerificationToken {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @db.Uuid
+  tokenHash String   @unique @db.VarChar(255)
+  expiresAt DateTime @db.Timestamp
+  createdAt DateTime @default(now()) @db.Timestamp
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
 // 3. UserAddresses
 model UserAddress {
   id           String   @id @default(uuid()) @db.Uuid
@@ -80,6 +98,7 @@ model UserAddress {
   createdAt    DateTime @default(now()) @db.Timestamp
 
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@index([userId])
 }
 
 // 4. Categories
@@ -96,6 +115,8 @@ model Category {
   parent      Category?  @relation("CategoryToCategory", fields: [parentId], references: [id], onDelete: Cascade)
   children    Category[] @relation("CategoryToCategory")
   products    Product[]
+
+  @@index([parentId, status])
 }
 
 // 5. Brands
@@ -132,6 +153,9 @@ model Product {
   variants     ProductVariant[]
   wishlists    Wishlist[]
   reviews      Review[]
+
+  @@index([categoryId, status])
+  @@index([brandId, status])
 }
 
 // 7. ProductImages
@@ -143,6 +167,7 @@ model ProductImage {
   createdAt    DateTime @default(now()) @db.Timestamp
 
   product      Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  @@index([productId, displayOrder])
 }
 
 // 8. ProductVariants
@@ -163,6 +188,7 @@ model ProductVariant {
   cartItems             CartItem[]
   orderItems            OrderItem[]
   flashSaleVariants     FlashSaleVariant[]
+  @@index([productId, status])
 }
 
 // 9. InventoryTransactions
@@ -178,6 +204,8 @@ model InventoryTransaction {
 
   variant          ProductVariant @relation(fields: [productVariantId], references: [id], onDelete: Cascade)
   user             User           @relation(fields: [createdBy], references: [id])
+  @@index([productVariantId, createdAt])
+  @@index([createdBy])
 }
 
 // 10. Carts
@@ -244,6 +272,8 @@ model Order {
   items          OrderItem[]
   payment        Payment?
   couponUsages   CouponUsage[]
+  @@index([userId, createdAt])
+  @@index([status, createdAt])
 }
 
 // 14. OrderItems
@@ -265,6 +295,8 @@ model OrderItem {
   flashSaleVariant   FlashSaleVariant? @relation(fields: [flashSaleVariantId], references: [id])
 
   reviews          Review[]
+  @@index([orderId])
+  @@index([productVariantId])
 }
 
 // 15. Payments
@@ -293,6 +325,7 @@ model Coupon {
   minOrderAmount    Decimal       @db.Decimal(18, 2)
   maxDiscountAmount Decimal       @db.Decimal(18, 2)
   usageLimit        Int
+  usedCount         Int           @default(0)
   startDate         DateTime      @db.Timestamp
   endDate           DateTime      @db.Timestamp
   isActive          Boolean       @default(true)
@@ -314,6 +347,7 @@ model CouponUsage {
   order    Order    @relation(fields: [orderId], references: [id])
 
   @@unique([couponId, orderId])
+  @@index([userId, couponId])
 }
 
 // 18. Reviews
@@ -333,6 +367,8 @@ model Review {
   user        User      @relation(fields: [userId], references: [id])
   product     Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
   orderItem   OrderItem @relation(fields: [orderItemId], references: [id])
+
+  @@index([productId, isHidden, createdAt])
 }
 
 // 19. StoreSettings
@@ -490,6 +526,7 @@ model FlashSaleVariant {
   orderItems OrderItem[]
 
   @@unique([flashSaleId, productVariantId])
+  @@index([productVariantId])
 }
 
 // 27. AuditLogs
@@ -504,4 +541,6 @@ model AuditLog {
   createdAt  DateTime @default(now()) @db.Timestamp
 
   user       User     @relation(fields: [userId], references: [id])
+  @@index([userId, createdAt])
+  @@index([createdAt])
 }

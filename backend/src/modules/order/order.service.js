@@ -67,42 +67,66 @@ calculateOrderData: async (userId, { cartItemIds, buyNowItems, province, couponC
   let appliedCouponId = null;
   let appliedCouponCode = null;
 
-  if (couponCode) {
-    const coupon = await orderRepository.findCouponByCode(couponCode.trim().toUpperCase());
-    const now = new Date();
+if (couponCode) {
+  const coupon =
+    await orderRepository.findCouponByCode(
+      couponCode.trim().toUpperCase()
+    );
 
-    if (coupon && coupon.isActive && now >= coupon.startDate && now <= coupon.endDate) {
-      if (coupon.usageLimit <= 0) {
-        throw new Error('Mã giảm giá này đã hết lượt sử dụng!');
-      }
+  const now = new Date();
 
-      const hasUsed = await orderRepository.checkUserCouponUsage(userId, coupon.id);
+  if (
+    coupon &&
+    coupon.isActive &&
+    now >= coupon.startDate &&
+    now <= coupon.endDate
+  ) {
+    if (coupon.usedCount >= coupon.usageLimit) {
+      throw new Error(
+        'Mã giảm giá này đã hết lượt sử dụng!'
+      );
+    }
+    const hasUsed =
+      await orderRepository.checkUserCouponUsage(
+        userId,
+        coupon.id
+      );
 
-      if (hasUsed) {
-        throw new Error('Bạn đã sử dụng mã giảm giá này rồi! Mỗi tài khoản chỉ được dùng 1 lần.');
-      }
+    if (hasUsed) {
+      throw new Error(
+        'Bạn đã sử dụng mã giảm giá này rồi! Mỗi tài khoản chỉ được dùng 1 lần.'
+      );
+    }
+    if (
+      subtotal >= Number(coupon.minOrderAmount)
+    ) {
+      appliedCouponId = coupon.id;
+      appliedCouponCode = coupon.code;
 
-      if (subtotal >= Number(coupon.minOrderAmount)) {
-        appliedCouponId = coupon.id;
-        appliedCouponCode = coupon.code;
+      const discountValue =
+        Number(coupon.discountValue);
 
-        const discountValue = Number(coupon.discountValue);
-
-        if (coupon.discountType === 'PERCENTAGE') {
-          discountAmount = Math.min(
-            (subtotal * discountValue) / 100,
-            Number(coupon.maxDiscountAmount)
-          );
-        } else {
-          discountAmount = discountValue;
-        }
+      if (
+        coupon.discountType === 'PERCENTAGE'
+      ) {
+        discountAmount = Math.min(
+          (subtotal * discountValue) / 100,
+          Number(coupon.maxDiscountAmount)
+        );
       } else {
-        throw new Error(ORDER_MESSAGES.COUPON_MIN_NOT_MET);
+        discountAmount = discountValue;
       }
     } else {
-      throw new Error(ORDER_MESSAGES.COUPON_INVALID);
+      throw new Error(
+        ORDER_MESSAGES.COUPON_MIN_NOT_MET
+      );
     }
+  } else {
+    throw new Error(
+      ORDER_MESSAGES.COUPON_INVALID
+    );
   }
+}
 
   let totalAmount = subtotal + shippingFee - discountAmount;
 

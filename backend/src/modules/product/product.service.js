@@ -3,6 +3,7 @@ const { STATUS, INVENTORY_TYPE, MESSAGES } = require('./product.constants');
 const slugify = require('slugify');
 const { getPagination, getPaginationMetadata } = require('../../utils/pagination');
 const auditLogService = require('../auditLog/auditLog.service');
+const redisCache = require('../../shared/cache/redisCache');
 
 const productService = {
  
@@ -457,7 +458,7 @@ getProductById: async id => {
     return result;
   },
 
-getProductsClient: async queryParams => {
+  getProductsClient: async queryParams => {
   const {
     search,
     categoryId,
@@ -477,6 +478,33 @@ getProductsClient: async queryParams => {
   const isPriceSort =
     sortBy === 'price_asc' ||
     sortBy === 'price_desc';
+  const cacheKey = [
+    'products:list',
+    `page=${page}`,
+    `limit=${limit}`,
+    `search=${search || ''}`,
+    `category=${categoryId || ''}`,
+    `brand=${brandId || ''}`,
+    `color=${color || ''}`,
+    `size=${size || ''}`,
+    `minPrice=${minPrice ?? ''}`,
+    `maxPrice=${maxPrice ?? ''}`,
+    `sort=${sortBy || ''}`
+  ].join(':');
+
+  try {
+    const cachedResult = await redisCache.get(cacheKey);
+
+    if (cachedResult) {
+      return cachedResult;
+    }
+
+  } catch (error) {
+    console.error(
+      '[Redis] Product list GET failed:',
+      error.message
+    );
+  }
 
   const { products, totalItems } =
     await productRepository.findProductsClient({
@@ -555,13 +583,14 @@ getProductsClient: async queryParams => {
 
   if (isPriceSort) {
     finalTotalItems = processedProducts.length;
+
     finalProducts = processedProducts.slice(
       skip,
       skip + limit
     );
   }
 
-  return {
+  const result = {
     products: finalProducts,
     pagination: getPaginationMetadata(
       finalTotalItems,
@@ -569,6 +598,21 @@ getProductsClient: async queryParams => {
       limit
     )
   };
+
+  try {
+    await redisCache.set(
+      cacheKey,
+      result,
+      5 * 60
+    );
+  } catch (error) {
+    console.error(
+      '[Redis] Product list SET failed:',
+      error.message
+    );
+  }
+
+  return result;
 },
 
 getProductBySlugClient: async slug => {

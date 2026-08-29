@@ -15,7 +15,7 @@ const sendPasswordResetEmail = async (email, resetLink) => {
     const info = await transporter.sendMail({
       from: `"Fashion Ecommerce" <${process.env.MAIL_USER}>`,
       to: email,
-      subject: 'Đặt lại mật khẩu - Fashion Ecommerce',
+      subject: 'Đặt lại mật khẩu - FashionHub',
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto;">
           <h2>Đặt lại mật khẩu</h2>
@@ -58,7 +58,7 @@ const sendPasswordResetEmail = async (email, resetLink) => {
 
           <p>
             Trân trọng,<br/>
-            Fashion Ecommerce
+            FashionHub
           </p>
         </div>
       `
@@ -78,6 +78,95 @@ const sendPasswordResetEmail = async (email, resetLink) => {
   }
 };
 
+const sendEmailVerificationEmail = async (
+  email,
+  verifyLink
+) => {
+  try {
+    const info = await transporter.sendMail({
+      from: `"FashionHub" <${process.env.MAIL_USER}>`,
+      to: email,
+      subject: 'Xác thực tài khoản - FashionHub',
+      html: `
+        <div style="
+          font-family: Arial, sans-serif;
+          max-width: 600px;
+          margin: auto;
+          padding: 20px;
+          color: #333;
+        ">
+
+          <h2 style="color: #c36374;">
+            Chào mừng bạn đến với FashionHub!
+          </h2>
+
+          <p>Xin chào,</p>
+
+          <p>
+            Cảm ơn bạn đã đăng ký tài khoản tại
+            <strong>FashionHub</strong>.
+          </p>
+
+          <p>
+            Để hoàn tất đăng ký và bảo vệ tài khoản,
+            vui lòng xác thực địa chỉ email của bạn
+            bằng cách nhấn vào nút bên dưới:
+          </p>
+
+          <div style="margin: 30px 0;">
+            <a
+              href="${verifyLink}"
+              style="
+                display: inline-block;
+                padding: 12px 24px;
+                background: #c36374;
+                color: white;
+                text-decoration: none;
+                border-radius: 25px;
+                font-weight: bold;
+              "
+            >
+              Xác thực tài khoản
+            </a>
+          </div>
+
+          <p>
+            Liên kết xác thực này chỉ có hiệu lực trong
+            <strong>15 phút</strong>.
+          </p>
+
+          <p>
+            Nếu bạn không thực hiện đăng ký tài khoản,
+            vui lòng bỏ qua email này.
+          </p>
+
+          <p style="margin-top: 30px;">
+            Trân trọng,<br/>
+            <strong>FashionHub</strong>
+          </p>
+
+        </div>
+      `
+    });
+
+    return info;
+  } catch (error) {
+    console.error(
+      '❌ Gửi email xác thực thất bại:',
+      {
+        message: error.message,
+        code: error.code,
+        response: error.response,
+        responseCode: error.responseCode,
+        command: error.command
+      }
+    );
+
+    throw error;
+  }
+};
+
 module.exports = {
-  sendPasswordResetEmail
+  sendPasswordResetEmail,
+  sendEmailVerificationEmail
 };

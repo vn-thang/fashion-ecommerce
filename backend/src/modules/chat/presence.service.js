@@ -1,5 +1,5 @@
 const userService = require('../user/user.service');
-const onlineUsers = new Map();
+const presenceRedis = require('../../shared/presence/presenceRedis');
 
 const presenceService = {
   addConnection: async (userId, socketId) => {
@@ -10,18 +10,18 @@ const presenceService = {
       };
     }
 
-    let sockets = onlineUsers.get(userId);
+    const wasOnline =
+      await presenceRedis.isOnline(userId);
 
-    if (!sockets) {
-      sockets = new Set();
-      onlineUsers.set(userId, sockets);
-    }
+    const result =
+      await presenceRedis.addConnection(
+        userId,
+        socketId
+      );
 
-    const wasOffline = sockets.size === 0;
-
-    sockets.add(socketId);
-    if (wasOffline) {
-      const user = await userService.setOnline(userId);
+    if (!wasOnline) {
+      const user =
+        await userService.setOnline(userId);
 
       return {
         isFirstConnection: true,
@@ -33,54 +33,59 @@ const presenceService = {
     return {
       isFirstConnection: false,
       isOnline: true,
-      userId
+      userId,
+      socketCount: result.socketCount
     };
   },
 
-  removeConnection: async (userId, socketId) => {
-    if (!userId || !socketId) {
-      return {
-        isLastConnection: false,
-        isOnline: false
-      };
-    }
+removeConnection: async (userId, socketId) => {
+  if (!userId || !socketId) {
+    return {
+      isLastConnection: false,
+      isOnline: false
+    };
+  }
 
-    const sockets = onlineUsers.get(userId);
-
-    if (!sockets) {
-      return {
-        isLastConnection: false,
-        isOnline: false
-      };
-    }
-
-    sockets.delete(socketId);
-    if (sockets.size > 0) {
-      return {
-        isLastConnection: false,
-        isOnline: true,
-        userId
-      };
-    }
-    onlineUsers.delete(userId);
-
-    const user = await userService.setOffline(userId);
+  const result = await presenceRedis.removeConnection(
+    userId,
+    socketId
+  );
+  if (!result.removed) {
 
     return {
-      isLastConnection: true,
-      isOnline: false,
-      user
+      isLastConnection: false,
+      isOnline: result.isOnline,
+      userId,
+      socketCount: result.socketCount
     };
+  }
+
+  if (result.isOnline) {
+    return {
+      isLastConnection: false,
+      isOnline: true,
+      userId,
+      socketCount: result.socketCount
+    };
+  }
+
+  const user = await userService.setOffline(userId);
+
+  return {
+    isLastConnection: true,
+    isOnline: false,
+    user
+  };
+},
+
+  isOnline: async userId => {
+    return await presenceRedis.isOnline(
+      userId
+    );
   },
 
-  isOnline: userId => {
-    const sockets = onlineUsers.get(userId);
-
-    return !!sockets && sockets.size > 0;
-  },
-
-  getOnlineUserIds: () => {
-    return Array.from(onlineUsers.keys());
+  getOnlineUserIds: async () => {
+    return await presenceRedis.getOnlineUserIds();
   }
 };
 

@@ -67,63 +67,66 @@ const handleConfirmCancel = async reason => {
       </div>
     );
   }
+return (
+  <div className="mx-auto w-full max-w-4xl px-4 py-5 sm:px-5 sm:py-6">
+    <button
+      onClick={() => navigate('/account/orders')}
+      className="mb-4 flex items-center text-sm text-gray-500 transition-colors hover:text-gray-800"
+    >
+      ← <span className="ml-1">Quay lại danh sách đơn hàng</span>
+    </button>
 
-  return (
-    <div className="max-w-4xl mx-auto py-6 px-4 sm:px-0">
-      <button 
-        onClick={() => navigate('/account/orders')}
-        className="flex items-center text-sm text-gray-500 hover:text-gray-800 mb-4 transition-colors"
-      >
-        ← Quay lại danh sách đơn hàng
-      </button>
-
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 sm:p-6 mb-4">
-        <OrderHeader order={order} statusConfig={STATUS_CONFIG} formatDate={formatDate} />
-        <ShippingAddress order={order} />
-      </div>
-
-      <OrderItemsList 
-        items={order.items} 
-        formatPrice={formatPrice} 
-        orderStatus={order.status}
-        onReviewClick={handleOpenReviewModal}
+    <div className="mb-4 rounded-xl border border-gray-100 bg-white p-4 shadow-sm sm:p-6">
+      <OrderHeader
+        order={order}
+        statusConfig={STATUS_CONFIG}
+        formatDate={formatDate}
       />
-      
-      <OrderSummary order={order} formatPrice={formatPrice} />
+      <ShippingAddress order={order} />
+    </div>
 
-      <div className="flex justify-end gap-3 mt-4">
-       {(order.status === 'PENDING' ||
-        order.status === 'PROCESSING') && (
+    <OrderItemsList
+      items={order.items}
+      formatPrice={formatPrice}
+      orderStatus={order.status}
+      onReviewClick={handleOpenReviewModal}
+    />
+
+    <OrderSummary order={order} formatPrice={formatPrice} />
+
+    {(order.status === 'PENDING' || order.status === 'PROCESSING') && (
+      <div className="mt-4 flex justify-stretch sm:justify-end">
         <Button
           variant="danger"
           onClick={() => setIsCancelModalOpen(true)}
+          className="w-full sm:w-auto"
         >
           Hủy đơn hàng
         </Button>
-      )}
       </div>
+    )}
 
-      {selectedItemForReview && (
-        <CreateReviewModal
-          isOpen={isReviewModalOpen}
-          onClose={() => {
-            setIsReviewModalOpen(false);
-            setSelectedItemForReview(null);
-          }}
-          orderItem={selectedItemForReview}
-          onSuccess={handleReviewSuccess}
-        />
-      )}
+    {selectedItemForReview && (
+      <CreateReviewModal
+        isOpen={isReviewModalOpen}
+        onClose={() => {
+          setIsReviewModalOpen(false);
+          setSelectedItemForReview(null);
+        }}
+        orderItem={selectedItemForReview}
+        onSuccess={handleReviewSuccess}
+      />
+    )}
 
-     <CancelOrderModal
+    <CancelOrderModal
       isOpen={isCancelModalOpen}
       order={order}
       onClose={() => setIsCancelModalOpen(false)}
       onConfirm={handleConfirmCancel}
       loading={loading}
     />
-    </div>
-  );
+  </div>
+);
 };
 
 export default OrderDetailPage;

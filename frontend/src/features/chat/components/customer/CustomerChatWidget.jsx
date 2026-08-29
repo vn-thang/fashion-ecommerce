@@ -10,19 +10,18 @@ import { useCustomerChat } from '../../hooks/useCustomerChat';
 const CustomerChatWidget = () => {
   const { user } = useAuth();
 
-  const [isOpen, setIsOpen] =
-    useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
   const currentUserId = user?.id;
+
+  if (!currentUserId || user?.role === 'Admin') {
+    return null;
+  }
 
   const chat = useCustomerChat({
     currentUserId,
     isOpen
   });
-
-  if (!currentUserId) {
-    return null;
-  }
 
   return (
     <>
@@ -51,6 +50,7 @@ const CustomerChatWidget = () => {
           onClick={() => setIsOpen(prev => !prev)}
           unreadCount={chat.unreadCount}
           store={chat.conversation?.store}
+          adminPresence={chat.adminPresence}
         />
 
       </div>

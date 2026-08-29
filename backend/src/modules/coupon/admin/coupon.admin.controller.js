@@ -1,6 +1,6 @@
-const couponService = require('./coupon.service');
-const { sendSuccess, sendError } = require('../../utils/response');
-const { MESSAGES } = require('./coupon.constants');
+const couponService = require('../coupon.service');
+const { sendSuccess, sendError } = require('../../../utils/response');
+const { MESSAGES } = require('../coupon.constants');
 
 const couponAdminController = {
   create: async (req, res) => {

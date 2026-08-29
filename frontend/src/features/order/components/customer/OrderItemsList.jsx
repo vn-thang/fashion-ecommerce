@@ -8,98 +8,92 @@ const OrderItemsList = ({
   onReviewClick
 }) => {
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden mb-4">
+    <div className="mb-4 overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm">
       <div className="p-4 sm:p-5">
-        <h2 className="text-base font-semibold text-gray-800 mb-4">
+        <h2 className="mb-4 text-base font-semibold text-gray-800">
           Sản phẩm
         </h2>
 
         <div className="space-y-4">
-          {items?.map((item) => {
+          {items?.map(item => {
             const variant = item.variant || {};
             const product = variant.product || {};
-
             const thumbnailUrl =
               product.thumbnailUrl ||
               'https://placehold.co/80x80?text=No+Image';
 
-            const hasReviewed =
-              item.reviews && item.reviews.length > 0;
-
+            const hasReviewed = item.reviews?.length > 0;
             const originalPrice = Number(
               item.originalPrice || item.unitPrice
             );
-
             const currentPrice = Number(item.unitPrice || 0);
-
             const isFlashSale =
               item.originalPrice &&
               Number(item.originalPrice) > Number(item.unitPrice);
 
             return (
               <div
-                key={item.id}
-                className="flex gap-4 py-4 border-t border-gray-50 first:border-0 first:py-0"
-              >
-                <img
-                  src={thumbnailUrl}
-                  alt={item.productName || product.name}
-                  className="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-lg border border-gray-100 flex-shrink-0"
-                />
+  key={item.id}
+  className="flex gap-3 border-t border-gray-50 py-4 first:border-0 first:pt-0 sm:gap-4"
+>
+  <img
+    src={thumbnailUrl}
+    alt={item.productName || product.name || 'Sản phẩm'}
+    className="h-16 w-16 shrink-0 rounded-lg border border-gray-100 object-cover sm:h-24 sm:w-24"
+  />
 
-                <div className="flex-1 flex flex-col justify-between">
-                  <div className="flex justify-between items-start gap-4">
-                    <div>
-                      <h4 className="font-medium text-gray-800 line-clamp-2">
-                        {item.productName || product.name}
-                      </h4>
+  <div className="min-w-0 flex-1">
+    <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+      <div className="min-w-0 flex-1">
+        <h4 className="line-clamp-2 break-words text-sm font-medium text-gray-800 sm:text-base">
+          {item.productName || product.name || 'Sản phẩm'}
+        </h4>
 
-                      <p className="text-sm text-gray-500 mt-1">
-                        Phân loại: {item.color} - {item.size}
-                      </p>
-                    </div>
+        <p className="mt-1 text-xs text-gray-500 sm:text-sm">
+          Phân loại: {item.color} - {item.size}
+        </p>
+      </div>
 
-                    <div className="text-right flex-shrink-0">
-                      {isFlashSale && (
-                        <p className="text-xs text-gray-400 line-through">
-                          {formatPrice(originalPrice)}
-                        </p>
-                      )}
+      <div className="flex shrink-0 items-center gap-2 sm:block sm:min-w-[120px] sm:text-right">
+        <div>
+          {isFlashSale && (
+            <span className="mr-2 text-[11px] text-gray-400 line-through sm:mr-0 sm:block sm:text-xs">
+              {formatPrice(originalPrice)}
+            </span>
+          )}
 
-                      <p className="font-semibold text-[#ee4d2d]">
-                        {formatPrice(currentPrice)}
-                      </p>
+          <span className="text-sm font-semibold text-[#ee4d2d] sm:text-base">
+            {formatPrice(currentPrice)}
+          </span>
+        </div>
 
-                      <p className="text-sm text-gray-500">
-                        x{item.quantity}
-                      </p>
-                    </div>
-                  </div>
+        <span className="text-xs text-gray-500 sm:block sm:text-sm">
+          x{item.quantity}
+        </span>
+      </div>
+    </div>
 
-                  <div className="flex justify-between items-center mt-3">
-                    <div className="text-sm font-medium text-rose-600">
-                      Thành tiền:{' '}
-                      {formatPrice(
-                        currentPrice * Number(item.quantity)
-                      )}
-                    </div>
+    <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+      <p className="text-xs font-medium text-rose-600 sm:text-sm">
+        Thành tiền: {formatPrice(currentPrice * Number(item.quantity))}
+      </p>
 
-                    {orderStatus === 'COMPLETED' &&
-                      (hasReviewed ? (
-                        <span className="text-xs text-gray-400 italic font-medium border border-gray-100 px-3 py-1.5 rounded-md bg-gray-50 select-none">
-                          Đã đánh giá
-                        </span>
-                      ) : (
-                        <Button
-                          onClick={() => onReviewClick(item)}
-                          className="bg-[#ee4d2d] hover:bg-[#d74123] text-white h-8 text-xs font-medium px-4 rounded-md shadow-sm"
-                        >
-                          Đánh giá
-                        </Button>
-                      ))}
-                  </div>
-                </div>
-              </div>
+      {orderStatus === 'COMPLETED' &&
+        (hasReviewed ? (
+          <span className="self-start rounded-md border border-gray-100 bg-gray-50 px-3 py-1.5 text-xs font-medium italic text-gray-400 sm:self-auto">
+            Đã đánh giá
+          </span>
+        ) : (
+          <Button
+            onClick={() => onReviewClick(item)}
+            className="w-full bg-[#ee4d2d] px-4 py-2 text-xs font-medium text-white shadow-sm hover:bg-[#d74123] sm:w-auto"
+          >
+            Đánh giá
+          </Button>
+        ))}
+    </div>
+  </div>
+</div>
             );
           })}
         </div>

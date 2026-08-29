@@ -19,7 +19,7 @@ const HighlyRatedHeader = ({ totalProducts = 0 }) => {
       </div>
 
       <Link
-        to="/products?sort=top-rated"
+        to="/products?sort=highestRated"
         className="flex items-center gap-1 text-sm font-medium text-rose-500 transition-colors hover:text-rose-600"
       >
         Xem tất cả

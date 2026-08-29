@@ -32,7 +32,7 @@ const AccountLayout = () => {
                 <span>👤</span> Hồ sơ của tôi
               </NavLink>
               <NavLink to="/account/addresses" className={navLinkClass}>
-                <span>📍</span> Sổ địa chỉ
+                <span>📍</span> Địa chỉ
               </NavLink>
               <NavLink to="/account/orders" className={navLinkClass}>
                 <span>📦</span> Đơn mua

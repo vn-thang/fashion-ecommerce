@@ -6,11 +6,7 @@ const authorize = (...roles) => {
         message: 'Bạn không có quyền truy cập!'
       });
     }
-
-    // Ép quyền của user thành IN HOA toàn bộ 
     const userRole = req.user.role.toUpperCase();
-
-    // Ép các quyền được phép thành IN HOA toàn bộ
     const allowedRoles = roles.map(role => role.toUpperCase());
 
     if (!allowedRoles.includes(userRole)) {

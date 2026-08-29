@@ -1,9 +1,8 @@
 const conversationService = require('../modules/chat/conversation.service');
 const messageService = require('../modules/chat/message.service');
-const notificationService = require('../modules/notification/notification.service');
-const { TYPE, CHAT } = require('../modules/notification/notification.constants');
 const { MESSAGE_TYPE, MESSAGE_STATUS, SOCKET_EVENTS } = require('../modules/chat/chat.constants');
 const presenceService = require('../modules/chat/presence.service');
+const presenceRedis = require('../shared/presence/presenceRedis');
 
 const getRoomName = conversationId => `conversation:${conversationId}`;
 
@@ -12,10 +11,10 @@ const isValidUUID = id => {
   return uuidRegex.test(id);
 };
 
-const registerChatSocket = (io, socket) => { 
+const registerChatSocket = (io, socket) => {
   const userId = socket.user.userId;
 
-  presenceService
+ presenceService
     .addConnection(userId, socket.id)
     .then(result => {
       if (result.isFirstConnection) {
@@ -24,10 +23,36 @@ const registerChatSocket = (io, socket) => {
           isOnline: true
         });
       }
-    })
-    .catch(error => {
-      console.error(`Failed to set user ${userId} online:`, error.message);
     });
+
+  const presenceInterval = setInterval(() => {
+    presenceRedis.refreshConnection(socket.id);
+  }, 30 * 1000);
+
+  socket.on('disconnect', async reason => {
+    clearInterval(presenceInterval);
+
+    try {
+      const result =
+        await presenceService.removeConnection(
+          userId,
+          socket.id
+        );
+
+      if (result.isLastConnection) {
+        io.emit('user:offline', {
+          userId,
+          isOnline: false,
+          lastSeenAt: result.user.lastSeenAt
+        });
+      }
+    } catch (error) {
+      console.error(
+        `Failed to set user ${userId} offline:`,
+        error.message
+      );
+    }
+  });
 
   socket.on(
     SOCKET_EVENTS.CONVERSATION_JOIN,
@@ -288,30 +313,6 @@ socket.on(
     }
   }
 );
-
-  socket.on('disconnect', reason => {
-    presenceService
-      .removeConnection(userId, socket.id)
-      .then(result => {
-        if (result.isLastConnection) {
-          io.emit('user:offline', {
-            userId,
-            isOnline: false,
-            lastSeenAt: result.user.lastSeenAt
-          });
-        }
-      })
-      .catch(error => {
-        console.error(
-          `Failed to set user ${userId} offline:`,
-          error.message
-        );
-      });
-
-    console.log(
-      `User ${userId} disconnected: ${reason}`
-    );
-  });
 };
 
 module.exports = registerChatSocket;

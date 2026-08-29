@@ -62,6 +62,25 @@ const ProductInfo = ({
 
   return (
     <div className="w-full md:w-[60%] flex flex-col">
+
+      <div className="mb-2 flex items-center gap-2">
+      {product.brand?.logoUrl && (
+        <img
+          src={product.brand.logoUrl}
+          alt={product.brand.name}
+          className="h-6 w-auto max-w-24 object-contain"
+        />
+      )}
+
+      <span className="text-sm text-gray-500">
+        Thương hiệu:
+      </span>
+
+      <span className="text-sm font-semibold text-gray-800">
+        {product.brand?.name || 'Không xác định'}
+      </span>
+    </div>
+
       <h1 className="text-xl md:text-2xl font-medium text-gray-800 leading-8 mb-3">
         <span className="bg-[#ee4d2d] text-white text-xs px-2 py-1 rounded-sm mr-2 font-semibold">
           Yêu thích
@@ -111,7 +130,10 @@ const ProductInfo = ({
               {availableColors.map(color => (
                 <button
                   key={color}
-                  onClick={() => setSelectedColor(color)}
+                  onClick={() =>
+                    setSelectedColor(prev =>
+                      prev === color ? null : color
+                    )}
                   className={`px-4 py-2 border rounded text-sm transition ${
                     selectedColor === color
                       ? 'border-[#ee4d2d] text-[#ee4d2d]'
@@ -135,7 +157,10 @@ const ProductInfo = ({
               {availableSizes.map(size => (
                 <button
                   key={size}
-                  onClick={() => setSelectedSize(size)}
+                  onClick={() =>
+                  setSelectedSize(prev =>
+                    prev === size ? null : size
+                  )}
                   className={`px-4 py-2 border rounded text-sm transition ${
                     selectedSize === size
                       ? 'border-[#ee4d2d] text-[#ee4d2d]'

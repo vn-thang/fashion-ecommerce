@@ -10,7 +10,8 @@ const {
   loginRateLimiter,
   registerRateLimiter,
   forgotPasswordRateLimiter,
-  resetPasswordRateLimiter
+  resetPasswordRateLimiter,
+  resendVerificationRateLimiter
 } = require('../../middlewares/rateLimit.middleware');
 
 router.post(
@@ -18,6 +19,17 @@ router.post(
   registerRateLimiter,
   authValidation.validateRegister,
   authController.register
+);
+
+router.get(
+  '/verify-email',
+  authController.verifyEmail
+);
+
+router.post(
+  '/resend-verification',
+  resendVerificationRateLimiter,
+  authController.resendVerificationEmail
 );
 
 router.post(
@@ -43,7 +55,7 @@ router.post(
   authController.resetPassword
 );
 
-router.post(
+router.put(
   '/change-password',
   authMiddleware,
   authController.changePassword

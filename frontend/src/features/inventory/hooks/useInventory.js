@@ -68,10 +68,8 @@ const fetchTransactions = async (customFilters = filters) => {
 };
 
   const fetchTransactionDetail = async id => {
-     console.log(id);
   try {
     const res = await inventoryApi.getTransactionDetail(id);
- console.log(res);
     setSelectedTransaction(res.data);
     setIsDetailOpen(true);
   } catch (error) {
@@ -125,12 +123,10 @@ useEffect(() => {
   };
 
   const searchTransactions = () => {
-    console.log('Filters:', filters);
     const newFilters = {
       ...filters,
       page: 1
     };
-  console.log('Search Params:', newFilters);
     setFilters(newFilters);
     fetchTransactions(newFilters);
   };

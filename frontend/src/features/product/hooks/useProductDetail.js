@@ -94,15 +94,31 @@ export const useProductDetail = () => {
     ];
   }, [product]);
 
-  const activeVariant = useMemo(() => {
-    if (!product?.variants) return null;
+const activeVariant = useMemo(() => {
+  if (!product?.variants) return null;
+  if ( availableColors.length > 0 && !selectedColor) {
+    return null;
+  }
 
-    return product.variants.find(
-      v =>
-        (selectedColor ? v.color === selectedColor : true) &&
-        (selectedSize ? v.size === selectedSize : true)
-    );
-  }, [product, selectedColor, selectedSize]);
+  if (
+    availableSizes.length > 0 &&
+    !selectedSize
+  ) {
+    return null;
+  }
+
+  return product.variants.find(
+    v =>
+      (!selectedColor || v.color === selectedColor) &&
+      (!selectedSize || v.size === selectedSize)
+  );
+}, [
+  product,
+  selectedColor,
+  selectedSize,
+  availableColors,
+  availableSizes
+]);
 
   const isFlashSale = activeVariant
     ? activeVariant.isFlashSale

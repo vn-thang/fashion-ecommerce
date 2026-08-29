@@ -65,7 +65,7 @@ export const useCheckout = (
 
   const fetchCoupons = useCallback(async () => {
     try {
-      const res = await couponApi.getAll({
+      const res = await couponApi.getAllClient({
         isActive: true,
         limit: 50
       });

@@ -5,7 +5,7 @@ import ImageUpload from '../../../../shared/components/ImageUpload';
 
 const ProfileInfo = ({ user, onSave, isSubmitLoading }) => {
   const [formData, setFormData] = useState({
-  fullName: '', email: '', phone: '', gender: 'male', dob: ''
+  fullName: '', email: '', phoneNumber: ''
   });
   
   const [avatarFile, setAvatarFile] = useState(null);
@@ -15,9 +15,7 @@ const ProfileInfo = ({ user, onSave, isSubmitLoading }) => {
       setFormData({
         fullName: user.fullName || '',
         email: user.email || '',
-        phone: user.phone || '',
-        gender: user.gender || 'male',
-        dob: user.dob ? user.dob.substring(0, 10) : '' 
+        phoneNumber: user.phoneNumber || ''
       });
     }
   }, [user]);
@@ -54,35 +52,9 @@ const ProfileInfo = ({ user, onSave, isSubmitLoading }) => {
 
           <Input
             label="Số điện thoại"
-            value={formData.phone}
-            onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+            value={formData.phoneNumber}
+            onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
             placeholder="Nhập số điện thoại"
-          />
-
-          <div className="space-y-1.5">
-            <label className="block text-sm font-semibold text-gray-700">Giới tính</label>
-            <div className="flex items-center gap-6 pt-1">
-              {['male', 'female', 'other'].map((g) => (
-                <label key={g} className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer capitalize">
-                  <input
-                    type="radio"
-                    name="gender"
-                    value={g}
-                    checked={formData.gender === g}
-                    onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
-                    className="w-4 h-4 accent-[#ee4d2d]"
-                  />
-                  {g === 'male' ? 'Nam' : g === 'female' ? 'Nữ' : 'Khác'}
-                </label>
-              ))}
-            </div>
-          </div>
-
-          <Input
-            label="Ngày sinh"
-            type="date"
-            value={formData.dob}
-            onChange={(e) => setFormData({ ...formData, dob: e.target.value })}
           />
 
           <div className="pt-4">

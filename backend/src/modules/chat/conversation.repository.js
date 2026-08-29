@@ -76,7 +76,6 @@ findById: async id => {
       where: { customerId }
     });
   },
-
 findAllPaginated: async ({
   search,
   status,
@@ -86,6 +85,7 @@ findAllPaginated: async ({
 }) => {
   const where = {
     ...(status ? { status } : {}),
+
     ...(search
       ? {
           customer: {
@@ -105,6 +105,13 @@ findAllPaginated: async ({
             ]
           }
         }
+      : {}),
+    ...(adminId
+      ? {
+          customerId: {
+            not: adminId
+          }
+        }
       : {})
   };
 
@@ -118,6 +125,7 @@ findAllPaginated: async ({
           { lastMessageAt: 'desc' },
           { createdAt: 'desc' }
         ],
+
         include: {
           customer: {
             select: {
@@ -138,6 +146,7 @@ findAllPaginated: async ({
               id: true,
               userId: true,
               lastReadAt: true,
+
               user: {
                 select: {
                   id: true,
@@ -170,13 +179,13 @@ findAllPaginated: async ({
         where
       })
     ]);
-
   if (!adminId) {
     return {
       conversations,
       totalItems
     };
   }
+
   const conversationIds = conversations.map(
     conversation => conversation.id
   );
@@ -215,7 +224,9 @@ findAllPaginated: async ({
             senderId: {
               not: adminId
             },
+
             isDeleted: false,
+
             ...(lastReadAt
               ? {
                   createdAt: {
@@ -243,6 +254,7 @@ findAllPaginated: async ({
   const conversationsWithUnreadCount =
     conversations.map(conversation => ({
       ...conversation,
+
       unreadCount:
         unreadMap.get(conversation.id) || 0
     }));

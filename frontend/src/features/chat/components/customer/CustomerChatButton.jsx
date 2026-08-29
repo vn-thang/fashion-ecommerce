@@ -1,12 +1,60 @@
 import React from 'react';
 
+const formatLastSeen = date => {
+  if (!date) return 'Không rõ';
+
+  const value = new Date(date);
+
+  if (Number.isNaN(value.getTime())) {
+    return 'Không rõ';
+  }
+
+  const diff = Date.now() - value.getTime();
+
+  if (diff < 60 * 1000) {
+    return 'Vừa hoạt động';
+  }
+
+  const minutes = Math.floor(diff / (60 * 1000));
+
+  if (minutes < 60) {
+    return `Hoạt động ${minutes} phút trước`;
+  }
+
+  const hours = Math.floor(minutes / 60);
+
+  if (hours < 24) {
+    return `Hoạt động ${hours} giờ trước`;
+  }
+
+  const days = Math.floor(hours / 24);
+
+  if (days < 7) {
+    return `Hoạt động ${days} ngày trước`;
+  }
+
+  return value.toLocaleDateString('vi-VN', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  });
+};
+
 const CustomerChatButton = ({
   onClick,
   unreadCount = 0,
-  store
+  store,
+  adminPresence
 }) => {
   const storeName = store?.storeName || 'FashionHub';
   const logoUrl = store?.logoUrl;
+
+  const isAdminOnline =
+    adminPresence?.isOnline === true;
+
+  const presenceText = isAdminOnline
+    ? 'Đang hoạt động'
+    : formatLastSeen(adminPresence?.lastSeenAt);
 
   return (
     <button
@@ -35,6 +83,7 @@ const CustomerChatButton = ({
           group-hover:opacity-20
         "
       />
+
       <div className="relative z-10 h-full w-full overflow-hidden rounded-full">
         {logoUrl ? (
           <img
@@ -50,8 +99,7 @@ const CustomerChatButton = ({
         ) : (
           <div
             className="
-              flex h-full w-full
-              items-center justify-center
+              flex h-full w-full items-center justify-center
               bg-indigo-100
               text-lg font-bold
               text-indigo-600
@@ -62,16 +110,21 @@ const CustomerChatButton = ({
         )}
       </div>
       <span
-        className="
+        className={`
           absolute bottom-0.5 right-0.5 z-20
           h-3.5 w-3.5
           rounded-full
           border-2 border-white
-          bg-emerald-500
           shadow-sm
-        "
-        title="Đang hoạt động"
+          ${
+            isAdminOnline
+              ? 'bg-emerald-500'
+              : 'bg-gray-300'
+          }
+        `}
+        title={presenceText}
       />
+
       {unreadCount > 0 && (
         <span
           className="
@@ -92,6 +145,7 @@ const CustomerChatButton = ({
           {unreadCount > 99 ? '99+' : unreadCount}
         </span>
       )}
+
       <span
         className="
           pointer-events-none absolute right-[calc(100%+12px)]
@@ -112,6 +166,7 @@ const CustomerChatButton = ({
         "
       >
         Chat với {storeName}
+
         <span
           className="
             absolute -right-1.5 top-1/2

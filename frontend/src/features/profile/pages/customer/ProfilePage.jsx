@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useProfile } from '../../hooks/customer/useProfile';
 import ProfileInfo from '../../components/customer/ProfileInfo';
-import ChangePassword from '../../components/customer/ChangePassword';
+import ChangePassword from '../../../auth/components/ChangePassword';
 
 const ProfilePage = () => {
   const { user, isLoading, isSubmitLoading, updateProfile } = useProfile();

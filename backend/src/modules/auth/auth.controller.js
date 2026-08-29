@@ -12,6 +12,39 @@ const authController = {
     }
   },
 
+   verifyEmail: async (req, res) => {
+    try {
+      const { token } = req.query;
+
+      const result = await authService.verifyEmail(token);
+
+      return sendSuccess(
+        res,
+        200,
+        result.message
+      );
+    } catch (error) {
+      return sendError(res, 400, error.message);
+    }
+  },
+
+  resendVerificationEmail: async (req, res) => {
+    try {
+      const { email } = req.body;
+
+      const result =
+        await authService.resendVerificationEmail(email);
+
+      return sendSuccess(
+        res,
+        200,
+        result.message
+      );
+    } catch (error) {
+      return sendError(res, 400, error.message);
+    }
+  },
+
   login: async (req, res) => {
     try {
       const { username, password } = req.body;
@@ -23,8 +56,6 @@ const authController = {
         sameSite: 'strict',
         maxAge: TOKEN_EXPIRY.COOKIE_MAX_AGE
       });
-
-      // Nhóm accessToken và user vào object data
       return sendSuccess(res, 200, MESSAGES.LOGIN_SUCCESS, { accessToken, user });
     } catch (error) {
       return sendError(res, 400, error.message);
@@ -78,10 +109,10 @@ const authController = {
 
   changePassword: async (req, res) => {
     try {
-      const { oldPassword, newPassword } = req.body;
+      const { currentPassword, newPassword } = req.body;
       const userId = req.user.userId;
 
-      const result = await authService.changePassword(userId, oldPassword, newPassword);
+      const result = await authService.changePassword(userId, currentPassword, newPassword);
 
       res.clearCookie('refreshToken');
       return sendSuccess(res, 200, 'Đổi mật khẩu thành công!', result);
