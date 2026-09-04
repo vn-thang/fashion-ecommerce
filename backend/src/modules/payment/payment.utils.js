@@ -73,6 +73,43 @@ const generateTxnRef = () => {
   return Date.now().toString();
 };
 
+const createRefundSecureHash = ({
+  vnp_RequestId,
+  vnp_Version,
+  vnp_Command,
+  vnp_TmnCode,
+  vnp_TransactionType,
+  vnp_TxnRef,
+  vnp_Amount,
+  vnp_TransactionNo,
+  vnp_TransactionDate,
+  vnp_CreateBy,
+  vnp_CreateDate,
+  vnp_IpAddr,
+  vnp_OrderInfo
+}) => {
+  const data = [
+    vnp_RequestId,
+    vnp_Version,
+    vnp_Command,
+    vnp_TmnCode,
+    vnp_TransactionType,
+    vnp_TxnRef,
+    vnp_Amount,
+    vnp_TransactionNo,
+    vnp_TransactionDate,
+    vnp_CreateBy,
+    vnp_CreateDate,
+    vnp_IpAddr,
+    vnp_OrderInfo
+  ].join('|');
+
+  return crypto
+    .createHmac('sha512', paymentConfig.hashSecret)
+    .update(Buffer.from(data, 'utf-8'))
+    .digest('hex');
+};
+
 module.exports = {
   sortObject,
   createSecureHash,
@@ -80,5 +117,6 @@ module.exports = {
   verifySecureHash,
   createDate,
   createExpireDate,
-  generateTxnRef
+  generateTxnRef,
+  createRefundSecureHash
 };

@@ -21,6 +21,6 @@ export const couponApi = {
     return await axiosInstance.delete(`/admin/coupons/${id}`);
   },
     getAllClient: async params => {
-    return await axiosInstance.get('/coupons', { params });
+    return await axiosInstance.get('/coupons/client', { params });
   },
 };

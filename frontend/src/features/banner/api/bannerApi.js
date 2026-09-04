@@ -9,11 +9,12 @@ export const bannerApi = {
     return await axiosInstance.get('/banners/active');
   },
 
-  create: async (formData) => {
+  create: async formData => {
     return await axiosInstance.post('/banners', formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
-      }
+      },
+      timeout: 60000
     });
   },
 
@@ -21,11 +22,12 @@ export const bannerApi = {
     return await axiosInstance.put(`/banners/${id}`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
-      }
+      },
+      timeout: 60000
     });
   },
 
-  delete: async (id) => {
+  delete: async id => {
     return await axiosInstance.delete(`/banners/${id}`);
   }
 };

@@ -137,23 +137,31 @@ export const useBanner = () => {
     }
   };
 
-  const confirmDelete = async () => {
-    if (!selectedBanner) return;
+const handleDelete = async id => {
+  if (!id) return;
 
-    try {
-      await bannerApi.delete(selectedBanner.id);
-      toast.success('Đã xóa Banner');
+  try {
+    setSaving(true);
 
-      setIsDeleteOpen(false);
-      setSelectedBanner(null);
+    await bannerApi.delete(id);
 
-      fetchBanners();
+    toast.success('Đã xóa Banner');
 
-    } catch (error) {
-      console.error(error);
-      toast.error(error.response?.data?.message || 'Không thể xóa Banner');
-    }
-  };
+    setIsDeleteOpen(false);
+    setSelectedBanner(null);
+
+    await fetchBanners();
+  } catch (error) {
+    console.error(error);
+
+    toast.error(
+      error.response?.data?.message ||
+      'Không thể xóa Banner'
+    );
+  } finally {
+    setSaving(false);
+  }
+};
 
   return {
     loading,
@@ -180,7 +188,7 @@ export const useBanner = () => {
     startEdit,
     openPreview,
     openDelete,
-    confirmDelete,
+    handleDelete,
     resetForm
   };
 };

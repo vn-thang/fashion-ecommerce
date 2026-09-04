@@ -23,9 +23,9 @@ const PAYMENT_STATUS = {
     className: 'bg-gray-100 text-gray-700'
   },
   REFUNDED: {
-    label: 'Đã hoàn tiền',
-    className: 'bg-sky-100 text-sky-700'
-  }
+  label: 'Đã hoàn tiền',
+  className: 'bg-purple-100 text-purple-700'
+},
 };
 
 const ORDER_STATUS = {
@@ -49,10 +49,10 @@ const ORDER_STATUS = {
     label: '❌ Đã hủy',
     className: 'bg-red-100 text-red-700'
   },
-  RETURN: {
-    label: '↩️ Hoàn trả',
-    className: 'bg-violet-100 text-violet-700'
-  }
+    RETURN: {
+    label: '🔄 Đã hoàn hàng',
+    className: 'bg-purple-100 text-purple-700'
+  },
 };
 
 const OrderDetailContent = ({ order, onUpdateStatus, onOpenCancel }) => {
@@ -110,7 +110,19 @@ const paymentStatus =
           <div className="divide-y divide-gray-200">
             {order.items?.map((item) => (
               <div key={item.id} className="flex items-center gap-4 py-3 first:pt-0 last:pb-0">
-                <div className="w-14 h-14 bg-gray-200 rounded-lg flex-shrink-0 flex items-center justify-center text-lg">👕</div>
+               <div className="h-14 w-14 flex-shrink-0 overflow-hidden rounded-lg bg-gray-100">
+                {item.variant?.product?.thumbnailUrl ? (
+                  <img
+                    src={item.variant.product.thumbnailUrl}
+                    alt={item.productName}
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center text-lg">
+                    👕
+                  </div>
+                )}
+              </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-bold text-slate-800 truncate">{item.productName}</p>
                   <p className="text-xs text-gray-500 mt-0.5">
@@ -167,7 +179,6 @@ const paymentStatus =
     <option value="PROCESSING">📦 Đang xử lý</option>
     <option value="SHIPPING">🚚 Đang giao</option>
     <option value="COMPLETED">✅ Hoàn thành</option>
-    <option value="RETURN">↩️ Hoàn trả</option>
   </select>
 
   {order.status !== 'COMPLETED' &&

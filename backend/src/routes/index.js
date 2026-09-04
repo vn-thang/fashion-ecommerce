@@ -29,6 +29,8 @@ const auditLogRoutes = require('../modules/auditLog/auditLog.routes');
 const notificationRoutes = require('../modules/notification/notification.routes');
 const chatRoutes = require('../modules/chat/chat.routes');
 const chatAdminRoutes = require('../modules/chat/admin/chatAdmin.routes');
+const returnRoutes = require('../modules/return/return.routes');
+const returnAdminRoutes = require('../modules/return/admin/returnAdmin.routes');
 
 router.use('/auth', authRoutes);           
 router.use('/categories', categoryRoutes); 
@@ -58,6 +60,8 @@ router.use('/admin/auditLog', auditLogRoutes );
 router.use('/notifications', notificationRoutes );
 router.use('/conversations', chatRoutes );
 router.use('/admin/conversations', chatAdminRoutes );
+router.use('/returns', returnRoutes);
+router.use('/admin/returns', returnAdminRoutes);
 
 
 module.exports = router;

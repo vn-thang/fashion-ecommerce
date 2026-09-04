@@ -20,23 +20,54 @@ const CouponSection = ({
     }
   }, [isModalOpen, appliedCoupon]);
 
-  const handleApplyManualCode = () => {
-    if (!couponInput.trim()) return;
-    const code = couponInput.trim().toUpperCase();
-    
-    const foundCoupon = availableCoupons.find(c => c.code.toUpperCase() === code);
-    if (foundCoupon) {
-      const minOrder = Number(foundCoupon.minOrderAmount);
-      if (subTotalAmount < minOrder) {
-        alert(`Mã này yêu cầu đơn hàng tối thiểu từ ${formatPrice(minOrder)}`);
-        return;
-      }
-    }
-    
-    setTempSelectedCoupon(code);
-    setAppliedCoupon(code);
-    setIsModalOpen(false);
-  };
+const handleApplyManualCode = () => {
+  if (!couponInput.trim()) return;
+
+  const code = couponInput.trim().toUpperCase();
+
+  const foundCoupon = availableCoupons.find(
+    c => c.code.toUpperCase() === code
+  );
+
+  if (!foundCoupon) {
+    alert('Mã giảm giá không tồn tại hoặc không khả dụng.');
+    return;
+  }
+
+  if (foundCoupon.isUsed) {
+    alert('Bạn đã sử dụng mã giảm giá này rồi.');
+    return;
+  }
+
+  if (foundCoupon.isOutOfStock) {
+    alert('Mã giảm giá này đã hết lượt sử dụng.');
+    return;
+  }
+
+  const now = new Date();
+
+  if (
+    new Date(foundCoupon.startDate) > now ||
+    new Date(foundCoupon.endDate) < now ||
+    !foundCoupon.isActive
+  ) {
+    alert('Mã giảm giá hiện không còn hiệu lực.');
+    return;
+  }
+
+  const minOrder = Number(foundCoupon.minOrderAmount);
+
+  if (subTotalAmount < minOrder) {
+    alert(
+      `Mã này yêu cầu đơn hàng tối thiểu từ ${formatPrice(minOrder)}`
+    );
+    return;
+  }
+
+  setTempSelectedCoupon(code);
+  setAppliedCoupon(code);
+  setIsModalOpen(false);
+};
 
   const handleCancelVoucher = () => {
     setCouponInput('');
@@ -147,17 +178,17 @@ const CouponSection = ({
               onChange={(e) => setCouponInput(e.target.value)}
               className="flex-1 text-sm px-3 py-2.5 border border-gray-300 rounded-sm outline-none focus:border-[#ee4d2d] uppercase bg-white placeholder:text-gray-300"
             />
-            <button 
-              onClick={() => { if(couponInput.trim()) setTempSelectedCoupon(couponInput.trim().toUpperCase()); }}
-              disabled={!couponInput.trim()}
-              className={`px-6 py-2.5 rounded-sm text-sm font-normal transition ${
-                couponInput.trim() 
-                  ? 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50' 
-                  : 'bg-gray-50 text-gray-300 border border-gray-200 cursor-not-allowed'
-              }`}
-            >
-              ÁP DỤNG
-            </button>
+          <button
+            onClick={handleApplyManualCode}
+            disabled={!couponInput.trim()}
+            className={`px-6 py-2.5 rounded-sm text-sm font-normal transition ${
+              couponInput.trim()
+                ? 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
+                : 'bg-gray-50 text-gray-300 border border-gray-200 cursor-not-allowed'
+            }`}
+          >
+            ÁP DỤNG
+          </button>
           </div>
 
           <div className="p-4 overflow-y-auto space-y-4 max-h-[50vh]">

@@ -13,10 +13,12 @@ import AdminSidebar from './components/AdminSidebar';
 import Button from '../shared/components/Button';
 import { useAuth } from '../features/auth/store/authContext';
 import NotificationBell from '../features/notification/components/NotificationBell';
+import { useSocket } from '../features/chat/context/SocketContext';
 
 const AdminLayout = () => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
+  const { disconnectSocket } = useSocket();
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isAccountOpen, setIsAccountOpen] = useState(false);
@@ -25,6 +27,7 @@ const AdminLayout = () => {
 
   const handleLogout = () => {
     setIsAccountOpen(false);
+     disconnectSocket();
     logout();
     navigate('/login');
   };

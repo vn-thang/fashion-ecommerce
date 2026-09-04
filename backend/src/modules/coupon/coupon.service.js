@@ -108,6 +108,60 @@ getAllCoupons: async (
   };
 },
 
+getAllClientCoupons: async (
+  queryParams = {},
+  userId
+) => {
+  const {
+    page: rawPage,
+    limit: rawLimit
+  } = queryParams;
+
+  const {
+    page,
+    limit,
+    skip
+  } = getPagination(
+    rawPage,
+    rawLimit
+  );
+
+  const {
+    coupons,
+    totalItems
+  } = await couponRepository.findAllClient({
+    userId,
+    skip,
+    take: limit
+  });
+
+  const processedCoupons = coupons.map(coupon => {
+    const {
+      usages,
+      ...restData
+    } = coupon;
+
+    return {
+      ...restData,
+
+      isUsed: usages.length > 0,
+
+      isOutOfStock:
+        coupon.usedCount >= coupon.usageLimit
+    };
+  });
+
+  return {
+    coupons: processedCoupons,
+
+    pagination: getPaginationMetadata(
+      totalItems,
+      page,
+      limit
+    )
+  };
+},
+
   getCouponById: async id => {
     const coupon = await couponRepository.findById(id);
 

@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useProductDetail } from '../../hooks/useProductDetail';
 import ProductGallery from '../../components/customer/ProductGallery';
 import ProductInfo from '../../components/customer/ProductInfo';
@@ -9,13 +9,14 @@ import useRecentlyViewed from '../../hooks/useRecentlyViewed';
 
 const ProductDetail = () => {
   const navigate = useNavigate();
+  const { slug } = useParams();
 
   useEffect(() => {
-  window.scrollTo({
-    top: 0,
-    behavior: 'instant'
-  });
-}, []);
+    window.scrollTo({
+      top: 0,
+      behavior: 'instant'
+    });
+  }, [slug]);
 
     const {
   addRecentlyViewed

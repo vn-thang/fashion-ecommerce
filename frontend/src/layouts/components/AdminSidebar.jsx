@@ -60,6 +60,10 @@ const AdminSidebar = ({ isOpen, onClose }) => {
           title: 'Thanh toán',
           path: '/admin/sales/payments',
         },
+         {
+          title: 'Trả hàng',
+          path: '/admin/sales/returns',
+        },
       ],
     },
     {

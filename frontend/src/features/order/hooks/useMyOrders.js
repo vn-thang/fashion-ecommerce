@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import toast from 'react-hot-toast';
 import { orderApi } from '../api/orderApi'; 
+import { paymentApi } from '../../payment/api/paymentApi';
 
 export const useMyOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -41,6 +42,30 @@ const cancelOrder = async (orderId, reason = 'Khách hàng hủy đơn') => {
   return res;
 };
 
+const retryPayment = async orderId => {
+  try {
+    const res = await paymentApi.createPaymentUrl({
+      orderId
+    });
+
+    if (res?.success && res.data?.paymentUrl) {
+      window.location.href = res.data.paymentUrl;
+      return;
+    }
+
+    toast.error(
+      res?.message || 'Không thể khởi tạo thanh toán'
+    );
+  } catch (err) {
+    console.error('Lỗi thanh toán lại:', err);
+
+    toast.error(
+      err.response?.data?.message ||
+      'Không thể khởi tạo thanh toán'
+    );
+  }
+};
+
   useEffect(() => {
     fetchMyOrders();
   }, [fetchMyOrders]);
@@ -61,6 +86,7 @@ const cancelOrder = async (orderId, reason = 'Khách hàng hủy đơn') => {
     handleTabChange,
     handlePageChange,
     refreshOrders: fetchMyOrders,
-    cancelOrder
+    cancelOrder,
+    retryPayment
   };
 };

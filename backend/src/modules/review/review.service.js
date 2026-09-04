@@ -3,7 +3,7 @@ const { REVIEW_MESSAGES } = require('./review.constants');
 const paginationHelper = require('../../utils/pagination'); 
 const auditLogService = require('../auditLog/auditLog.service');
 const notificationService = require('../notification/notification.service');
-const { TYPE } = require('../notification/notification.constants');
+const { TYPE, ADMIN: NOTIFICATION_ADMIN,  REVIEW: NOTIFICATION_REVIEW } = require('../notification/notification.constants');
 
 const reviewService = {
 createReview: async (userId, data) => {
@@ -20,6 +20,17 @@ createReview: async (userId, data) => {
   }
 
   const productId = orderItem.variant.productId;
+
+const returnedQuantity =
+  await reviewRepository.findCompletedReturnQuantity(
+    orderItemId
+  );
+
+  if (returnedQuantity >= orderItem.quantity) {
+    throw new Error(
+      'Sản phẩm đã được hoàn hàng, không thể đánh giá.'
+    );
+  }
 
   const existingReview =
     await reviewRepository.findReviewByOrderItemId(
@@ -182,16 +193,18 @@ getAdminReviews: async query => {
     }
   });
 
-  await notificationService.createNotification({
-    userId: review.userId,
-    title: 'Cửa hàng đã phản hồi đánh giá',
-    content: 'Đánh giá của bạn đã nhận được phản hồi từ cửa hàng.',
-    type: TYPE.REVIEW_REPLY,
-    data: {
-      reviewId: review.id,
-      productId: review.productId
-    }
-  });
+await notificationService.createNotification({
+  userId: review.userId,
+  title: NOTIFICATION_REVIEW.REPLIED_TITLE,
+  content: NOTIFICATION_REVIEW.REPLIED_CONTENT(
+    review.product.name
+  ),
+  type: TYPE.REVIEW_REPLIED,
+  data: {
+    reviewId: review.id,
+    productId: review.productId
+  }
+});
 
   return updatedReview;
 },

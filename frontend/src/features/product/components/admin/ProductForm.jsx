@@ -44,13 +44,28 @@ const ProductForm = ({ form, setForm, categories = [], brands = [], isEditing })
         </div>
       </div>
 
-      <Input
-        id="product-desc"
-        label="Mô tả tóm tắt"
-        placeholder="Nhập mô tả sản phẩm..."
-        value={form.description}
-        onChange={(e) => setForm({ ...form, description: e.target.value })}
-      />
+    <div>
+  <label
+    htmlFor="product-desc"
+    className="mb-1.5 block text-sm font-medium text-gray-700"
+  >
+    Mô tả sản phẩm
+  </label>
+
+  <textarea
+    id="product-desc"
+    placeholder="Nhập mô tả sản phẩm..."
+    value={form.description}
+    onChange={(e) =>
+      setForm({
+        ...form,
+        description: e.target.value
+      })
+    }
+    rows={12}
+    className="w-full resize-y rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-700 outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+  />
+</div>
 
            <div className="grid grid-cols-2 gap-4">
          TRẠNG THÁI

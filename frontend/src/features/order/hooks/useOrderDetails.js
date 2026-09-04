@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { orderApi } from '../api/orderApi';
+import { paymentApi } from '../../payment/api/paymentApi';
 
 export const useOrderDetails = () => {
   const { id } = useParams();
@@ -39,6 +40,32 @@ export const useOrderDetails = () => {
   }
 };
 
+const retryPayment = async () => {
+  if (!order?.id) return;
+
+  try {
+    const res = await paymentApi.createPaymentUrl({
+      orderId: order.id
+    });
+
+    if (res?.success && res.data?.paymentUrl) {
+      window.location.href = res.data.paymentUrl;
+      return;
+    }
+
+    toast.error(
+      res?.message || 'Không thể khởi tạo thanh toán'
+    );
+  } catch (err) {
+    console.error('Lỗi thanh toán lại:', err);
+
+    toast.error(
+      err.response?.data?.message ||
+      'Không thể khởi tạo thanh toán'
+    );
+  }
+};
+
   useEffect(() => {
     if (id) {
       fetchOrderDetails();
@@ -49,6 +76,7 @@ export const useOrderDetails = () => {
     order, 
     loading, 
     refreshOrder: fetchOrderDetails,
-    cancelOrder
+    cancelOrder,
+    retryPayment
   };
 };

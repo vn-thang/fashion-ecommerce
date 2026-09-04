@@ -16,13 +16,13 @@ import 'swiper/css/effect-fade';
 const HomeBanner = ({ loading, banners }) => {
   if (loading) {
     return (
-      <div className="w-full h-[260px] md:h-[380px] lg:h-[500px] rounded-2xl overflow-hidden bg-gray-200 animate-pulse" />
+      <div className="w-full aspect-[16/6] rounded-2xl overflow-hidden bg-gray-200 animate-pulse" />
     );
   }
 
   if (!banners || banners.length === 0) {
     return (
-      <div className="w-full h-[260px] md:h-[380px] lg:h-[500px] rounded-2xl bg-gray-100 flex items-center justify-center text-gray-500">
+      <div className="w-full aspect-[16/6] rounded-2xl bg-gray-100 flex items-center justify-center text-gray-500">
         Chưa có banner nào.
       </div>
     );
@@ -51,7 +51,7 @@ const HomeBanner = ({ loading, banners }) => {
           clickable: true
         }}
         navigation
-        className="w-full h-[260px] md:h-[380px] lg:h-[500px]"
+        className="w-full aspect-[16/6]"
       >
         {banners.map(banner => (
           <SwiperSlide key={banner.id}>
@@ -68,8 +68,8 @@ const HomeBanner = ({ loading, banners }) => {
                   group-hover:scale-105
                 "
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-black/5 pointer-events-none" />
 
+              <div className="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-black/5 pointer-events-none" />
             </div>
           </SwiperSlide>
         ))}

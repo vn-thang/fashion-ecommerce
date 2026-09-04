@@ -6,7 +6,6 @@ const BannerPreviewModal = ({
   onClose,
   banner
 }) => {
-
   if (!banner) return null;
 
   return (
@@ -16,37 +15,28 @@ const BannerPreviewModal = ({
       size="3xl"
       title={banner.title}
     >
-
-      <img
-        src={banner.imageUrl}
-        alt={banner.title}
-        className="w-full rounded-xl border"
-      />
+      <div className="w-full aspect-[16/6] overflow-hidden rounded-xl border bg-gray-100">
+        <img
+          src={banner.imageUrl}
+          alt={banner.title}
+          className="w-full h-full object-cover"
+        />
+      </div>
 
       <div className="mt-6 space-y-3">
-
         <div>
-
           <h2 className="font-bold text-xl">
-
             {banner.title}
-
           </h2>
-
         </div>
 
         <p className="text-gray-600">
-
           {banner.description}
-
         </p>
 
         <div className="flex gap-3">
-
           <span className="px-3 py-1 rounded-full bg-indigo-100 text-indigo-700 text-sm">
-
             Thứ tự: {banner.displayOrder}
-
           </span>
 
           <span
@@ -60,11 +50,8 @@ const BannerPreviewModal = ({
               ? 'Đang hiển thị'
               : 'Đã ẩn'}
           </span>
-
         </div>
-
       </div>
-
     </Modal>
   );
 };

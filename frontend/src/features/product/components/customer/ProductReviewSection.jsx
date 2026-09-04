@@ -203,11 +203,11 @@ const ProductReviewSection = ({
 
                   </div>
 
-                  <div className="text-sm text-gray-700 mt-3 whitespace-pre-line bg-gray-50 p-3 rounded border">
-                    {review.comment ||
-                      'Người dùng không để lại nhận xét.'}
-                  </div>
-
+                   {review.comment?.trim() && (
+                    <div className="text-sm text-gray-700 mt-3 whitespace-pre-line bg-gray-50 p-3 rounded border">
+                      {review.comment}
+                    </div>
+                  )}
                   {review.reply && (
                     <div className="mt-3 ml-4 border-l-4 border-indigo-500 bg-indigo-50 rounded-r-lg p-4">
 

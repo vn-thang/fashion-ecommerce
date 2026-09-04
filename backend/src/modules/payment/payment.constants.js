@@ -25,7 +25,11 @@ const PAYMENT_MESSAGES = {
   ORDER_INVALID_STATUS: 'Đơn hàng không ở trạng thái cho phép thanh toán.',
 
   GET_PAYMENTS_SUCCESS: 'Lấy danh sách giao dịch thành công',
-  GET_PAYMENT_DETAIL_SUCCESS: 'Lấy chi tiết giao dịch thành công'
+  GET_PAYMENT_DETAIL_SUCCESS: 'Lấy chi tiết giao dịch thành công',
+
+  REFUND_SUCCESS: 'Hoàn tiền thành công',
+  REFUND_FAILED: 'Hoàn tiền thất bại',
+  REFUND_INVALID_PAYMENT: 'Giao dịch không đủ điều kiện hoàn tiền'
 };
 
 module.exports = {

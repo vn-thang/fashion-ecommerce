@@ -12,10 +12,6 @@ const NewestHeader = ({ totalProducts = 0 }) => {
             Sản phẩm mới
           </h2>
         </div>
-
-        <p className="mt-1 text-sm text-gray-500">
-          {totalProducts} sản phẩm mới vừa được cập nhật
-        </p>
       </div>
 
       <Link

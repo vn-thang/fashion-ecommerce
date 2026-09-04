@@ -6,11 +6,13 @@ import { useCart } from '../../features/cart/hooks/CartContext';
 import { storeSettingApi } from '../../features/storeSetting/api/storeSettingApi';
 import SearchBox from '../../features/search/components/SearchBox';
 import NotificationBell from '../../features/notification/components/NotificationBell';
+import { useSocket } from '../../features/chat/context/SocketContext';
 
 const CustomerHeader = () => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const { cart } = useCart();
+  const { disconnectSocket } = useSocket();
   
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
   const [categories, setCategories] = useState([]);
@@ -67,7 +69,8 @@ const CustomerHeader = () => {
     e.preventDefault();
   };
 
-  const handleLogout = () => {  
+  const handleLogout = () => { 
+     disconnectSocket(); 
     logout();
     navigate('/login');
   };
@@ -301,7 +304,7 @@ const CustomerHeader = () => {
             </div>
           )}
         </div>
-        <nav className="flex items-center gap-5 md:gap-8 ml-4 md:ml-8 overflow-x-auto whitespace-nowrap scrollbar-hide font-medium text-[11px] md:text-[13px] uppercase tracking-wide">
+  <nav className="ml-4 flex items-center gap-6 overflow-x-auto whitespace-nowrap scrollbar-hide font-medium text-[11px] uppercase tracking-wide md:ml-8 md:gap-10 md:text-[13px]">
 
           <Link
             to="/"
@@ -322,20 +325,6 @@ const CustomerHeader = () => {
             className="shrink-0 hover:text-white/80 transition-colors"
           >
             ⚡ Flash Sale
-          </Link>
-
-          <Link
-            to="/vouchers"
-            className="shrink-0 hover:text-white/80 transition-colors"
-          >
-            Mã Giảm Giá
-          </Link>
-
-          <Link
-            to="/news"
-            className="shrink-0 hover:text-white/80 transition-colors"
-          >
-            Tin tức Mới
           </Link>
 
         </nav>

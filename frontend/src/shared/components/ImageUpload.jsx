@@ -23,22 +23,25 @@ const ImageUpload = ({
     setPreview(initialImage);
   }, [initialImage]);
 
-  const compressImage = async (file) => {
-    if (!compress || !file.type.startsWith('image/')) return file;
-    
-    const options = {
-      maxSizeMB: 0.8,         
-      maxWidthOrHeight: 1920, 
-      useWebWorker: true,
-    };
+const compressImage = async (file) => {
+  if (!compress || !file.type.startsWith('image/')) {
+    return file;
+  }
 
-    try {
-      return await imageCompression(file, options);
-    } catch (error) {
-      console.error("Lỗi nén ảnh:", error);
-      return file; 
-    }
+  const options = {
+    maxSizeMB: 2,
+    maxWidthOrHeight: 2400,
+    initialQuality: 0.9,
+    useWebWorker: true,
   };
+
+  try {
+    return await imageCompression(file, options);
+  } catch (error) {
+    console.error('Lỗi nén ảnh:', error);
+    return file;
+  }
+};
 
   const handleFileChange = (e) => {
     const files = e.target.files;
@@ -46,27 +49,32 @@ const ImageUpload = ({
     processFiles(files);
   };
 
-  const processFiles = async (files) => {
-    setIsCompressing(true);
-    try {
-      if (multiple) {
-        const compressedFiles = await Promise.all(
-          Array.from(files).map(file => compressImage(file))
-        );
-        const dataTransfer = new DataTransfer();
-        compressedFiles.forEach(file => dataTransfer.items.add(file));
-        
-        onChange(dataTransfer.files); 
-        if (fileInputRef.current) fileInputRef.current.value = ''; 
-      } else {
-        const compressedFile = await compressImage(files[0]);
-        setPreview(URL.createObjectURL(compressedFile)); 
-        onChange(compressedFile); 
+const processFiles = async (files) => {
+  setIsCompressing(true);
+
+  try {
+    const fileArray = Array.from(files);
+
+    if (multiple) {
+      const compressedFiles = await Promise.all(
+        fileArray.map(file => compressImage(file))
+      );
+
+      onChange(compressedFiles);
+
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
       }
-    } finally {
-      setIsCompressing(false);
+    } else {
+      const compressedFile = await compressImage(fileArray[0]);
+
+      setPreview(URL.createObjectURL(compressedFile));
+      onChange(compressedFile);
     }
-  };
+  } finally {
+    setIsCompressing(false);
+  }
+};
 
   const onDragOver = (e) => { e.preventDefault(); if (!isUploading && !isCompressing) setIsDragging(true); };
   const onDragLeave = (e) => { e.preventDefault(); setIsDragging(false); };
@@ -79,26 +87,29 @@ const ImageUpload = ({
     if (files && files.length > 0) processFiles(files);
   };
 
-  const handlePaste = (e) => {
-    if (isUploading || isCompressing) return;
-    const items = e.clipboardData?.items;
-    if (!items) return;
+const handlePaste = (e) => {
+  if (isUploading || isCompressing) return;
 
-    const pastedFiles = [];
-    for (let i = 0; i < items.length; i++) {
-      if (items[i].type.indexOf('image') !== -1) {
-        const file = items[i].getAsFile();
-        if (file) pastedFiles.push(file);
+  const items = e.clipboardData?.items;
+  if (!items) return;
+
+  const pastedFiles = [];
+
+  for (let i = 0; i < items.length; i++) {
+    if (items[i].type.startsWith('image/')) {
+      const file = items[i].getAsFile();
+
+      if (file) {
+        pastedFiles.push(file);
       }
     }
+  }
 
-    if (pastedFiles.length > 0) {
-      e.preventDefault(); 
-      const dataTransfer = new DataTransfer();
-      pastedFiles.forEach(file => dataTransfer.items.add(file));
-      processFiles(dataTransfer.files);
-    }
-  };
+  if (pastedFiles.length > 0) {
+    e.preventDefault();
+    processFiles(pastedFiles);
+  }
+};
 
   const isLoading = isUploading || isCompressing;
 

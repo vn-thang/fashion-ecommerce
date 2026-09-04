@@ -37,7 +37,7 @@ const CategoryRevenueChart = ({
         </h2>
 
         <p className="text-sm text-gray-500">
-          Top 5 danh mục có doanh thu cao nhất.
+          Top danh mục có doanh thu cao nhất.
         </p>
       </div>
 
