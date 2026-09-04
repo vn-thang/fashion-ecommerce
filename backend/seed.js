@@ -5,13 +5,7 @@ const prisma = new PrismaClient();
 
 async function main() {
   console.log('🔥 BẮT ĐẦU SEED DATABASE...\n');
-
-  // =========================================================
-  // 0. XÓA DỮ LIỆU CŨ
-  // =========================================================
   console.log('🧹 Đang xóa dữ liệu cũ...');
-
-  // Xóa các bảng phụ thuộc Product / User / Category / Brand
   await prisma.productVariant.deleteMany({});
   await prisma.productImage.deleteMany({});
   await prisma.product.deleteMany({});
@@ -19,7 +13,6 @@ async function main() {
   await prisma.brand.deleteMany({});
   await prisma.category.deleteMany({});
 
-  // Chỉ xóa các user seed nếu muốn giữ user cũ thì bỏ phần này.
   await prisma.user.deleteMany({
     where: {
       email: {
@@ -35,9 +28,6 @@ async function main() {
 
   console.log('✅ Đã dọn dữ liệu seed cũ.\n');
 
-  // =========================================================
-  // 1. USERS
-  // =========================================================
   console.log('👤 Đang tạo Users...');
 
   const passwordHash = await bcrypt.hash('12345678', 10);
@@ -94,9 +84,6 @@ async function main() {
 
   console.log(`✅ 1 Admin + ${users.length} Customer\n`);
 
-  // =========================================================
-  // 2. BRANDS
-  // =========================================================
   console.log('🏷️ Đang tạo Brands...');
 
   const brandData = [
@@ -158,9 +145,6 @@ async function main() {
 
   console.log(`✅ Đã tạo ${brandData.length} Brands\n`);
 
-  // =========================================================
-  // 3. CATEGORIES
-  // =========================================================
   console.log('📂 Đang tạo Categories...');
 
   const categoryStructure = [
@@ -303,14 +287,8 @@ async function main() {
 
   console.log('✅ Đã tạo 4 category cha + 15 category con\n');
 
-  // =========================================================
-  // 4. PRODUCT DATA
-  // =========================================================
   const products = [];
 
-  // ---------------------------------------------------------
-  // ÁO NAM
-  // ---------------------------------------------------------
   products.push(
     ...createProducts(
       categories['ao-nam'].id,
@@ -329,9 +307,6 @@ async function main() {
     )
   );
 
-  // ---------------------------------------------------------
-  // QUẦN NAM
-  // ---------------------------------------------------------
   products.push(
     ...createProducts(
       categories['quan-nam'].id,
@@ -350,9 +325,6 @@ async function main() {
     )
   );
 
-  // ---------------------------------------------------------
-  // ÁO KHOÁC NAM
-  // ---------------------------------------------------------
   products.push(
     ...createProducts(
       categories['ao-khoac-nam'].id,
@@ -371,9 +343,6 @@ async function main() {
     )
   );
 
-  // ---------------------------------------------------------
-  // ÁO NỮ
-  // ---------------------------------------------------------
   products.push(
     ...createProducts(
       categories['ao-nu'].id,
@@ -392,9 +361,6 @@ async function main() {
     )
   );
 
-  // ---------------------------------------------------------
-  // QUẦN NỮ
-  // ---------------------------------------------------------
   products.push(
     ...createProducts(
       categories['quan-nu'].id,
@@ -413,9 +379,6 @@ async function main() {
     )
   );
 
-  // ---------------------------------------------------------
-  // VÁY & ĐẦM
-  // ---------------------------------------------------------
   products.push(
     ...createProducts(
       categories['vay-dam'].id,
@@ -434,9 +397,6 @@ async function main() {
     )
   );
 
-  // ---------------------------------------------------------
-  // ÁO KHOÁC NỮ
-  // ---------------------------------------------------------
   products.push(
     ...createProducts(
       categories['ao-khoac-nu'].id,
@@ -455,9 +415,6 @@ async function main() {
     )
   );
 
-  // ---------------------------------------------------------
-  // GIÀY NAM
-  // ---------------------------------------------------------
   products.push(
     ...createProducts(
       categories['giay-nam'].id,
@@ -479,9 +436,6 @@ async function main() {
     )
   );
 
-  // ---------------------------------------------------------
-  // GIÀY NỮ
-  // ---------------------------------------------------------
   products.push(
     ...createProducts(
       categories['giay-nu'].id,
@@ -503,9 +457,6 @@ async function main() {
     )
   );
 
-  // ---------------------------------------------------------
-  // SANDAL & DÉP
-  // ---------------------------------------------------------
   products.push(
     ...createProducts(
       categories['sandal-dep'].id,
@@ -527,9 +478,6 @@ async function main() {
     )
   );
 
-  // ---------------------------------------------------------
-  // TÚI XÁCH
-  // ---------------------------------------------------------
   products.push(
     ...createProducts(
       categories['tui-xach'].id,
@@ -551,9 +499,6 @@ async function main() {
     )
   );
 
-  // ---------------------------------------------------------
-  // BALO
-  // ---------------------------------------------------------
   products.push(
     ...createProducts(
       categories['balo'].id,
@@ -575,9 +520,6 @@ async function main() {
     )
   );
 
-  // ---------------------------------------------------------
-  // VÍ
-  // ---------------------------------------------------------
   products.push(
     ...createProducts(
       categories['vi'].id,
@@ -599,9 +541,6 @@ async function main() {
     )
   );
 
-  // ---------------------------------------------------------
-  // MŨ
-  // ---------------------------------------------------------
   products.push(
     ...createProducts(
       categories['mu'].id,
@@ -623,9 +562,6 @@ async function main() {
     )
   );
 
-  // ---------------------------------------------------------
-  // THẮT LƯNG
-  // ---------------------------------------------------------
   products.push(
     ...createProducts(
       categories['that-lung'].id,
@@ -647,9 +583,6 @@ async function main() {
     )
   );
 
-  // =========================================================
-  // 5. CREATE PRODUCTS + VARIANTS
-  // =========================================================
   console.log(`📦 Đang tạo ${products.length} sản phẩm...`);
 
   let createdProductCount = 0;
@@ -665,8 +598,6 @@ async function main() {
 
         name: profile.name,
         slug: profile.slug,
-
-        // ⭐ ĐỂ NULL ĐỂ ANH TỰ UPLOAD CLOUDINARY
         thumbnailUrl: null,
 
         description: profile.description,
@@ -693,10 +624,6 @@ async function main() {
 
     createdVariantCount += variants.length;
 
-    // -------------------------------------------------------
-    // Tạo InventoryTransaction nhập kho ban đầu
-    // Admin là người tạo giao dịch.
-    // -------------------------------------------------------
     for (const variant of variants) {
       await prisma.inventoryTransaction.create({
         data: {
@@ -705,23 +632,12 @@ async function main() {
             : undefined
         }
       }).catch(() => {
-        // Bỏ qua vì variant từ createMany không có ID.
       });
     }
   }
 
   console.log(`✅ ${createdProductCount} Products`);
   console.log(`✅ ${createdVariantCount} Variants\n`);
-
-  // =========================================================
-  // 6. TẠO INVENTORY TRANSACTIONS
-  // =========================================================
-  //
-  // Vì createMany không trả về ID trong cách sử dụng trên,
-  // phần inventory sẽ được tạo lại bằng cách lấy toàn bộ
-  // variants sau khi products đã tạo.
-  //
-  // =========================================================
 
   const allVariants = await prisma.productVariant.findMany({
     select: {
@@ -730,8 +646,6 @@ async function main() {
     }
   });
 
-  // Xóa những transaction rỗng nếu đoạn trên không tạo được.
-  // Thực tế đoạn tạo ở trên sẽ bị catch nên không ảnh hưởng.
   for (const variant of allVariants) {
     await prisma.inventoryTransaction.create({
       data: {
@@ -747,9 +661,6 @@ async function main() {
 
   console.log(`✅ Đã tạo ${allVariants.length} InventoryTransactions\n`);
 
-  // =========================================================
-  // 7. SUMMARY
-  // =========================================================
   const categoryCount = await prisma.category.count();
   const brandCount = await prisma.brand.count();
   const productCount = await prisma.product.count();
@@ -777,10 +688,6 @@ async function main() {
   console.log('==============================================');
 }
 
-// ============================================================
-// PRODUCT FACTORY
-// ============================================================
-
 function createProducts(
   categoryId,
   data,
@@ -801,24 +708,12 @@ function createProducts(
   }));
 }
 
-// ============================================================
-// VARIANT FACTORY
-// ============================================================
-
 function createVariants(product, basePrice, type) {
   const variants = [];
-
-  // ==========================================================
-  // Tạo mã sản phẩm từ slug
-  // ==========================================================
 
   const productCode = product.slug
     .replace(/-/g, '')
     .toUpperCase();
-
-  // ==========================================================
-  // CLOTHING
-  // ==========================================================
 
   if (type === 'clothing') {
     const colors = [
@@ -868,10 +763,6 @@ function createVariants(product, basePrice, type) {
     return variants;
   }
 
-  // ==========================================================
-  // SHOES
-  // ==========================================================
-
   if (type === 'shoe') {
     const colors = [
       'Đen',
@@ -915,10 +806,6 @@ function createVariants(product, basePrice, type) {
     return variants;
   }
 
-  // ==========================================================
-  // ACCESSORIES
-  // ==========================================================
-
   if (type === 'accessory') {
     const colors = [
       'Đen',
@@ -955,10 +842,6 @@ function createVariants(product, basePrice, type) {
   return [];
 }
 
-// ============================================================
-// BRAND NAME
-// ============================================================
-
 function capitalizeBrand(slug) {
   const names = {
     uniqlo: 'Uniqlo',
@@ -975,10 +858,6 @@ function capitalizeBrand(slug) {
 
   return names[slug] || slug;
 }
-
-// ============================================================
-// RUN
-// ============================================================
 
 main()
   .catch(error => {

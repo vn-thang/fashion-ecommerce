@@ -3,7 +3,7 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('🖼️ Bắt đầu cập nhật thumbnail từ ProductImage...');
+  console.log('Bắt đầu cập nhật thumbnail từ ProductImage...');
 
   const products = await prisma.product.findMany({
     where: {
@@ -41,10 +41,10 @@ async function main() {
     });
 
     updated++;
-    console.log(`✅ ${product.name}`);
+    console.log(` ${product.name}`);
   }
 
-  console.log(`\n🎉 Hoàn thành! Đã cập nhật ${updated} thumbnail.`);
+  console.log(`\nHoàn thành! Đã cập nhật ${updated} thumbnail.`);
 }
 
 main()

@@ -312,7 +312,6 @@ completeTransaction: async ({
         },
         include: {
           items: {
-           items: {
   include: {
     orderItem: {
       include: {
@@ -320,7 +319,6 @@ completeTransaction: async ({
       }
     }
   }
-}
           },
           order: {
             include: {

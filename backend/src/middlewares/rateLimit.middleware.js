@@ -57,7 +57,7 @@ const resendVerificationRateLimiter =
 const forgotPasswordRateLimiter =
   createRateLimiter({
     windowMs: 15 * 60 * 1000,
-    limit: 10,
+    limit: 5,
     prefix: 'rate-limit:forgot-password:',
     message:
       'Bạn đã yêu cầu đặt lại mật khẩu quá nhiều lần. Vui lòng thử lại sau.'
@@ -74,7 +74,7 @@ const resetPasswordRateLimiter =
 
 const refreshRateLimiter = createRateLimiter({
   windowMs: 15 * 60 * 1000,
-  limit: 20,
+  limit: 60,
   prefix: 'rate-limit:refresh:',
   message:
     'Quá nhiều lần yêu cầu làm mới phiên đăng nhập. Vui lòng thử lại sau.'
@@ -83,7 +83,7 @@ const refreshRateLimiter = createRateLimiter({
 const createOrderRateLimiter =
   createRateLimiter({
     windowMs: 1 * 60 * 1000,
-    limit: 10,
+    limit: 5,
     prefix: 'rate-limit:create-order:',
     message:
       'Bạn tạo đơn hàng quá nhanh. Vui lòng thử lại sau.'
