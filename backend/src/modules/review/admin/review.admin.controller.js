@@ -17,6 +17,12 @@ const reviewAdminController = {
     try {
       const { id } = req.params;
       const { reply } = req.body;
+       console.log('========== REPLY DEBUG ==========');
+    console.log('reviewId:', id);
+    console.log('body:', req.body);
+    console.log('reply:', reply);
+    console.log('userId:', req.user.userId);
+    console.log('==================================');
       const result = await reviewService.replyToReview(req.user.userId, id, reply);
       return sendSuccess(res, 200, REVIEW_MESSAGES.REPLY_SUCCESS, result);
     } catch (err) {

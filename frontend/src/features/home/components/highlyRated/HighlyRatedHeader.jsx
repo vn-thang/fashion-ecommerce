@@ -12,10 +12,6 @@ const HighlyRatedHeader = ({ totalProducts = 0 }) => {
             Đánh giá cao
           </h2>
         </div>
-
-        <p className="mt-1 text-sm text-gray-500">
-          {totalProducts} sản phẩm được khách hàng đánh giá cao
-        </p>
       </div>
 
       <Link

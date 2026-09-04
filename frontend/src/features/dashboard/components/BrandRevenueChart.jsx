@@ -37,7 +37,7 @@ const BrandRevenueChart = ({
         </h2>
 
         <p className="text-sm text-gray-500">
-          Top 5 thương hiệu có doanh thu cao nhất.
+          Top thương hiệu có doanh thu cao nhất.
         </p>
       </div>
 

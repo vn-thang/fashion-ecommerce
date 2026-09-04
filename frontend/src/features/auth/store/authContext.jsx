@@ -63,10 +63,10 @@ export const AuthProvider = ({ children }) => {
       JSON.stringify(userData)
     );
   };
-  const logout = () => {
+  const logout = () => { 
     setUser(null);
     setToken(null);
-
+ 
     localStorage.removeItem('isLoggedIn');
     localStorage.removeItem('accessToken');
     localStorage.removeItem('user');

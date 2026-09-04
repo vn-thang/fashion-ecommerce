@@ -34,7 +34,7 @@ const productService = {
       name,
       slug,
       description,
-      thumbnailUrl: file.path,
+      thumbnailUrl: file?.path || null,
       status: status || STATUS.ACTIVE
     });
 
@@ -49,32 +49,45 @@ const productService = {
     return product;
   },
 
-   uploadAlbumImages: async (
+  uploadAlbumImages: async (
+  productId,
+  files,
+  adminId
+) => {
+  if (!files || files.length === 0) {
+    return [];
+  }
+
+  const imagesData = files.map((file, index) => ({
     productId,
-    files,
-    adminId
-  ) => {
-    const imagesData = files.map((file, index) => ({
-      productId,
-      imageUrl: file.path,
-      displayOrder: index + 1
-    }));
+    imageUrl: file.path,
+    displayOrder: index
+  }));
 
-    const images =
-      await productRepository.createProductImages(
-        imagesData
-      );
+  const images =
+    await productRepository.createProductImages(
+      imagesData
+    );
 
-    await auditLogService.createAuditLog({
-      userId: adminId,
-      action: 'CREATE_IMAGE',
-      entityName: 'Product',
-      entityId: productId,
-      newValues: images
+  const product =
+    await productRepository.findProductById(productId);
+
+  if (!product.thumbnailUrl && images.length > 0) {
+    await productRepository.updateProduct(productId, {
+      thumbnailUrl: images[0].imageUrl
     });
+  }
 
-    return images;
-  },
+  await auditLogService.createAuditLog({
+    userId: adminId,
+    action: 'CREATE_IMAGE',
+    entityName: 'Product',
+    entityId: productId,
+    newValues: images
+  });
+
+  return images;
+},
 
   createVariant: async (
     productId,

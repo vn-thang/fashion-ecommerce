@@ -26,6 +26,8 @@ export const useStoreSetting = () => {
       const res = await storeSettingApi.get();
 
       const data = res.data?.data || res.data || res;
+      console.log('Store setting API:', res);
+console.log('Store setting data:', data);
 
       setForm(prev => ({
         ...prev,

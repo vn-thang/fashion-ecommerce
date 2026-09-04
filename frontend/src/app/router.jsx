@@ -41,6 +41,13 @@ import AdminNotificationPage from '../features/notification/pages/admin/AdminNot
 import ChatAdminPage from '../features/chat/pages/admin/ChatAdminPage';
 import ChangePasswordPage from '../features/auth/pages/ChangePasswordPage';
 import VerifyEmailPage from '../features/auth/pages/VerifyEmailPage';
+import HelpPage from '../features/policy/pages/HelpPage';
+import ShippingPolicyPage from '../features/policy/pages/ShippingPolicyPage';
+import RefundPolicyPage from '../features/policy/pages/RefundPolicyPage';
+import PrivacyPage from '../features/policy/pages/PrivacyPage';
+import TermsPage from '../features/policy/pages/TermsPage';
+import ReturnManagementPage from '../features/return/pages/admin/ReturnManagementPage';
+import ReturnPage from '../features/return/pages/customer/ReturnPage';
 
 const ProtectedRoute = ({ children }) => {
   const { token } = useAuth();
@@ -131,9 +138,33 @@ export const router = createBrowserRouter([
           {
             path: 'orders/:id', 
             element: <OrderDetailPage />
+          },
+          {
+            path: 'returns',
+            element: <ReturnPage />
           }
         ]
       }, 
+       {
+            path: 'help', 
+            element: <HelpPage />
+          },
+           {
+            path: 'shipping-policy', 
+            element: <ShippingPolicyPage />
+          },
+           {
+            path: 'refund-policy', 
+            element: <RefundPolicyPage />
+          },
+           {
+            path: '/privacy', 
+            element: <PrivacyPage />
+          },
+           {
+            path: 'terms', 
+            element: <TermsPage />
+          },
     ]
   },
 
@@ -206,6 +237,10 @@ export const router = createBrowserRouter([
           {
             path: 'payments',
             element: <AdminPaymentPage />
+          },
+          {
+            path: 'returns',
+            element: <ReturnManagementPage />
           }
         ]
       },

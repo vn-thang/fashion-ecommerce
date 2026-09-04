@@ -18,10 +18,14 @@ const ProductGallery = ({
       .map((image) => image.imageUrl || image.url)
       .filter(Boolean) || [];
 
-  const allImages = [
-    product.thumbnailUrl,
-    ...productImages
-  ].filter(Boolean);
+const allImages = product.thumbnailUrl
+  ? [
+      product.thumbnailUrl,
+      ...productImages.filter(
+        image => image !== product.thumbnailUrl
+      )
+    ]
+  : productImages;
 
   const currentImage =
     activeImage || allImages[0];

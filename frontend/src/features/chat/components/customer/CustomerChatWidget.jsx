@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 import { useAuth } from '../../../auth/store/authContext';
 
@@ -6,11 +6,15 @@ import CustomerChat from './CustomerChat';
 import CustomerChatButton from './CustomerChatButton';
 
 import { useCustomerChat } from '../../hooks/useCustomerChat';
+import { useCustomerChatContext } from '../../context/CustomerChatContext';
 
 const CustomerChatWidget = () => {
   const { user } = useAuth();
 
-  const [isOpen, setIsOpen] = useState(false);
+  const {
+    isOpen,
+    toggleChat
+  } = useCustomerChatContext();
 
   const currentUserId = user?.id;
 
@@ -47,7 +51,7 @@ const CustomerChatWidget = () => {
       <div className="fixed bottom-5 right-4 z-[9999] sm:right-6">
 
         <CustomerChatButton
-          onClick={() => setIsOpen(prev => !prev)}
+          onClick={toggleChat}
           unreadCount={chat.unreadCount}
           store={chat.conversation?.store}
           adminPresence={chat.adminPresence}

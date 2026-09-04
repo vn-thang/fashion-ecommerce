@@ -11,7 +11,7 @@ const STATUS_CONFIG = {
   RETURN: { label: 'HOÀN HÀNG', color: 'text-red-500' },
 };
 
-const MyOrderItem = ({ order, formatPrice, onCancel, onReviewClick }) => {
+const MyOrderItem = ({ order, formatPrice, onCancel, onReviewClick, onRetryPayment, onReturnClick }) => {
   const navigate = useNavigate();
 
   const statusConfig =
@@ -19,6 +19,11 @@ const MyOrderItem = ({ order, formatPrice, onCancel, onReviewClick }) => {
       label: order.status,
       color: 'text-gray-800',
     };
+
+    const isVnpayPending =
+    order?.status === 'PENDING' &&
+    order?.payment?.paymentMethod === 'VNPAY' &&
+    order?.payment?.status === 'PENDING';
 
   const totalItems = order.items?.length || 0;
 
@@ -29,7 +34,8 @@ const MyOrderItem = ({ order, formatPrice, onCancel, onReviewClick }) => {
 
   const isAllReviewed =
     totalItems > 0 && reviewedItemsCount === totalItems;
-
+    
+    const hasReturnRequest = order.returnRequests?.length > 0;
   const handleReviewClick = () => {
     if (totalItems === 1) {
       onReviewClick?.(order.items[0]);
@@ -128,6 +134,20 @@ return (
       </div>
 
       <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
+
+          {isVnpayPending && (
+    <Button
+      variant="primary"
+      className="w-full bg-[#ee4d2d] text-white hover:bg-[#d74123] sm:w-auto"
+      onClick={(e) => {
+        e.stopPropagation();
+        onRetryPayment?.(order.id);
+      }}
+    >
+      Thanh toán ngay
+    </Button>
+  )}
+
         {(order.status === 'PENDING' ||
           order.status === 'PROCESSING') && (
           <Button
@@ -138,6 +158,32 @@ return (
             Hủy đơn
           </Button>
         )}
+
+{order.status === 'COMPLETED' && (
+  hasReturnRequest ? (
+    <Button
+      variant="outline"
+      className="w-full border-blue-300 text-blue-600 hover:bg-blue-50 sm:w-auto"
+      onClick={e => {
+        e.stopPropagation();
+        navigate('/account/returns');
+      }}
+    >
+      Xem trả hàng
+    </Button>
+  ) : (
+    <Button
+      variant="outline"
+      className="w-full border-orange-300 text-orange-600 hover:bg-orange-50 sm:w-auto"
+      onClick={e => {
+        e.stopPropagation();
+        onReturnClick?.(order);
+      }}
+    >
+      Trả hàng
+    </Button>
+  )
+)}
 
         {order.status === 'COMPLETED' &&
           (isAllReviewed ? (

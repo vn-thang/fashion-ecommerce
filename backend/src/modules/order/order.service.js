@@ -6,7 +6,7 @@ const prisma = require('../../config/database');
 const { PAYMENT_METHOD, PAYMENT_MESSAGES, PAYMENT_STATUS} = require('../payment/payment.constants');
 const auditLogService = require('../auditLog/auditLog.service');
 const notificationService = require('../notification/notification.service');
-const { TYPE, ORDER: NOTIFICATION_ORDER } = require('../notification/notification.constants');
+const { TYPE, ORDER: NOTIFICATION_ORDER, PAYMENT: NOTIFICATION_PAYMENT, ADMIN: NOTIFICATION_ADMIN} = require('../notification/notification.constants');
 
 const ORDER_EXPIRE_MINUTES =
   Number(process.env.ORDER_EXPIRE_MINUTES) || 30;
@@ -46,7 +46,8 @@ calculateOrderData: async (userId, { cartItemIds, buyNowItems, province, couponC
       originalPrice,
       unitPrice,
       quantity: item.quantity,
-      subtotal: sub
+      subtotal: sub,
+      discountAmount: 0
     };
   });
 
@@ -74,7 +75,6 @@ if (couponCode) {
     );
 
   const now = new Date();
-
   if (
     coupon &&
     coupon.isActive &&
@@ -126,6 +126,28 @@ if (couponCode) {
       ORDER_MESSAGES.COUPON_INVALID
     );
   }
+}
+
+  if (discountAmount > 0 && subtotal > 0) {
+  let allocatedDiscount = 0;
+
+  itemsData.forEach((item, index) => {
+    if (index === itemsData.length - 1) {
+      item.discountAmount =
+        Math.round(
+          (discountAmount - allocatedDiscount) * 100
+        ) / 100;
+      return;
+    }
+
+    const itemDiscount =
+      Math.round(
+        (discountAmount * item.subtotal) / subtotal * 100
+      ) / 100;
+
+    item.discountAmount = itemDiscount;
+    allocatedDiscount += itemDiscount;
+  });
 }
 
   let totalAmount = subtotal + shippingFee - discountAmount;
@@ -222,61 +244,97 @@ previewOrder: async (userId, payload) => {
     }
   });
 
-  try {
+try {
+  if (paymentMethod === PAYMENT_METHOD.VNPAY) {
+    await notificationService.createNotification({
+      userId,
+      title: NOTIFICATION_PAYMENT.PAYMENT_PENDING_TITLE,
+      content: NOTIFICATION_PAYMENT.PAYMENT_PENDING_CONTENT(
+        order.orderNumber
+      ),
+      type: TYPE.ORDER_PAYMENT_PENDING,
+      data: {
+        orderId: order.id,
+        orderNumber: order.orderNumber,
+        totalAmount: Number(order.totalAmount),
+        paymentMethod
+      }
+    });
+  } else {
     await notificationService.createNotification({
       userId,
       title: NOTIFICATION_ORDER.CREATED_TITLE,
-      content: NOTIFICATION_ORDER.CREATED_CONTENT(order.orderNumber),
+      content: NOTIFICATION_ORDER.CREATED_CONTENT(
+        order.orderNumber
+      ),
       type: TYPE.ORDER_CREATED,
       data: {
         orderId: order.id,
-        orderNumber: order.orderNumber
+        orderNumber: order.orderNumber,
+        paymentMethod
       }
     });
-
-      await notificationService.notifyAdmins({ 
-          title: NOTIFICATION.ADMIN.NEW_ORDER_TITLE, 
-          content: NOTIFICATION.ADMIN.NEW_ORDER_CONTENT( order.orderNumber ), 
-          type: TYPE.ADMIN_NEW_ORDER, 
-          data: { 
-            orderId: order.id, 
-            orderNumber: order.orderNumber, 
-            status: order.status, 
-            totalAmount: order.totalAmount } 
-          });
-
-           for (const variant of lowStockVariants) {
-      await notificationService.notifyAdmins({
-        title: NOTIFICATION.ADMIN.LOW_STOCK_TITLE,
-        content: NOTIFICATION.ADMIN.LOW_STOCK_CONTENT(
-          variant.productName
-        ),
-        type: TYPE.ADMIN_LOW_STOCK,
-        data: {
-          productId: variant.productId,
-          variantId: variant.variantId,
-          productName: variant.productName,
-          color: variant.color,
-          size: variant.size,
-          stockQuantity: variant.stockQuantity
-        }
-      });
-    }
-  } catch (error) {
-    console.error('Create order notification failed:', error.message);
   }
 
-  return {
-    orderId: order.id,
-    orderNumber: order.orderNumber,
-    paymentMethod
-  };
+  await notificationService.notifyAdmins({
+    title: NOTIFICATION_ADMIN.NEW_ORDER_TITLE,
+    content: NOTIFICATION_ADMIN.NEW_ORDER_CONTENT(
+      order.orderNumber
+    ),
+    type: TYPE.ADMIN_NEW_ORDER,
+    data: {
+      orderId: order.id,
+      orderNumber: order.orderNumber,
+      status: order.status,
+      totalAmount: Number(order.totalAmount)
+    }
+  });
+
+  for (const variant of lowStockVariants) {
+    await notificationService.notifyAdmins({
+      title: NOTIFICATION_ADMIN.LOW_STOCK_TITLE,
+      content: NOTIFICATION_ADMIN.LOW_STOCK_CONTENT(
+        variant.productName
+      ),
+      type: TYPE.ADMIN_LOW_STOCK,
+      data: {
+        productId: variant.productId,
+        variantId: variant.variantId,
+        productName: variant.productName,
+        color: variant.color,
+        size: variant.size,
+        stockQuantity: variant.stockQuantity
+      }
+    });
+  }
+
+} catch (error) {
+  console.error(
+    'Create order notification failed:',
+    error.message
+  );
+}
+
+return {
+  orderId: order.id,
+  orderNumber: order.orderNumber,
+  receiverName: order.receiverName,
+  phoneNumber: order.phoneNumber,
+  address: `${order.addressLine}, ${order.ward}, ${order.province}`,
+  subtotal: Number(order.subtotal),
+  discountAmount: Number(order.discountAmount),
+  shippingFee: Number(order.shippingFee),
+  totalAmount: Number(order.totalAmount),
+  paymentMethod,
+  paymentStatus: order.payment?.status
+};
 },
 
 cancelOrder: async (
   userId,
   orderId,
-  cancelReason = ''
+  cancelReason = '',
+  ipAddress
 ) => {
   const order = await orderRepository.findOrderForCancel(orderId);
 
@@ -308,14 +366,29 @@ cancelOrder: async (
     paymentStatus: order.payment?.status
   };
 
-  await orderRepository.restoreOrderResourcesTransaction(
-    order.id
-  );
+  let paymentStatus;
 
-  const paymentStatus =
+  if (
+    order.payment.paymentMethod === PAYMENT_METHOD.VNPAY &&
     order.payment.status === PAYMENT_STATUS.SUCCESS
-      ? PAYMENT_STATUS.REFUNDED
-      : PAYMENT_STATUS.CANCELLED;
+  ) {
+    await paymentService.refundPayment({
+      orderId: order.id,
+      ipAddress,
+      createdBy: userId
+    });
+
+    paymentStatus = PAYMENT_STATUS.REFUNDED;
+  } else {
+    paymentStatus = PAYMENT_STATUS.CANCELLED;
+  }
+
+  await orderRepository.restoreOrderResourcesTransaction(
+    order.id,
+    {
+      restoreCoupon: true
+    }
+  );
 
   const reason =
     cancelReason.trim() ||
@@ -355,16 +428,18 @@ cancelOrder: async (
       }
     });
 
-    await notificationService.notifyAdmins({ 
-      title: NOTIFICATION.ADMIN.ORDER_CANCELLED_TITLE, 
-      content: `${NOTIFICATION.ADMIN.ORDER_CANCELLED_CONTENT( order.orderNumber )} 
-      Lý do: ${reason}`, type: TYPE.ADMIN_ORDER_CANCELLED, 
-      data: { orderId: order.id, 
-        orderNumber: order.orderNumber, 
-        status: ORDER_STATUS.CANCELLED, 
-        cancelledBy: ORDER_CANCELLED_BY.CUSTOMER, 
-        cancelReason: reason } 
-      });
+    await notificationService.notifyAdmins({
+      title: NOTIFICATION_ADMIN.ORDER_CANCELLED_TITLE,
+      content: `${NOTIFICATION_ADMIN.ORDER_CANCELLED_CONTENT(order.orderNumber)} Lý do: ${reason}`,
+      type: TYPE.ADMIN_ORDER_CANCELLED,
+      data: {
+        orderId: order.id,
+        orderNumber: order.orderNumber,
+        status: ORDER_STATUS.CANCELLED,
+        cancelledBy: ORDER_CANCELLED_BY.CUSTOMER,
+        cancelReason: reason
+      }
+    });
   } catch (error) {
     console.error('Cancel order notification failed:', error.message);
   }
@@ -675,7 +750,8 @@ updateOrderStatusByAdmin: async (adminId, orderId, status) => {
 cancelOrderByAdmin: async (
   adminId,
   orderId,
-  cancelReason = ''
+  cancelReason = '',
+  ipAddress
 ) => {
   const order = await orderRepository.findOrderForCancel(orderId);
 
@@ -704,12 +780,29 @@ cancelOrderByAdmin: async (
     paymentStatus: order.payment?.status
   };
 
-  await orderRepository.restoreOrderResourcesTransaction(order.id);
+  let paymentStatus;
 
-  const paymentStatus =
+  if (
+    order.payment.paymentMethod === PAYMENT_METHOD.VNPAY &&
     order.payment.status === PAYMENT_STATUS.SUCCESS
-      ? PAYMENT_STATUS.REFUNDED
-      : PAYMENT_STATUS.CANCELLED;
+  ) {
+    await paymentService.refundPayment({
+      orderId: order.id,
+      ipAddress,
+      createdBy: adminId
+    });
+
+    paymentStatus = PAYMENT_STATUS.REFUNDED;
+  } else {
+    paymentStatus = PAYMENT_STATUS.CANCELLED;
+  }
+
+  await orderRepository.restoreOrderResourcesTransaction(
+    order.id,
+    {
+      restoreCoupon: true
+    }
+  );
 
   const reason =
     cancelReason.trim() ||
@@ -751,7 +844,7 @@ cancelOrderByAdmin: async (
     });
   } catch (error) {
     console.error(
-      'Admin cancel notification failed:',
+      'Admin cancel order notification failed:',
       error.message
     );
   }
@@ -809,8 +902,8 @@ cancelExpiredPendingOrders: async () => {
         });
 
         await notificationService.notifyAdmins({ 
-          title: NOTIFICATION.ADMIN.ORDER_CANCELLED_TITLE, 
-          content: `${NOTIFICATION.ADMIN.ORDER_CANCELLED_CONTENT( order.orderNumber )} 
+          title: NOTIFICATION_ADMIN.ORDER_CANCELLED_TITLE, 
+          content: `${NOTIFICATION_ADMIN.ORDER_CANCELLED_CONTENT( order.orderNumber )} 
           Hệ thống đã tự động hủy do quá thời gian thanh toán.`, 
           type: TYPE.ADMIN_ORDER_CANCELLED, 
           data: { orderId: order.id, 

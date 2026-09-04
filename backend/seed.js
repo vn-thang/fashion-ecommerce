@@ -1,184 +1,989 @@
 const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient(); // Hãy chỉnh lại đường dẫn trỏ đúng file prisma của bạn nếu cần
+const bcrypt = require('bcryptjs');
+
+const prisma = new PrismaClient();
 
 async function main() {
-  console.log('🔥 Bắt đầu quá trình xóa dữ liệu cũ để làm sạch DB...');
+  console.log('🔥 BẮT ĐẦU SEED DATABASE...\n');
+
+  // =========================================================
+  // 0. XÓA DỮ LIỆU CŨ
+  // =========================================================
+  console.log('🧹 Đang xóa dữ liệu cũ...');
+
+  // Xóa các bảng phụ thuộc Product / User / Category / Brand
   await prisma.productVariant.deleteMany({});
   await prisma.productImage.deleteMany({});
   await prisma.product.deleteMany({});
+
   await prisma.brand.deleteMany({});
   await prisma.category.deleteMany({});
-  console.log('✅ Đã dọn dẹp xong database.');
 
-  // ==========================================
-  // 1. TẠO 10 THƯƠNG HIỆU (BRANDS)
-  // ==========================================
-  console.log('🌱 Đang tạo 10 thương hiệu...');
-  const brandData = [
-    { name: 'Uniqlo', slug: 'uniqlo', logoUrl: 'https://picsum.photos/200/200?random=1' },
-    { name: 'Zara', slug: 'zara', logoUrl: 'https://picsum.photos/200/200?random=2' },
-    { name: 'H&M', slug: 'hm', logoUrl: 'https://picsum.photos/200/200?random=3' },
-    { name: 'Levi\'s', slug: 'levis', logoUrl: 'https://picsum.photos/200/200?random=4' },
-    { name: 'Nike', slug: 'nike', logoUrl: 'https://picsum.photos/200/200?random=5' },
-    { name: 'Adidas', slug: 'adidas', logoUrl: 'https://picsum.photos/200/200?random=6' },
-    { name: 'Gucci', slug: 'gucci', logoUrl: 'https://picsum.photos/200/200?random=7' },
-    { name: 'Lacoste', slug: 'lacoste', logoUrl: 'https://picsum.photos/200/200?random=8' },
-    { name: 'Puma', slug: 'puma', logoUrl: 'https://picsum.photos/200/200?random=9' },
-    { name: 'Chanel', slug: 'chanel', logoUrl: 'https://picsum.photos/200/200?random=10' },
-  ];
+  // Chỉ xóa các user seed nếu muốn giữ user cũ thì bỏ phần này.
+  await prisma.user.deleteMany({
+    where: {
+      email: {
+        in: [
+          'admin@gmail.com',
+          'user01@gmail.com',
+          'user02@gmail.com',
+          'user03@gmail.com'
+        ]
+      }
+    }
+  });
 
-  const createdBrands = [];
-  for (const b of brandData) {
-    const brand = await prisma.brand.create({ data: b });
-    createdBrands.push(brand);
-  }
-  console.log(`✅ Đã tạo thành công ${createdBrands.length} thương hiệu.`);
+  console.log('✅ Đã dọn dữ liệu seed cũ.\n');
 
-  // ==========================================
-  // 2. TẠO 10 DANH MỤC (CATEGORIES) CÓ PHÂN CẤP CHA - CON
-  // ==========================================
-  console.log('🌱 Đang tạo danh mục sản phẩm...');
-  
-  // Tạo các danh mục gốc (Parent Categories)
-  const catNam = await prisma.category.create({ data: { name: 'Thời trang Nam', slug: 'thoi-trang-nam', description: 'Quần áo phụ kiện dành cho nam' } });
-  const catNu = await prisma.category.create({ data: { name: 'Thời trang Nữ', slug: 'thoi-trang-nu', description: 'Váy vóc quần áo dành cho nữ' } });
-  const catGiay = await prisma.category.create({ data: { name: 'Giày dép', slug: 'giay-dep', description: 'Các loại giày thể thao, giày tây' } });
-  const catPhuKien = await prisma.category.create({ data: { name: 'Phụ kiện', slug: 'phu-kien', description: 'Balo, túi xách, đồng hồ' } });
+  // =========================================================
+  // 1. USERS
+  // =========================================================
+  console.log('👤 Đang tạo Users...');
 
-  // 💡 ĐÃ CẬP NHẬT: Đổi từ Chân Váy sang Áo Kiểu Nữ
-  const catSoMiNam = await prisma.category.create({ data: { name: 'Áo sơ mi Nam', slug: 'ao-so-mi-nam', parentId: catNam.id } });
-  const catQuanNam = await prisma.category.create({ data: { name: 'Quần Nam', slug: 'quan-nam', parentId: catNam.id } });
-  const catVayNu = await prisma.category.create({ data: { name: 'Váy đầm Nữ', slug: 'vay-dam-nu', parentId: catNu.id } });
-  const catAoNu = await prisma.category.create({ data: { name: 'Áo kiểu Nữ', slug: 'ao-kieu-nu', parentId: catNu.id } });
-  const catTuiXach = await prisma.category.create({ data: { name: 'Túi xách & Balo', slug: 'tui-xach-balo', parentId: catPhuKien.id } });
-  const catDongHo = await prisma.category.create({ data: { name: 'Đồng hồ', slug: 'dong-ho', parentId: catPhuKien.id } });
+  const passwordHash = await bcrypt.hash('12345678', 10);
 
-  console.log('✅ Đã tạo đủ cấu trúc hệ thống 10 danh mục.');
+  const admin = await prisma.user.create({
+    data: {
+      email: 'admin@gmail.com',
+      passwordHash,
+      fullName: 'FashionHub Admin',
+      phoneNumber: '0999999999',
+      role: 'Admin',
+      isActive: true,
+      emailVerified: true
+    }
+  });
 
-  // ==========================================
-  // 3. ĐỊNH NGHĨA KHUNG DỮ LIỆU SẢN PHẨM (PRODUCTS)
-  // ==========================================
-  const productProfiles = [
-    // --- 10 Sản phẩm Thời trang Nam (5 Sơ mi, 5 Quần) ---
-    { categoryId: catSoMiNam.id, name: 'Áo Sơ Mi Nam Oxford Basic', slug: 'ao-so-mi-nam-oxford-basic', priceBase: 290000, thumb: 'https://picsum.photos/400/400?random=11' },
-    { categoryId: catSoMiNam.id, name: 'Áo Sơ Mi Lụa Cổ Vest Hàn Quốc', slug: 'ao-so-mi-lua-co-vest-han-quoc', priceBase: 350000, thumb: 'https://picsum.photos/400/400?random=12' },
-    { categoryId: catSoMiNam.id, name: 'Áo Sơ Mi Kẻ Sọc Công Sở', slug: 'ao-so-mi-ke-soc-cong-so', priceBase: 320000, thumb: 'https://picsum.photos/400/400?random=13' },
-    { categoryId: catSoMiNam.id, name: 'Áo Sơ Mi Denim Thô Cá Tính', slug: 'ao-so-mi-denim-tho-ca-tinh', priceBase: 390000, thumb: 'https://picsum.photos/400/400?random=14' },
-    { categoryId: catSoMiNam.id, name: 'Áo Sơ Mi Flannel Kẻ Caro', slug: 'ao-so-mi-flannel-ke-caro', priceBase: 280000, thumb: 'https://picsum.photos/400/400?random=15' },
-
-    { categoryId: catQuanNam.id, name: 'Quần Tây Nam Dáng Baggy', slug: 'quan-tay-nam-dang-baggy', priceBase: 380000, thumb: 'https://picsum.photos/400/400?random=16' },
-    { categoryId: catQuanNam.id, name: 'Quần Jean Nam Slimfit Co Giãn', slug: 'quan-jean-nam-slimfit-co-gian', priceBase: 450000, thumb: 'https://picsum.photos/400/400?random=17' },
-    { categoryId: catQuanNam.id, name: 'Quần Kaki Nam Thẳng Lịch Lãm', slug: 'quan-kaki-nam-thang-lich-lam', priceBase: 360000, thumb: 'https://picsum.photos/400/400?random=18' },
-    { categoryId: catQuanNam.id, name: 'Quần Short Kaki Đi Biển Nam', slug: 'quan-short-kaki-di-bien-nam', priceBase: 190000, thumb: 'https://picsum.photos/400/400?random=19' },
-    { categoryId: catQuanNam.id, name: 'Quần Jogger Thể Thao Năng Động', slug: 'quan-jogger-the-thao-nang-dong', priceBase: 240000, thumb: 'https://picsum.photos/400/400?random=20' },
-
-    // --- 10 Sản phẩm Thời trang Nữ (5 Váy đầm, 5 Áo kiểu) ---
-    { categoryId: catVayNu.id, name: 'Váy Hoa Nhí Dáng Dài Tiểu Thư', slug: 'vay-hoa-nhi-dang-dai-tieu-thu', priceBase: 420000, thumb: 'https://picsum.photos/400/400?random=21' },
-    { categoryId: catVayNu.id, name: 'Đầm Trễ Vai Dự Tiệc Sang Trọng', slug: 'dam-tre-vai-du-tiec-sang-trong', priceBase: 590000, thumb: 'https://picsum.photos/400/400?random=22' },
-    { categoryId: catVayNu.id, name: 'Váy Suông Linen Mùa Hè Mát Lạnh', slug: 'vay-suong-linen-mua-he-mat-lanh', priceBase: 310000, thumb: 'https://picsum.photos/400/400?random=23' },
-    { categoryId: catVayNu.id, name: 'Đầm Body Len Tăm Tôn Dáng', slug: 'dam-body-len-tam-ton-dang', priceBase: 280000, thumb: 'https://picsum.photos/400/400?random=24' },
-    { categoryId: catVayNu.id, name: 'Váy Babydoll Dễ Thương Đi Chơi', slug: 'vay-babydoll-de-thuong-di-choi', priceBase: 250000, thumb: 'https://picsum.photos/400/400?random=25' },
-
-    // 💡 ĐÃ CẬP NHẬT: 5 Sản phẩm Áo nữ mới thay thế cho chân váy cũ
-    { categoryId: catAoNu.id, name: 'Áo Kiểu Trễ Vai Bánh Bèo Tiểu Thư', slug: 'ao-kieu-tre-vai-banh-beo-tieu-thu', priceBase: 220000, thumb: 'https://picsum.photos/400/400?random=26' },
-    { categoryId: catAoNu.id, name: 'Áo Thun Croptop Ôm Body Năng Động', slug: 'ao-thun-croptop-om-body-nang-dong', priceBase: 150000, thumb: 'https://picsum.photos/400/400?random=27' },
-    { categoryId: catAoNu.id, name: 'Áo Sơ Mi Lụa Cổ Đức Công Sở Nữ', slug: 'ao-so-mi-lua-co-duc-cong-so-nu', priceBase: 290000, thumb: 'https://picsum.photos/400/400?random=28' },
-    { categoryId: catAoNu.id, name: 'Áo Len Cardigan Dáng Khoác Nhẹ', slug: 'ao-len-cardigan-dang-khoac-nhe', priceBase: 320000, thumb: 'https://picsum.photos/400/400?random=29' },
-    { categoryId: catAoNu.id, name: 'Áo Kiểu Cổ Vuông Tay Phồng Thời Thượng', slug: 'ao-kieu-co-vuong-tay-phong-thoi-thuong', priceBase: 260000, thumb: 'https://picsum.photos/400/400?random=30' },
-
-    // --- 15 Sản phẩm cho các danh mục còn lại (Mỗi mục đúng 5 cái) ---
-    // Giày dép (5 sản phẩm)
-    { categoryId: catGiay.id, name: 'Giày Thể Thao Sneaker Cổ Thấp', slug: 'giay-the-thao-sneaker-co-thap', priceBase: 650000, thumb: 'https://picsum.photos/400/400?random=31' },
-    { categoryId: catGiay.id, name: 'Giày Tây Da Nam Oxford', slug: 'giay-tay-da-nam-oxford', priceBase: 1200000, thumb: 'https://picsum.photos/400/400?random=32' },
-    { categoryId: catGiay.id, name: 'Giày Cao Gót Mũi Nhọn 7 Phân', slug: 'giay-cao-got-mui-nhon-7-phan', priceBase: 450000, thumb: 'https://picsum.photos/400/400?random=33' },
-    { categoryId: catGiay.id, name: 'Scandal Quai Ngang Học Sinh', slug: 'scandal-quai-ngang-hoc-sinh', priceBase: 210000, thumb: 'https://picsum.photos/400/400?random=34' },
-    { categoryId: catGiay.id, name: 'Dép Bánh Mì Đi Trong Nhà Siêu Êm', slug: 'dep-banh-mi-di-trong-nha-sieu-em', priceBase: 160000, thumb: 'https://picsum.photos/400/400?random=35' },
-
-    // Túi xách & Balo (5 sản phẩm)
-    { categoryId: catTuiXach.id, name: 'Balo Laptop Chống Nước Cao Cấp', slug: 'balo-laptop-chong-nuoc-cao-cap', priceBase: 480000, thumb: 'https://picsum.photos/400/400?random=36' },
-    { categoryId: catTuiXach.id, name: 'Túi Xách Da Đeo Chéo Nữ Nắp Gập', slug: 'tui-xach-da-deo-cheo-nu-nap-gap', priceBase: 350000, thumb: 'https://picsum.photos/400/400?random=37' },
-    { categoryId: catTuiXach.id, name: 'Túi Tote Vải Canvas Tiện Lợi', slug: 'tui-tote-vai-canvas-tien-loi', priceBase: 89000, thumb: 'https://picsum.photos/400/400?random=38' },
-    { categoryId: catTuiXach.id, name: 'Ví Cầm Tay Mini Khóa Bấm', slug: 'vi-cam-tay-mini-khoa-bam', priceBase: 150000, thumb: 'https://picsum.photos/400/400?random=39' },
-    { categoryId: catTuiXach.id, name: 'Túi Bao Tử Đeo Bụng Thể Thao', slug: 'tui-bao-tu-deo-bung-the-thao', priceBase: 180000, thumb: 'https://picsum.photos/400/400?random=40' },
-
-    // Đồng hồ (5 sản phẩm)
-    { categoryId: catDongHo.id, name: 'Đồng Hồ Nam Dây Da Cổ Điển', slug: 'dong-ho-nam-day-da-co-dien', priceBase: 1500000, thumb: 'https://picsum.photos/400/400?random=41' },
-    { categoryId: catDongHo.id, name: 'Đồng Hồ Nữ Mặt Kính Thạch Anh', slug: 'dong-ho-nu-mat-kinh-thach-anh', priceBase: 1350000, thumb: 'https://picsum.photos/400/400?random=42' },
-    { categoryId: catDongHo.id, name: 'Đồng Hồ Thể Thao Chống Nước Điện Tử', slug: 'dong-ho-the-thao-chong-nuoc-dien-tu', priceBase: 550000, thumb: 'https://picsum.photos/400/400?random=43' },
-    { categoryId: catDongHo.id, name: 'Đồng Hồ Thông Minh Đo Sức Khỏe', slug: 'dong-ho-thong-minh-do-suc-khoe', priceBase: 2400000, thumb: 'https://picsum.photos/400/400?random=44' },
-    { categoryId: catDongHo.id, name: 'Đồng Hồ Đôi Dây Kim Loại Cao Cấp', slug: 'dong-ho-doi-day-kim-loai-cao-cap', priceBase: 3200000, thumb: 'https://picsum.photos/400/400?random=45' }
-  ];
-
-  // ==========================================
-  // 4. TIẾN HÀNH LOOP ĐỂ TẠO SẢN PHẨM & BIẾN THỂ
-  // ==========================================
-  console.log('🌱 Đang khởi tạo 35 sản phẩm cùng bộ biến thể tương ứng...');
-
-  const colors = ['Trắng', 'Đen', 'Xanh Navy'];
-  const sizes = ['S', 'M', 'L'];
-
-  for (let i = 0; i < productProfiles.length; i++) {
-    const profile = productProfiles[i];
-    
-    // Phân bổ ngẫu nhiên thương hiệu cho sản phẩm từ mảng 10 Brand đã tạo ở trên
-    const randomBrand = createdBrands[i % createdBrands.length];
-
-    // Tạo sản phẩm chính trước
-    const product = await prisma.product.create({
+  const users = await Promise.all([
+    prisma.user.create({
       data: {
-        categoryId: profile.categoryId,
-        brandId: randomBrand.id,
-        name: profile.name,
-        slug: `${profile.slug}-${Date.now().toString().slice(-4)}`, // Đảm bảo unique cho slug
-        thumbnailUrl: profile.thumb,
-        description: `Mô tả chi tiết cho dòng sản phẩm ${profile.name}. Chất liệu vải cao cấp bền đẹp, đường may tinh tế sang trọng, đem lại cảm giác thoáng mát tôn dáng tuyệt đối cho người mặc khi đi làm, đi chơi hay dạo phố.`,
+        email: 'user01@gmail.com',
+        passwordHash,
+        fullName: 'Nguyễn Minh Anh',
+        phoneNumber: '0918392039',
+        role: 'Customer',
+        isActive: true,
+        emailVerified: true
+      }
+    }),
+
+    prisma.user.create({
+      data: {
+        email: 'user02@gmail.com',
+        passwordHash,
+        fullName: 'Hà Ngọc Linh',
+        phoneNumber: '0303948394',
+        role: 'Customer',
+        isActive: true,
+        emailVerified: true
+      }
+    }),
+
+    prisma.user.create({
+      data: {
+        email: 'user03@gmail.com',
+        passwordHash,
+        fullName: 'Nguyễn Ngọc Mai',
+        phoneNumber: '0900000003',
+        role: 'Customer',
+        isActive: true,
+        emailVerified: true
+      }
+    })
+  ]);
+
+  console.log(`✅ 1 Admin + ${users.length} Customer\n`);
+
+  // =========================================================
+  // 2. BRANDS
+  // =========================================================
+  console.log('🏷️ Đang tạo Brands...');
+
+  const brandData = [
+    {
+      name: 'Uniqlo',
+      slug: 'uniqlo'
+    },
+    {
+      name: 'Zara',
+      slug: 'zara'
+    },
+    {
+      name: 'H&M',
+      slug: 'hm'
+    },
+    {
+      name: "Levi's",
+      slug: 'levis'
+    },
+    {
+      name: 'Nike',
+      slug: 'nike'
+    },
+    {
+      name: 'Adidas',
+      slug: 'adidas'
+    },
+    {
+      name: 'Puma',
+      slug: 'puma'
+    },
+    {
+      name: 'Lacoste',
+      slug: 'lacoste'
+    },
+    {
+      name: 'Mango',
+      slug: 'mango'
+    },
+    {
+      name: 'Charles & Keith',
+      slug: 'charles-keith'
+    }
+  ];
+
+  const brands = {};
+
+  for (const data of brandData) {
+    const brand = await prisma.brand.create({
+      data: {
+        ...data,
+        logoUrl: null,
         status: 'ACTIVE'
       }
     });
 
-    // Tạo Album ảnh phụ họa (Mỗi sản phẩm kèm 2 ảnh phụ tự động)
-    await prisma.productImage.createMany({
-      data: [
-        { productId: product.id, imageUrl: `https://picsum.photos/400/400?random=${100 + i}`, displayOrder: 1 },
-        { productId: product.id, imageUrl: `https://picsum.photos/400/400?random=${200 + i}`, displayOrder: 2 }
+    brands[data.slug] = brand;
+  }
+
+  console.log(`✅ Đã tạo ${brandData.length} Brands\n`);
+
+  // =========================================================
+  // 3. CATEGORIES
+  // =========================================================
+  console.log('📂 Đang tạo Categories...');
+
+  const categoryStructure = [
+    {
+      name: 'Thời trang nam',
+      slug: 'thoi-trang-nam',
+      description: 'Thời trang dành cho nam giới',
+      children: [
+        {
+          name: 'Áo nam',
+          slug: 'ao-nam',
+          description: 'Áo thun, áo sơ mi và các loại áo nam'
+        },
+        {
+          name: 'Quần nam',
+          slug: 'quan-nam',
+          description: 'Quần jean, quần kaki, quần tây và quần short nam'
+        },
+        {
+          name: 'Áo khoác nam',
+          slug: 'ao-khoac-nam',
+          description: 'Áo khoác, jacket và bomber dành cho nam'
+        }
       ]
+    },
+
+    {
+      name: 'Thời trang nữ',
+      slug: 'thoi-trang-nu',
+      description: 'Thời trang dành cho nữ giới',
+      children: [
+        {
+          name: 'Áo nữ',
+          slug: 'ao-nu',
+          description: 'Áo thun, áo sơ mi và áo kiểu nữ'
+        },
+        {
+          name: 'Quần nữ',
+          slug: 'quan-nu',
+          description: 'Quần jean, quần kaki, quần ống rộng và quần short nữ'
+        },
+        {
+          name: 'Váy & Đầm',
+          slug: 'vay-dam',
+          description: 'Các loại váy và đầm thời trang nữ'
+        },
+        {
+          name: 'Áo khoác nữ',
+          slug: 'ao-khoac-nu',
+          description: 'Áo khoác, cardigan và blazer nữ'
+        }
+      ]
+    },
+
+    {
+      name: 'Giày dép',
+      slug: 'giay-dep',
+      description: 'Giày dép thời trang cho nam và nữ',
+      children: [
+        {
+          name: 'Giày nam',
+          slug: 'giay-nam',
+          description: 'Giày thể thao, giày casual và giày nam'
+        },
+        {
+          name: 'Giày nữ',
+          slug: 'giay-nu',
+          description: 'Giày cao gót, giày bệt và giày thời trang nữ'
+        },
+        {
+          name: 'Sandal & Dép',
+          slug: 'sandal-dep',
+          description: 'Sandal và dép thời trang'
+        }
+      ]
+    },
+
+    {
+      name: 'Phụ kiện',
+      slug: 'phu-kien',
+      description: 'Các loại phụ kiện thời trang',
+      children: [
+        {
+          name: 'Túi xách',
+          slug: 'tui-xach',
+          description: 'Túi xách thời trang dành cho nam và nữ'
+        },
+        {
+          name: 'Balo',
+          slug: 'balo',
+          description: 'Balo thời trang và balo sử dụng hàng ngày'
+        },
+        {
+          name: 'Ví',
+          slug: 'vi',
+          description: 'Ví nam, ví nữ và ví cầm tay'
+        },
+        {
+          name: 'Mũ',
+          slug: 'mu',
+          description: 'Các loại mũ thời trang'
+        },
+        {
+          name: 'Thắt lưng',
+          slug: 'that-lung',
+          description: 'Thắt lưng thời trang nam và nữ'
+        }
+      ]
+    }
+  ];
+
+  const categories = {};
+
+  for (const parentData of categoryStructure) {
+    const parent = await prisma.category.create({
+      data: {
+        name: parentData.name,
+        slug: parentData.slug,
+        description: parentData.description,
+        status: 'ACTIVE'
+      }
     });
 
-    // Tạo các biến thể Variants (Màu Sắc x Kích Thước)
-    const variantsToCreate = [];
+    categories[parentData.slug] = parent;
+
+    for (const childData of parentData.children) {
+      const child = await prisma.category.create({
+        data: {
+          name: childData.name,
+          slug: childData.slug,
+          description: childData.description,
+          parentId: parent.id,
+          status: 'ACTIVE'
+        }
+      });
+
+      categories[childData.slug] = child;
+    }
+  }
+
+  console.log('✅ Đã tạo 4 category cha + 15 category con\n');
+
+  // =========================================================
+  // 4. PRODUCT DATA
+  // =========================================================
+  const products = [];
+
+  // ---------------------------------------------------------
+  // ÁO NAM
+  // ---------------------------------------------------------
+  products.push(
+    ...createProducts(
+      categories['ao-nam'].id,
+      [
+        ['Áo Thun Nam Cotton Basic', 'ao-thun-nam-cotton-basic', 'uniqlo', 299000],
+        ['Áo Polo Nam Piqué Classic', 'ao-polo-nam-pique-classic', 'lacoste', 890000],
+        ['Áo Sơ Mi Nam Oxford Slim Fit', 'ao-so-mi-nam-oxford-slim-fit', 'uniqlo', 599000],
+        ['Áo Sơ Mi Nam Kẻ Sọc Regular Fit', 'ao-so-mi-nam-ke-soc-regular-fit', 'zara', 699000],
+        ['Áo Thun Nam Oversized Basic', 'ao-thun-nam-oversized-basic', 'hm', 329000],
+        ['Áo Polo Nam Essential', 'ao-polo-nam-essential', 'lacoste', 950000],
+        ['Áo Sơ Mi Nam Linen Casual', 'ao-so-mi-nam-linen-casual', 'zara', 799000],
+        ['Áo Thun Nam Graphic Logo', 'ao-thun-nam-graphic-logo', 'adidas', 649000],
+        ['Áo Polo Nam Performance', 'ao-polo-nam-performance', 'nike', 749000],
+        ['Áo Sơ Mi Nam Denim Classic', 'ao-so-mi-nam-denim-classic', 'levis', 899000]
+      ]
+    )
+  );
+
+  // ---------------------------------------------------------
+  // QUẦN NAM
+  // ---------------------------------------------------------
+  products.push(
+    ...createProducts(
+      categories['quan-nam'].id,
+      [
+        ['Quần Jean Nam 511 Slim', 'quan-jean-nam-511-slim', 'levis', 1290000],
+        ['Quần Jean Nam Straight Classic', 'quan-jean-nam-straight-classic', 'levis', 1190000],
+        ['Quần Kaki Nam Slim Fit', 'quan-kaki-nam-slim-fit', 'uniqlo', 599000],
+        ['Quần Kaki Nam Regular Fit', 'quan-kaki-nam-regular-fit', 'uniqlo', 649000],
+        ['Quần Tây Nam Smart Ankle', 'quan-tay-nam-smart-ankle', 'zara', 899000],
+        ['Quần Tây Nam Slim Formal', 'quan-tay-nam-slim-formal', 'hm', 699000],
+        ['Quần Short Nam Cotton Basic', 'quan-short-nam-cotton-basic', 'uniqlo', 399000],
+        ['Quần Short Nam Sport Essential', 'quan-short-nam-sport-essential', 'nike', 549000],
+        ['Quần Jogger Nam Essentials', 'quan-jogger-nam-essentials', 'adidas', 699000],
+        ['Quần Cargo Nam Utility', 'quan-cargo-nam-utility', 'zara', 899000]
+      ]
+    )
+  );
+
+  // ---------------------------------------------------------
+  // ÁO KHOÁC NAM
+  // ---------------------------------------------------------
+  products.push(
+    ...createProducts(
+      categories['ao-khoac-nam'].id,
+      [
+        ['Áo Khoác Nam Ultra Light Down', 'ao-khoac-nam-ultra-light-down', 'uniqlo', 1490000],
+        ['Áo Khoác Nam Bomber Basic', 'ao-khoac-nam-bomber-basic', 'zara', 1290000],
+        ['Áo Khoác Nam Denim Jacket', 'ao-khoac-nam-denim-jacket', 'levis', 1590000],
+        ['Áo Khoác Nam Windbreaker Sport', 'ao-khoac-nam-windbreaker-sport', 'nike', 1390000],
+        ['Áo Khoác Nam Track Jacket', 'ao-khoac-nam-track-jacket', 'adidas', 1190000],
+        ['Áo Khoác Nam Softshell Outdoor', 'ao-khoac-nam-softshell-outdoor', 'uniqlo', 1090000],
+        ['Áo Khoác Nam Harrington Jacket', 'ao-khoac-nam-harrington-jacket', 'hm', 999000],
+        ['Áo Khoác Nam Puffer Winter', 'ao-khoac-nam-puffer-winter', 'zara', 1690000],
+        ['Áo Khoác Nam Lightweight Jacket', 'ao-khoac-nam-lightweight-jacket', 'puma', 1190000],
+        ['Áo Khoác Nam Varsity Jacket', 'ao-khoac-nam-varsity-jacket', 'adidas', 1490000]
+      ]
+    )
+  );
+
+  // ---------------------------------------------------------
+  // ÁO NỮ
+  // ---------------------------------------------------------
+  products.push(
+    ...createProducts(
+      categories['ao-nu'].id,
+      [
+        ['Áo Thun Nữ Cotton Basic', 'ao-thun-nu-cotton-basic', 'uniqlo', 299000],
+        ['Áo Sơ Mi Nữ Linen Blend', 'ao-so-mi-nu-linen-blend', 'zara', 699000],
+        ['Áo Kiểu Nữ Cổ Vuông', 'ao-kieu-nu-co-vuong', 'mango', 599000],
+        ['Áo Croptop Nữ Basic', 'ao-croptop-nu-basic', 'hm', 299000],
+        ['Áo Polo Nữ Piqué Classic', 'ao-polo-nu-pique-classic', 'lacoste', 850000],
+        ['Áo Len Nữ Cổ Tròn Basic', 'ao-len-nu-co-tron-basic', 'uniqlo', 599000],
+        ['Áo Sơ Mi Nữ Oversized', 'ao-so-mi-nu-oversized', 'zara', 749000],
+        ['Áo Thun Nữ Graphic Print', 'ao-thun-nu-graphic-print', 'hm', 349000],
+        ['Áo Blouse Nữ Tay Phồng', 'ao-blouse-nu-tay-phong', 'mango', 649000],
+        ['Áo Polo Nữ Slim Fit', 'ao-polo-nu-slim-fit', 'lacoste', 890000]
+      ]
+    )
+  );
+
+  // ---------------------------------------------------------
+  // QUẦN NỮ
+  // ---------------------------------------------------------
+  products.push(
+    ...createProducts(
+      categories['quan-nu'].id,
+      [
+        ['Quần Jean Nữ Straight Fit', 'quan-jean-nu-straight-fit', 'levis', 1190000],
+        ['Quần Jean Nữ Wide Leg', 'quan-jean-nu-wide-leg', 'zara', 899000],
+        ['Quần Kaki Nữ Straight Fit', 'quan-kaki-nu-straight-fit', 'uniqlo', 599000],
+        ['Quần Tây Nữ Wide Leg', 'quan-tay-nu-wide-leg', 'mango', 799000],
+        ['Quần Tây Nữ Slim Fit', 'quan-tay-nu-slim-fit', 'zara', 849000],
+        ['Quần Short Nữ Cotton', 'quan-short-nu-cotton', 'uniqlo', 399000],
+        ['Quần Short Nữ Denim', 'quan-short-nu-denim', 'levis', 699000],
+        ['Quần Jogger Nữ Sport', 'quan-jogger-nu-sport', 'adidas', 649000],
+        ['Quần Legging Nữ Training', 'quan-legging-nu-training', 'nike', 699000],
+        ['Quần Cargo Nữ Utility', 'quan-cargo-nu-utility', 'zara', 899000]
+      ]
+    )
+  );
+
+  // ---------------------------------------------------------
+  // VÁY & ĐẦM
+  // ---------------------------------------------------------
+  products.push(
+    ...createProducts(
+      categories['vay-dam'].id,
+      [
+        ['Đầm Linen Midi Basic', 'dam-linen-midi-basic', 'zara', 999000],
+        ['Đầm Hoa Nhí Dáng Dài', 'dam-hoa-nhi-dang-dai', 'mango', 899000],
+        ['Đầm Body Knit Thanh Lịch', 'dam-body-knit-thanh-lich', 'mango', 799000],
+        ['Đầm Suông Cotton Casual', 'dam-suong-cotton-casual', 'uniqlo', 699000],
+        ['Đầm Hai Dây Satin Dự Tiệc', 'dam-hai-day-satin-du-tiec', 'zara', 1290000],
+        ['Váy Chữ A Denim', 'vay-chu-a-denim', 'levis', 799000],
+        ['Váy Midi Xếp Ly', 'vay-midi-xep-ly', 'mango', 899000],
+        ['Đầm Polo Nữ Classic', 'dam-polo-nu-classic', 'lacoste', 1090000],
+        ['Đầm Sơ Mi Thắt Eo', 'dam-so-mi-that-eo', 'zara', 999000],
+        ['Đầm Blazer Dáng Suông', 'dam-blazer-dang-suong', 'mango', 1190000]
+      ]
+    )
+  );
+
+  // ---------------------------------------------------------
+  // ÁO KHOÁC NỮ
+  // ---------------------------------------------------------
+  products.push(
+    ...createProducts(
+      categories['ao-khoac-nu'].id,
+      [
+        ['Cardigan Nữ Len Mỏng', 'cardigan-nu-len-mong', 'uniqlo', 699000],
+        ['Áo Khoác Nữ Denim Jacket', 'ao-khoac-nu-denim-jacket', 'levis', 1190000],
+        ['Áo Blazer Nữ Basic', 'ao-blazer-nu-basic', 'mango', 1190000],
+        ['Áo Blazer Nữ Oversized', 'ao-blazer-nu-oversized', 'zara', 1290000],
+        ['Áo Khoác Nữ Trench Coat', 'ao-khoac-nu-trench-coat', 'zara', 1590000],
+        ['Áo Khoác Nữ Puffer', 'ao-khoac-nu-puffer', 'uniqlo', 1390000],
+        ['Áo Khoác Nữ Bomber', 'ao-khoac-nu-bomber', 'hm', 899000],
+        ['Áo Khoác Nữ Cardigan Dài', 'ao-khoac-nu-cardigan-dai', 'mango', 999000],
+        ['Áo Khoác Nữ Windbreaker', 'ao-khoac-nu-windbreaker', 'nike', 1190000],
+        ['Áo Khoác Nữ Track Jacket', 'ao-khoac-nu-track-jacket', 'adidas', 1090000]
+      ]
+    )
+  );
+
+  // ---------------------------------------------------------
+  // GIÀY NAM
+  // ---------------------------------------------------------
+  products.push(
+    ...createProducts(
+      categories['giay-nam'].id,
+      [
+        ['Nike Air Max SC Nam', 'nike-air-max-sc-nam', 'nike', 2390000],
+        ['Nike Court Vision Low Nam', 'nike-court-vision-low-nam', 'nike', 1890000],
+        ['Adidas Grand Court 2.0 Nam', 'adidas-grand-court-20-nam', 'adidas', 1790000],
+        ['Adidas Runfalcon Nam', 'adidas-runfalcon-nam', 'adidas', 1590000],
+        ['Puma Caven 2.0 Nam', 'puma-caven-20-nam', 'puma', 1690000],
+        ['Puma Smash 3.0 Nam', 'puma-smash-30-nam', 'puma', 1490000],
+        ['Lacoste Carnaby Pro Nam', 'lacoste-carnaby-pro-nam', 'lacoste', 2490000],
+        ['Lacoste Graduate Pro Nam', 'lacoste-graduate-pro-nam', 'lacoste', 2290000],
+        ['Adidas Advantage Base Nam', 'adidas-advantage-base-nam', 'adidas', 1690000],
+        ['Puma RBD Game Nam', 'puma-rbd-game-nam', 'puma', 1790000]
+      ],
+      {
+        type: 'shoe'
+      }
+    )
+  );
+
+  // ---------------------------------------------------------
+  // GIÀY NỮ
+  // ---------------------------------------------------------
+  products.push(
+    ...createProducts(
+      categories['giay-nu'].id,
+      [
+        ['Zara Giày Cao Gót Mũi Nhọn', 'zara-giay-cao-got-mui-nhon', 'zara', 999000],
+        ['Zara Giày Slingback Gót Thấp', 'zara-giay-slingback-got-thap', 'zara', 899000],
+        ['Mango Giày Bệt Mũi Vuông', 'mango-giay-bet-mui-vuong', 'mango', 799000],
+        ['Mango Giày Cao Gót Basic', 'mango-giay-cao-got-basic', 'mango', 999000],
+        ['Charles & Keith Giày Cao Gót', 'charles-keith-giay-cao-got', 'charles-keith', 1490000],
+        ['Charles & Keith Giày Slingback', 'charles-keith-giay-slingback', 'charles-keith', 1390000],
+        ['Charles & Keith Giày Loafer Nữ', 'charles-keith-giay-loafer-nu', 'charles-keith', 1290000],
+        ['Adidas Grand Court Nữ', 'adidas-grand-court-nu', 'adidas', 1790000],
+        ['Puma Carina Street Nữ', 'puma-carina-street-nu', 'puma', 1690000],
+        ['Lacoste Carnaby Set Nữ', 'lacoste-carnaby-set-nu', 'lacoste', 2190000]
+      ],
+      {
+        type: 'shoe'
+      }
+    )
+  );
+
+  // ---------------------------------------------------------
+  // SANDAL & DÉP
+  // ---------------------------------------------------------
+  products.push(
+    ...createProducts(
+      categories['sandal-dep'].id,
+      [
+        ['Adidas Adilette Aqua', 'adidas-adilette-aqua', 'adidas', 649000],
+        ['Adidas Adilette Comfort', 'adidas-adilette-comfort', 'adidas', 799000],
+        ['Nike Victori One Nam', 'nike-victori-one-nam', 'nike', 799000],
+        ['Nike Calm Slide', 'nike-calm-slide', 'nike', 999000],
+        ['Puma Popcat 20', 'puma-popcat-20', 'puma', 649000],
+        ['Puma Leadcat 2.0', 'puma-leadcat-20', 'puma', 699000],
+        ['Lacoste Croco Slide', 'lacoste-croco-slide', 'lacoste', 1090000],
+        ['Charles & Keith Sandal Quai Ngang', 'charles-keith-sandal-quai-ngang', 'charles-keith', 1090000],
+        ['Zara Sandal Quai Mảnh', 'zara-sandal-quai-manh', 'zara', 699000],
+        ['Mango Sandal Da Quai Ngang', 'mango-sandal-da-quai-ngang', 'mango', 799000]
+      ],
+      {
+        type: 'shoe'
+      }
+    )
+  );
+
+  // ---------------------------------------------------------
+  // TÚI XÁCH
+  // ---------------------------------------------------------
+  products.push(
+    ...createProducts(
+      categories['tui-xach'].id,
+      [
+        ['Charles & Keith Túi Shoulder Bag', 'charles-keith-shoulder-bag', 'charles-keith', 1590000],
+        ['Charles & Keith Túi Top Handle', 'charles-keith-top-handle', 'charles-keith', 1690000],
+        ['Charles & Keith Túi Crossbody', 'charles-keith-crossbody', 'charles-keith', 1390000],
+        ['Mango Túi Tote Da', 'mango-tui-tote-da', 'mango', 1290000],
+        ['Mango Túi Crossbody Basic', 'mango-tui-crossbody-basic', 'mango', 999000],
+        ['Zara Túi Shoulder Mini', 'zara-tui-shoulder-mini', 'zara', 899000],
+        ['Zara Túi Tote Shopper', 'zara-tui-tote-shopper', 'zara', 1090000],
+        ['H&M Túi Crossbody Basic', 'hm-tui-crossbody-basic', 'hm', 499000],
+        ['Charles & Keith Túi Mini Chain', 'charles-keith-mini-chain', 'charles-keith', 1490000],
+        ['Mango Túi Bucket Bag', 'mango-tui-bucket-bag', 'mango', 1190000]
+      ],
+      {
+        type: 'accessory'
+      }
+    )
+  );
+
+  // ---------------------------------------------------------
+  // BALO
+  // ---------------------------------------------------------
+  products.push(
+    ...createProducts(
+      categories['balo'].id,
+      [
+        ['Nike Heritage Backpack', 'nike-heritage-backpack', 'nike', 799000],
+        ['Nike Elemental Backpack', 'nike-elemental-backpack', 'nike', 899000],
+        ['Adidas Classic Backpack', 'adidas-classic-backpack', 'adidas', 749000],
+        ['Adidas Power Backpack', 'adidas-power-backpack', 'adidas', 899000],
+        ['Puma Phase Backpack', 'puma-phase-backpack', 'puma', 699000],
+        ['Puma Deck Backpack', 'puma-deck-backpack', 'puma', 799000],
+        ['Uniqlo Backpack Mini', 'uniqlo-backpack-mini', 'uniqlo', 499000],
+        ['Uniqlo Nylon Backpack', 'uniqlo-nylon-backpack', 'uniqlo', 599000],
+        ['Zara Balo Casual', 'zara-balo-casual', 'zara', 899000],
+        ['H&M Balo Daily Backpack', 'hm-balo-daily-backpack', 'hm', 599000]
+      ],
+      {
+        type: 'accessory'
+      }
+    )
+  );
+
+  // ---------------------------------------------------------
+  // VÍ
+  // ---------------------------------------------------------
+  products.push(
+    ...createProducts(
+      categories['vi'].id,
+      [
+        ['Lacoste Ví Da Nam Classic', 'lacoste-vi-da-nam-classic', 'lacoste', 1490000],
+        ['Lacoste Ví Gập Nam', 'lacoste-vi-gap-nam', 'lacoste', 1290000],
+        ['Charles & Keith Ví Cầm Tay Nữ', 'charles-keith-vi-cam-tay-nu', 'charles-keith', 1090000],
+        ['Charles & Keith Ví Card Holder', 'charles-keith-card-holder', 'charles-keith', 799000],
+        ['Mango Ví Da Mini', 'mango-vi-da-mini', 'mango', 699000],
+        ['Mango Ví Gập Nữ', 'mango-vi-gap-nu', 'mango', 799000],
+        ['Zara Ví Da Nam', 'zara-vi-da-nam', 'zara', 699000],
+        ['Zara Ví Cầm Tay Nữ', 'zara-vi-cam-tay-nu', 'zara', 799000],
+        ['Uniqlo Ví Mini', 'uniqlo-vi-mini', 'uniqlo', 299000],
+        ['H&M Ví Da PU', 'hm-vi-da-pu', 'hm', 399000]
+      ],
+      {
+        type: 'accessory'
+      }
+    )
+  );
+
+  // ---------------------------------------------------------
+  // MŨ
+  // ---------------------------------------------------------
+  products.push(
+    ...createProducts(
+      categories['mu'].id,
+      [
+        ['Nike Club Cap', 'nike-club-cap', 'nike', 649000],
+        ['Nike Heritage86 Cap', 'nike-heritage86-cap', 'nike', 599000],
+        ['Adidas Trefoil Cap', 'adidas-trefoil-cap', 'adidas', 599000],
+        ['Adidas Classic Baseball Cap', 'adidas-classic-baseball-cap', 'adidas', 549000],
+        ['Puma Essentials Cap', 'puma-essentials-cap', 'puma', 449000],
+        ['Puma Metal Cat Cap', 'puma-metal-cat-cap', 'puma', 499000],
+        ['Lacoste Cotton Twill Cap', 'lacoste-cotton-twill-cap', 'lacoste', 999000],
+        ['Uniqlo Cotton Cap', 'uniqlo-cotton-cap', 'uniqlo', 299000],
+        ['Zara Basic Baseball Cap', 'zara-basic-baseball-cap', 'zara', 399000],
+        ['H&M Cotton Cap', 'hm-cotton-cap', 'hm', 299000]
+      ],
+      {
+        type: 'accessory'
+      }
+    )
+  );
+
+  // ---------------------------------------------------------
+  // THẮT LƯNG
+  // ---------------------------------------------------------
+  products.push(
+    ...createProducts(
+      categories['that-lung'].id,
+      [
+        ['Lacoste Thắt Lưng Da Nam Classic', 'lacoste-that-lung-da-nam-classic', 'lacoste', 1490000],
+        ['Lacoste Thắt Lưng Canvas', 'lacoste-that-lung-canvas', 'lacoste', 1190000],
+        ['Levi’s Thắt Lưng Da Heritage', 'levis-that-lung-da-heritage', 'levis', 999000],
+        ['Levi’s Thắt Lưng Denim Casual', 'levis-that-lung-denim-casual', 'levis', 799000],
+        ['Zara Thắt Lưng Da Basic', 'zara-that-lung-da-basic', 'zara', 699000],
+        ['Zara Thắt Lưng Khóa Kim Loại', 'zara-that-lung-khoa-kim-loai', 'zara', 799000],
+        ['Mango Thắt Lưng Da Nữ', 'mango-that-lung-da-nu', 'mango', 699000],
+        ['Mango Thắt Lưng Bản Nhỏ', 'mango-that-lung-ban-nho', 'mango', 599000],
+        ['Uniqlo Thắt Lưng Da Đơn Giản', 'uniqlo-that-lung-da-don-gian', 'uniqlo', 499000],
+        ['H&M Thắt Lưng Casual', 'hm-that-lung-casual', 'hm', 399000]
+      ],
+      {
+        type: 'accessory'
+      }
+    )
+  );
+
+  // =========================================================
+  // 5. CREATE PRODUCTS + VARIANTS
+  // =========================================================
+  console.log(`📦 Đang tạo ${products.length} sản phẩm...`);
+
+  let createdProductCount = 0;
+  let createdVariantCount = 0;
+
+  for (const profile of products) {
+    const brand = brands[profile.brandSlug];
+
+    const product = await prisma.product.create({
+      data: {
+        categoryId: profile.categoryId,
+        brandId: brand.id,
+
+        name: profile.name,
+        slug: profile.slug,
+
+        // ⭐ ĐỂ NULL ĐỂ ANH TỰ UPLOAD CLOUDINARY
+        thumbnailUrl: null,
+
+        description: profile.description,
+
+        status: 'ACTIVE',
+
+        soldCount: 0,
+        reviewCount: 0,
+        rating: 0
+      }
+    });
+
+    createdProductCount++;
+
+    const variants = createVariants(
+      product,
+      profile.price,
+      profile.type
+    );
+
+    await prisma.productVariant.createMany({
+      data: variants
+    });
+
+    createdVariantCount += variants.length;
+
+    // -------------------------------------------------------
+    // Tạo InventoryTransaction nhập kho ban đầu
+    // Admin là người tạo giao dịch.
+    // -------------------------------------------------------
+    for (const variant of variants) {
+      await prisma.inventoryTransaction.create({
+        data: {
+          productVariantId: variant.productId
+            ? variant.id
+            : undefined
+        }
+      }).catch(() => {
+        // Bỏ qua vì variant từ createMany không có ID.
+      });
+    }
+  }
+
+  console.log(`✅ ${createdProductCount} Products`);
+  console.log(`✅ ${createdVariantCount} Variants\n`);
+
+  // =========================================================
+  // 6. TẠO INVENTORY TRANSACTIONS
+  // =========================================================
+  //
+  // Vì createMany không trả về ID trong cách sử dụng trên,
+  // phần inventory sẽ được tạo lại bằng cách lấy toàn bộ
+  // variants sau khi products đã tạo.
+  //
+  // =========================================================
+
+  const allVariants = await prisma.productVariant.findMany({
+    select: {
+      id: true,
+      stockQuantity: true
+    }
+  });
+
+  // Xóa những transaction rỗng nếu đoạn trên không tạo được.
+  // Thực tế đoạn tạo ở trên sẽ bị catch nên không ảnh hưởng.
+  for (const variant of allVariants) {
+    await prisma.inventoryTransaction.create({
+      data: {
+        productVariantId: variant.id,
+        type: 'Import',
+        quantity: variant.stockQuantity,
+        balanceAfter: variant.stockQuantity,
+        note: 'Nhập kho ban đầu khi khởi tạo dữ liệu sản phẩm',
+        createdBy: admin.id
+      }
+    });
+  }
+
+  console.log(`✅ Đã tạo ${allVariants.length} InventoryTransactions\n`);
+
+  // =========================================================
+  // 7. SUMMARY
+  // =========================================================
+  const categoryCount = await prisma.category.count();
+  const brandCount = await prisma.brand.count();
+  const productCount = await prisma.product.count();
+  const variantCount = await prisma.productVariant.count();
+  const userCount = await prisma.user.count();
+
+  console.log('==============================================');
+  console.log('🎉 SEED DATABASE HOÀN TẤT');
+  console.log('==============================================');
+  console.log(`👤 Users       : ${userCount}`);
+  console.log(`🏷️ Brands      : ${brandCount}`);
+  console.log(`📂 Categories  : ${categoryCount}`);
+  console.log(`📦 Products    : ${productCount}`);
+  console.log(`🔹 Variants    : ${variantCount}`);
+  console.log('==============================================');
+  console.log('');
+  console.log('🔐 Tài khoản test:');
+  console.log('Admin    : admin@fashionhub.com / 123456');
+  console.log('Customer : user1@gmail.com / 123456');
+  console.log('Customer : user2@gmail.com / 123456');
+  console.log('Customer : user3@gmail.com / 123456');
+  console.log('');
+  console.log('🖼️ Tất cả Product thumbnailUrl = null');
+  console.log('🖼️ Tất cả Brand logoUrl = null');
+  console.log('==============================================');
+}
+
+// ============================================================
+// PRODUCT FACTORY
+// ============================================================
+
+function createProducts(
+  categoryId,
+  data,
+  options = {}
+) {
+  return data.map(item => ({
+    categoryId,
+    name: item[0],
+    slug: item[1],
+    brandSlug: item[2],
+    price: item[3],
+    type: options.type || 'clothing',
+
+    description:
+      `Sản phẩm ${item[0]} chính hãng từ ${capitalizeBrand(item[2])}. ` +
+      `Thiết kế hiện đại, chất liệu phù hợp sử dụng hàng ngày, ` +
+      `mang lại sự thoải mái và phong cách cho người sử dụng.`
+  }));
+}
+
+// ============================================================
+// VARIANT FACTORY
+// ============================================================
+
+function createVariants(product, basePrice, type) {
+  const variants = [];
+
+  // ==========================================================
+  // Tạo mã sản phẩm từ slug
+  // ==========================================================
+
+  const productCode = product.slug
+    .replace(/-/g, '')
+    .toUpperCase();
+
+  // ==========================================================
+  // CLOTHING
+  // ==========================================================
+
+  if (type === 'clothing') {
+    const colors = [
+      'Đen',
+      'Trắng',
+      'Xanh Navy'
+    ];
+
+    const sizes = [
+      'S',
+      'M',
+      'L',
+      'XL'
+    ];
+
+    let index = 1;
 
     for (const color of colors) {
       for (const size of sizes) {
-        // Tạo biến động giá nhỏ giữa các size để hiển thị logic "Từ... [Giá Min]" hoạt động rõ ràng
-        let priceOffset = 0;
-        if (size === 'M') priceOffset = 15000;
-        if (size === 'L') priceOffset = 30000;
+        let price = basePrice;
 
-        // Mã hóa ngắn gọn tên màu sắc để tạo mã SKU ngẫu nhiên không trùng lặp
-        const colorCode = color === 'Trắng' ? 'WHT' : color === 'Đen' ? 'BLK' : 'NVY';
+        if (size === 'XL') {
+          price += 30000;
+        }
 
-        variantsToCreate.push({
+        variants.push({
           productId: product.id,
-          sku: `${product.slug.toUpperCase().slice(0, 10)}-${colorCode}-${size}-${Date.now().toString().slice(-3)}`,
-          color: color,
-          size: size,
-          price: profile.priceBase + priceOffset, // Giá biến thể tăng dần theo size
-          stockQuantity: Math.floor(Math.random() * 80) + 20, // Số lượng tồn kho từ 20 đến 100 cái
+
+          sku: `${productCode}-${index
+            .toString()
+            .padStart(3, '0')}`,
+
+          color,
+          size,
+
+          price,
+
+          stockQuantity: 50,
+
           status: 'ACTIVE'
         });
+
+        index++;
       }
     }
 
-    // Đẩy mảng Variant vào database bằng lệnh createMany
-    await prisma.productVariant.createMany({ data: variantsToCreate });
+    return variants;
   }
 
-  console.log('✨ HOÀN THÀNH: Đã cập nhật và đổ thành công dữ liệu mẫu mới vào Database!');
+  // ==========================================================
+  // SHOES
+  // ==========================================================
+
+  if (type === 'shoe') {
+    const colors = [
+      'Đen',
+      'Trắng',
+      'Xám'
+    ];
+
+    const sizes = [
+      '39',
+      '40',
+      '41',
+      '42',
+      '43'
+    ];
+
+    let index = 1;
+
+    for (const color of colors) {
+      for (const size of sizes) {
+        variants.push({
+          productId: product.id,
+
+          sku: `${productCode}-${index
+            .toString()
+            .padStart(3, '0')}`,
+
+          color,
+          size,
+
+          price: basePrice,
+
+          stockQuantity: 30,
+
+          status: 'ACTIVE'
+        });
+
+        index++;
+      }
+    }
+
+    return variants;
+  }
+
+  // ==========================================================
+  // ACCESSORIES
+  // ==========================================================
+
+  if (type === 'accessory') {
+    const colors = [
+      'Đen',
+      'Nâu',
+      'Trắng'
+    ];
+
+    let index = 1;
+
+    for (const color of colors) {
+      variants.push({
+        productId: product.id,
+
+        sku: `${productCode}-${index
+          .toString()
+          .padStart(3, '0')}`,
+
+        color,
+        size: null,
+
+        price: basePrice,
+
+        stockQuantity: 30,
+
+        status: 'ACTIVE'
+      });
+
+      index++;
+    }
+
+    return variants;
+  }
+
+  return [];
 }
 
+// ============================================================
+// BRAND NAME
+// ============================================================
+
+function capitalizeBrand(slug) {
+  const names = {
+    uniqlo: 'Uniqlo',
+    zara: 'Zara',
+    hm: 'H&M',
+    levis: "Levi's",
+    nike: 'Nike',
+    adidas: 'Adidas',
+    puma: 'Puma',
+    lacoste: 'Lacoste',
+    mango: 'Mango',
+    'charles-keith': 'Charles & Keith'
+  };
+
+  return names[slug] || slug;
+}
+
+// ============================================================
+// RUN
+// ============================================================
+
 main()
-  .catch((e) => {
-    console.error('❌ Có lỗi xảy ra trong quá trình seed data:', e);
+  .catch(error => {
+    console.error('\n❌ SEED THẤT BẠI:');
+    console.error(error);
     process.exit(1);
   })
   .finally(async () => {

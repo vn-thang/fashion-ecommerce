@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import toast from 'react-hot-toast';
 import { flashSaleVariantApi } from '../api/flashSaleVariantApi';
-import { categoryApi } from '../../category/api/categoryApi';
+import { categoryAdminApi } from '../../category/api/categoryAdminApi';
 import { brandApi } from '../../brand/api/brandApi';
 import { flashSaleApi } from '../api/flashSaleApi';
 
@@ -129,7 +129,7 @@ setAvailableVariants(data.products || []);
 
   const fetchCategories = useCallback(async () => {
   try {
-    const res = await categoryApi.getAll({
+    const res = await categoryAdminApi.getAll({
       page: 1,
       limit: 1000
     });

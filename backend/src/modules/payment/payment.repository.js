@@ -215,6 +215,22 @@ findPaymentDetail: async (
     }
   });
 },
+
+updateRefundAmount: async (
+  paymentId,
+  refundedAmount,
+  status
+) => {
+  return await prisma.payment.update({
+    where: {
+      id: paymentId
+    },
+    data: {
+      refundedAmount,
+      status
+    }
+  });
+},
 };
 
 module.exports = paymentRepository;

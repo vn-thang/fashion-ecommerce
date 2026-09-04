@@ -3,10 +3,10 @@ const { sendSuccess, sendError } = require('../../utils/response');
 const { MESSAGES } = require('./coupon.constants');
 
 const couponController = {
-  getAll: async (req, res) => {
+  getAllClient: async (req, res) => {
     try {
       const userId = req.user.userId;
-      const result = await couponService.getAllCoupons(req.query, userId);
+      const result = await couponService.getAllClientCoupons(req.query, userId);
 
       return sendSuccess(res, 200, MESSAGES.FETCH_SUCCESS, result);
     } catch (err) {

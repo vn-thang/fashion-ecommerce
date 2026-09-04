@@ -72,7 +72,7 @@ const OrderHeader = ({
               <option value="SHIPPING">🚚 Đang giao hàng</option>
               <option value="COMPLETED">✅ Đã hoàn thành</option>
               <option value="CANCELLED">❌ Đã hủy đơn</option>
-              <option value="RETURN">↩️ Hoàn lại</option>
+              <option value="RETURN">↩️ Hoàn trả</option>
             </select>
           </div>
         </div>

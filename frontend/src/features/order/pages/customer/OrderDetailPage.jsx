@@ -11,6 +11,7 @@ import ShippingAddress from '../../components/customer/ShippingAddress';
 import OrderItemsList from '../../components/customer/OrderItemsList';
 import OrderSummary from '../../components/customer/OrderSummary';
 import CreateReviewModal from '../../../review/components/customer/CreateReviewModal';
+import ReturnRequestModal from '../../../return/components/customer/ReturnRequestModal';
 
 const STATUS_CONFIG = {
   PENDING: { label: 'CHỜ XÁC NHẬN', color: 'text-orange-600', bg: 'bg-orange-50' },
@@ -32,12 +33,18 @@ const formatDate = (dateString) => {
 
 const OrderDetailPage = () => {
   const navigate = useNavigate();
-  const { order, loading, refreshOrder,  cancelOrder } = useOrderDetails();
+  const { order, loading, refreshOrder,  cancelOrder,  retryPayment } = useOrderDetails();
 
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [selectedItemForReview, setSelectedItemForReview] = useState(null);
 
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+  const [isReturnModalOpen, setIsReturnModalOpen] = useState(false);
+
+  const isVnpayPending =
+  order?.status === 'PENDING' &&
+  order?.payment?.paymentMethod === 'VNPAY' &&
+  order?.payment?.status === 'PENDING';
 
 const handleConfirmCancel = async reason => {
   await cancelOrder(reason);
@@ -67,6 +74,9 @@ const handleConfirmCancel = async reason => {
       </div>
     );
   }
+  
+  const hasReturnRequest = order.returnRequests?.length > 0;
+  
 return (
   <div className="mx-auto w-full max-w-4xl px-4 py-5 sm:px-5 sm:py-6">
     <button
@@ -90,21 +100,53 @@ return (
       formatPrice={formatPrice}
       orderStatus={order.status}
       onReviewClick={handleOpenReviewModal}
+      onRetryPayment={retryPayment}
     />
 
     <OrderSummary order={order} formatPrice={formatPrice} />
 
-    {(order.status === 'PENDING' || order.status === 'PROCESSING') && (
-      <div className="mt-4 flex justify-stretch sm:justify-end">
-        <Button
-          variant="danger"
-          onClick={() => setIsCancelModalOpen(true)}
-          className="w-full sm:w-auto"
-        >
-          Hủy đơn hàng
-        </Button>
-      </div>
-    )}
+<div className="mt-4 flex flex-col gap-2 sm:flex-row sm:justify-end">
+  {isVnpayPending && (
+    <Button
+      variant="primary"
+      onClick={retryPayment}
+      className="w-full bg-[#ee4d2d] text-white hover:bg-[#d74123] sm:w-auto"
+    >
+      Thanh toán ngay
+    </Button>
+  )}
+
+  {(order.status === 'PENDING' ||
+    order.status === 'PROCESSING') && (
+    <Button
+      variant="danger"
+      onClick={() => setIsCancelModalOpen(true)}
+      className="w-full sm:w-auto"
+    >
+      Hủy đơn hàng
+    </Button>
+  )}
+
+{order.status === 'COMPLETED' && (
+  hasReturnRequest ? (
+    <Button
+      variant="outline"
+      onClick={() => navigate('/account/returns')}
+      className="w-full border-blue-300 text-blue-600 hover:bg-blue-50 sm:w-auto"
+    >
+      Xem trả hàng
+    </Button>
+  ) : (
+    <Button
+      variant="outline"
+      onClick={() => setIsReturnModalOpen(true)}
+      className="w-full border-orange-300 text-orange-600 hover:bg-orange-50 sm:w-auto"
+    >
+      Trả hàng
+    </Button>
+  )
+)}
+</div>
 
     {selectedItemForReview && (
       <CreateReviewModal
@@ -117,6 +159,13 @@ return (
         onSuccess={handleReviewSuccess}
       />
     )}
+
+    <ReturnRequestModal
+  isOpen={isReturnModalOpen}
+  order={order}
+  onClose={() => setIsReturnModalOpen(false)}
+  onSuccess={refreshOrder}
+/>
 
     <CancelOrderModal
       isOpen={isCancelModalOpen}

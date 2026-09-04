@@ -28,11 +28,15 @@ export const useProductDetail = () => {
 
         setProduct(data);
 
-        if (data?.images?.length > 0) {
-          setActiveImage(data.images[0].imageUrl);
-        } else if (data?.thumbnailUrl) {
-          setActiveImage(data.thumbnailUrl);
-        }
+       if (data?.thumbnailUrl) {
+        setActiveImage(data.thumbnailUrl);
+      } else if (data?.images?.length > 0) {
+        setActiveImage(
+          data.images[0].imageUrl || data.images[0].url
+        );
+      } else {
+        setActiveImage('');
+      }
       } catch (error) {
         console.error(error);
       } finally {

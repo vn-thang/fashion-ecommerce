@@ -1,232 +1,272 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { io } from 'socket.io-client';
-import { useAuth } from '../../../features/auth/store/authContext';
+import { useCallback, useEffect, useRef } from 'react';
+import { useSocket } from '../context/SocketContext';
 
-const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:3000';
-
-export const useChatSocket = ({ 
-  onNewMessage, 
+export const useChatSocket = ({
+  onNewMessage,
   onRead,
   onMessageStatus,
-  onUserOnline, 
-  onUserOffline, 
-  onTypingStart, 
-  onTypingStop 
+  onUserOnline,
+  onUserOffline,
+  onTypingStart,
+  onTypingStop
 }) => {
-  const { token } = useAuth();
-  const socketRef = useRef(null);
-const callbacksRef = useRef({ 
-  onNewMessage, 
-  onRead,
-  onMessageStatus,
-  onUserOnline, 
-  onUserOffline, 
-  onTypingStart, 
-  onTypingStop 
-});
-  const [isConnected, setIsConnected] = useState(false);
+  const {
+    socket,
+    isConnected
+  } = useSocket();
+
+  const callbacksRef = useRef({
+    onNewMessage,
+    onRead,
+    onMessageStatus,
+    onUserOnline,
+    onUserOffline,
+    onTypingStart,
+    onTypingStop
+  });
 
   useEffect(() => {
-callbacksRef.current = { 
-  onNewMessage, 
-  onRead,
-  onMessageStatus,
-  onUserOnline, 
-  onUserOffline, 
-  onTypingStart, 
-  onTypingStop 
-};
-}, [ 
-  onNewMessage, 
-  onRead,
-  onMessageStatus,
-  onUserOnline, 
-  onUserOffline, 
-  onTypingStart, 
-  onTypingStop
-]);
+    callbacksRef.current = {
+      onNewMessage,
+      onRead,
+      onMessageStatus,
+      onUserOnline,
+      onUserOffline,
+      onTypingStart,
+      onTypingStop
+    };
+  }, [
+    onNewMessage,
+    onRead,
+    onMessageStatus,
+    onUserOnline,
+    onUserOffline,
+    onTypingStart,
+    onTypingStop
+  ]);
 
-useEffect(() => {
-  if (!token) {
+  useEffect(() => {
+    if (!socket) return;
 
-    if (socketRef.current) {
-    
-      socketRef.current.disconnect();
-      socketRef.current = null;
-    }
+    const handleNewMessage = message => {
+      callbacksRef.current.onNewMessage?.(message);
+    };
 
-    setIsConnected(false);
-    return;
-  }
+    const handleRead = data => {
+      callbacksRef.current.onRead?.(data);
+    };
 
-  const socket = io(SOCKET_URL, {
-    auth: {
-      token
-    },
-    withCredentials: true,
-    transports: ['websocket', 'polling']
-  });
+    const handleMessageStatus = data => {
+      callbacksRef.current.onMessageStatus?.(data);
+    };
 
-  socketRef.current = socket;
+    const handleUserOnline = data => {
+      callbacksRef.current.onUserOnline?.(data);
+    };
 
-  socket.on('connect', () => {
-   
-    setIsConnected(true);
-  });
+    const handleUserOffline = data => {
+      callbacksRef.current.onUserOffline?.(data);
+    };
 
-  socket.on('disconnect', reason => {
-   
-    setIsConnected(false);
-  });
+    const handleTypingStart = data => {
+      callbacksRef.current.onTypingStart?.(data);
+    };
 
-  socket.on('connect_error', error => {
-    console.error(
-      '[CHAT SOCKET] CONNECT ERROR:',
-      error.message
+    const handleTypingStop = data => {
+      callbacksRef.current.onTypingStop?.(data);
+    };
+
+    socket.on('message:new', handleNewMessage);
+    socket.on('message:read', handleRead);
+    socket.on(
+      'message:status',
+      handleMessageStatus
+    );
+    socket.on('user:online', handleUserOnline);
+    socket.on('user:offline', handleUserOffline);
+    socket.on(
+      'typing:start',
+      handleTypingStart
+    );
+    socket.on(
+      'typing:stop',
+      handleTypingStop
     );
 
-    setIsConnected(false);
-  });
+    return () => {
+      socket.off(
+        'message:new',
+        handleNewMessage
+      );
+      socket.off(
+        'message:read',
+        handleRead
+      );
+      socket.off(
+        'message:status',
+        handleMessageStatus
+      );
+      socket.off(
+        'user:online',
+        handleUserOnline
+      );
+      socket.off(
+        'user:offline',
+        handleUserOffline
+      );
+      socket.off(
+        'typing:start',
+        handleTypingStart
+      );
+      socket.off(
+        'typing:stop',
+        handleTypingStop
+      );
+    };
+  }, [socket]);
 
-  socket.on('message:new', message => {
-    callbacksRef.current.onNewMessage?.(message);
-  });
-
-  socket.on('message:read', data => {
-    callbacksRef.current.onRead?.(data);
-  });
-
-  socket.on('message:status', data => {
-    callbacksRef.current.onMessageStatus?.(data);
-  });
-
-  socket.on('user:online', data => {
-    callbacksRef.current.onUserOnline?.(data);
-  });
-
-  socket.on('user:offline', data => {
-    callbacksRef.current.onUserOffline?.(data);
-  });
-
-  socket.on('typing:start', data => {
-    callbacksRef.current.onTypingStart?.(data);
-  });
-
-  socket.on('typing:stop', data => {
-    callbacksRef.current.onTypingStop?.(data);
-  });
-
-  return () => {
-    socket.disconnect();
-
-    if (socketRef.current === socket) {
-      socketRef.current = null;
-    }
-
-    setIsConnected(false);
-  };
-}, [token]);
-
-  const joinConversation = useCallback((conversationId, callback) => {
-    const socket = socketRef.current;
-
-    if (!socket?.connected) {
-      callback?.({ success: false, message: 'Socket chưa kết nối!' });
-      return;
-    }
-
-    socket.emit('conversation:join', { conversationId }, response => {
-      if (!response?.success) {
-        console.error('Join conversation failed:', response?.message);
+  const joinConversation = useCallback(
+    (conversationId, callback) => {
+      if (!socket?.connected) {
+        callback?.({
+          success: false,
+          message: 'Socket chưa kết nối!'
+        });
+        return;
       }
-      callback?.(response);
-    });
-  }, []);
 
-  const leaveConversation = useCallback((conversationId, callback) => {
-    const socket = socketRef.current;
+      socket.emit(
+        'conversation:join',
+        { conversationId },
+        callback
+      );
+    },
+    [socket]
+  );
 
-    if (!socket?.connected) {
-      callback?.({ success: false, message: 'Socket chưa kết nối!' });
-      return;
-    }
-
-    socket.emit('conversation:leave', { conversationId }, response => {
-      if (!response?.success) {
-        console.error('Leave conversation failed:', response?.message);
+  const leaveConversation = useCallback(
+    (conversationId, callback) => {
+      if (!socket?.connected) {
+        callback?.({
+          success: false,
+          message: 'Socket chưa kết nối!'
+        });
+        return;
       }
-      callback?.(response);
-    });
-  }, []);
 
-  const sendMessage = useCallback((data, callback) => {
-    const socket = socketRef.current;
+      socket.emit(
+        'conversation:leave',
+        { conversationId },
+        callback
+      );
+    },
+    [socket]
+  );
 
-    if (!socket?.connected) {
-      callback?.({ success: false, message: 'Socket chưa kết nối!' });
-      return;
-    }
+  const sendMessage = useCallback(
+    (data, callback) => {
+      if (!socket?.connected) {
+        callback?.({
+          success: false,
+          message: 'Socket chưa kết nối!'
+        });
+        return;
+      }
 
-    socket.emit('message:send', data, callback);
-  }, []);
+      socket.emit(
+        'message:send',
+        data,
+        callback
+      );
+    },
+    [socket]
+  );
 
-  const markAsRead = useCallback((conversationId, callback) => {
-    const socket = socketRef.current;
+  const markAsRead = useCallback(
+    (conversationId, callback) => {
+      if (!socket?.connected) {
+        callback?.({
+          success: false,
+          message: 'Socket chưa kết nối!'
+        });
+        return;
+      }
 
-    if (!socket?.connected) {
-      callback?.({ success: false, message: 'Socket chưa kết nối!' });
-      return;
-    }
-
-    socket.emit('message:read', { conversationId }, callback);
-  }, []);
+      socket.emit(
+        'message:read',
+        { conversationId },
+        callback
+      );
+    },
+    [socket]
+  );
 
   const markAsDelivered = useCallback(
-  (messageId, conversationId, callback) => {
-    const socket = socketRef.current;
-
-    if (!socket?.connected) {
-      callback?.({
-        success: false,
-        message: 'Socket chưa kết nối!'
-      });
-      return;
-    }
-
-    socket.emit(
-      'message:delivered',
-      {
-        messageId,
-        conversationId
-      },
+    (
+      messageId,
+      conversationId,
       callback
-    );
-  },
-  []
-);
+    ) => {
+      if (!socket?.connected) {
+        callback?.({
+          success: false,
+          message: 'Socket chưa kết nối!'
+        });
+        return;
+      }
 
-  const startTyping = useCallback(conversationId => {
-    const socket = socketRef.current;
-    if (!socket?.connected || !conversationId) return;
+      socket.emit(
+        'message:delivered',
+        {
+          messageId,
+          conversationId
+        },
+        callback
+      );
+    },
+    [socket]
+  );
 
-    socket.emit('typing:start', { conversationId });
-  }, []);
+  const startTyping = useCallback(
+    conversationId => {
+      if (
+        !socket?.connected ||
+        !conversationId
+      ) {
+        return;
+      }
 
-  const stopTyping = useCallback(conversationId => {
-    const socket = socketRef.current;
-    if (!socket?.connected || !conversationId) return;
+      socket.emit('typing:start', {
+        conversationId
+      });
+    },
+    [socket]
+  );
 
-    socket.emit('typing:stop', { conversationId });
-  }, []);
+  const stopTyping = useCallback(
+    conversationId => {
+      if (
+        !socket?.connected ||
+        !conversationId
+      ) {
+        return;
+      }
 
-return {
-  joinConversation,
-  leaveConversation,
-  sendMessage,
-  markAsDelivered,
-  markAsRead,
-  startTyping,
-  stopTyping,
-  isConnected
-};
+      socket.emit('typing:stop', {
+        conversationId
+      });
+    },
+    [socket]
+  );
+
+  return {
+    joinConversation,
+    leaveConversation,
+    sendMessage,
+    markAsDelivered,
+    markAsRead,
+    startTyping,
+    stopTyping,
+    isConnected
+  };
 };

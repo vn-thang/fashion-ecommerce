@@ -41,6 +41,7 @@ model User {
   auditLogs           AuditLog[]
   passwordResetTokens PasswordResetToken[]
   emailVerificationTokens    EmailVerificationToken[]
+  returnRequests ReturnRequest[]
 
   @@index([role])
 }
@@ -57,6 +58,7 @@ model RefreshToken {
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
+// 3. PasswordResetTokens
 model PasswordResetToken {
   id        String    @id @default(uuid()) @db.Uuid
   userId    String    @db.Uuid
@@ -71,7 +73,7 @@ model PasswordResetToken {
   @@index([expiresAt])
 }
 
-// Email verification tokens
+// 4. Email verification tokens
 model EmailVerificationToken {
   id        String   @id @default(uuid()) @db.Uuid
   userId    String   @db.Uuid
@@ -85,7 +87,7 @@ model EmailVerificationToken {
   @@index([expiresAt])
 }
 
-// 3. UserAddresses
+// 5. UserAddresses
 model UserAddress {
   id           String   @id @default(uuid()) @db.Uuid
   userId       String   @db.Uuid
@@ -101,7 +103,7 @@ model UserAddress {
   @@index([userId])
 }
 
-// 4. Categories
+// 6. Categories
 model Category {
   id          String     @id @default(uuid()) @db.Uuid
   parentId    String?    @db.Uuid
@@ -119,7 +121,7 @@ model Category {
   @@index([parentId, status])
 }
 
-// 5. Brands
+// 7. Brands
 model Brand {
   id        String    @id @default(uuid()) @db.Uuid
   name      String    @db.VarChar(255)
@@ -131,7 +133,7 @@ model Brand {
   products  Product[]
 }
 
-// 6. Products
+// 8. Products
 model Product {
   id           String           @id @default(uuid()) @db.Uuid
   categoryId   String           @db.Uuid
@@ -158,7 +160,7 @@ model Product {
   @@index([brandId, status])
 }
 
-// 7. ProductImages
+// 9. ProductImages
 model ProductImage {
   id           String   @id @default(uuid()) @db.Uuid
   productId    String   @db.Uuid
@@ -170,7 +172,7 @@ model ProductImage {
   @@index([productId, displayOrder])
 }
 
-// 8. ProductVariants
+// 10. ProductVariants
 model ProductVariant {
   id                    String                 @id @default(uuid()) @db.Uuid
   productId             String                 @db.Uuid
@@ -191,7 +193,7 @@ model ProductVariant {
   @@index([productId, status])
 }
 
-// 9. InventoryTransactions
+// 11. InventoryTransactions
 model InventoryTransaction {
   id               String         @id @default(uuid()) @db.Uuid
   productVariantId String         @db.Uuid
@@ -208,7 +210,7 @@ model InventoryTransaction {
   @@index([createdBy])
 }
 
-// 10. Carts
+// 12. Carts
 model Cart {
   id        String     @id @default(uuid()) @db.Uuid
   userId    String     @unique @db.Uuid
@@ -218,7 +220,7 @@ model Cart {
   items     CartItem[]
 }
 
-// 11. CartItems
+// 13. CartItems
 model CartItem {
   id               String         @id @default(uuid()) @db.Uuid
   cartId           String         @db.Uuid
@@ -232,7 +234,7 @@ model CartItem {
   @@unique([cartId, productVariantId])
 }
 
-// 12. Wishlists
+// 14. Wishlists
 model Wishlist {
   id        String   @id @default(uuid()) @db.Uuid
   userId    String   @db.Uuid
@@ -245,7 +247,7 @@ model Wishlist {
   @@unique([userId, productId])
 }
 
-// 13. Orders
+// 15. Orders
 model Order {
   id             String        @id @default(uuid()) @db.Uuid
   userId         String        @db.Uuid
@@ -272,11 +274,12 @@ model Order {
   items          OrderItem[]
   payment        Payment?
   couponUsages   CouponUsage[]
+  returnRequests ReturnRequest[]
   @@index([userId, createdAt])
   @@index([status, createdAt])
 }
 
-// 14. OrderItems
+// 16. OrderItems
 model OrderItem {
   id               String         @id @default(uuid()) @db.Uuid
   orderId          String         @db.Uuid
@@ -289,25 +292,29 @@ model OrderItem {
   unitPrice        Decimal        @db.Decimal(18, 2)
   quantity         Int
   subtotal         Decimal        @db.Decimal(18, 2)
+  discountAmount Decimal @default(0) @db.Decimal(18, 2)
 
   order            Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
   variant          ProductVariant @relation(fields: [productVariantId], references: [id])
   flashSaleVariant   FlashSaleVariant? @relation(fields: [flashSaleVariantId], references: [id])
 
   reviews          Review[]
+  returnRequestItems ReturnRequestItem[]
   @@index([orderId])
   @@index([productVariantId])
 }
 
-// 15. Payments
+// 17. Payments
 model Payment {
   id                  String    @id @default(uuid()) @db.Uuid
   orderId             String    @unique @db.Uuid
   paymentMethod       String    @db.VarChar(30)
   status              String    @db.VarChar(30)
   amount              Decimal   @db.Decimal(18, 2)
+  refundedAmount Decimal @default(0) @db.Decimal(18, 2)
   transactionRef      String?   @db.VarChar(255)
   transactionNo       String?   @db.VarChar(255)
+  transactionDate     String?   @db.VarChar(14)
   gatewayResponseCode String?   @db.VarChar(50)
   paidAt              DateTime? @db.Timestamp
   createdAt           DateTime  @default(now()) @db.Timestamp
@@ -316,7 +323,7 @@ model Payment {
   order               Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
 }
 
-// 16. Coupons
+// 18. Coupons
 model Coupon {
   id                String        @id @default(uuid()) @db.Uuid
   code              String        @unique @db.VarChar(50)
@@ -334,7 +341,7 @@ model Coupon {
   usages            CouponUsage[]
 }
 
-// 17. CouponUsages
+// 19. CouponUsages
 model CouponUsage {
   id       String   @id @default(uuid()) @db.Uuid
   couponId String   @db.Uuid
@@ -350,7 +357,7 @@ model CouponUsage {
   @@index([userId, couponId])
 }
 
-// 18. Reviews
+// 20. Reviews
 model Review {
   id          String    @id @default(uuid()) @db.Uuid
   userId      String    @db.Uuid
@@ -368,10 +375,11 @@ model Review {
   product     Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
   orderItem   OrderItem @relation(fields: [orderItemId], references: [id])
 
+  @@unique([userId, orderItemId])
   @@index([productId, isHidden, createdAt])
 }
 
-// 19. StoreSettings
+// 21. StoreSettings
 model StoreSetting {
   id           String   @id @default(uuid()) @db.Uuid
   storeName    String   @db.VarChar(255)
@@ -386,7 +394,7 @@ model StoreSetting {
   updatedAt    DateTime @updatedAt @db.Timestamp
 }
 
-// 20. Banners
+// 22. Banners
 model Banner {
   id           String   @id @default(uuid()) @db.Uuid
   title        String?  @db.VarChar(255)
@@ -398,7 +406,7 @@ model Banner {
   updatedAt    DateTime @updatedAt @db.Timestamp
 }
 
-// 21. Notifications
+// 23. Notifications
 model Notification {
   id        String   @id @default(uuid()) @db.Uuid
   userId    String   @db.Uuid
@@ -414,6 +422,7 @@ model Notification {
   @@index([userId, isRead])
 }
 
+// 24. UserDevices
 model UserDevice {
   id         String   @id @default(uuid()) @db.Uuid
   userId     String   @db.Uuid
@@ -427,7 +436,7 @@ model UserDevice {
   @@index([userId])
 }
 
-// 22. Conversations
+// 25. Conversations
 model Conversation {
   id            String    @id @default(uuid()) @db.Uuid
   customerId String @unique @db.Uuid
@@ -445,7 +454,7 @@ model Conversation {
   @@index([lastMessageAt])
 }
 
-// 23. Conversation Participants
+// 26. Conversation Participants
 model ConversationParticipant {
   id             String       @id @default(uuid()) @db.Uuid
   conversationId String       @db.Uuid
@@ -463,7 +472,7 @@ model ConversationParticipant {
 }
 
 
-// 24. Messages
+// 27. Messages
 model Message {
   id             String       @id @default(uuid()) @db.Uuid
   conversationId String       @db.Uuid
@@ -485,7 +494,7 @@ model Message {
   @@index([senderId])
 }
 
-// 24. LoyaltyTransactions
+// 28. LoyaltyTransactions
 model LoyaltyTransaction {
   id          String   @id @default(uuid()) @db.Uuid
   userId      String   @db.Uuid
@@ -497,7 +506,7 @@ model LoyaltyTransaction {
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-// 25. FlashSales
+// 29. FlashSales
 model FlashSale {
   id                String             @id @default(uuid()) @db.Uuid
   name              String             @db.VarChar(255)
@@ -510,7 +519,7 @@ model FlashSale {
   flashSaleVariants FlashSaleVariant[]
 }
 
-// 26. FlashSaleVariants
+// 30. FlashSaleVariants
 model FlashSaleVariant {
   id               String         @id @default(uuid()) @db.Uuid
   flashSaleId      String         @db.Uuid
@@ -529,7 +538,7 @@ model FlashSaleVariant {
   @@index([productVariantId])
 }
 
-// 27. AuditLogs
+// 31. AuditLogs
 model AuditLog {
   id         String   @id @default(uuid()) @db.Uuid
   userId     String   @db.Uuid
@@ -543,4 +552,47 @@ model AuditLog {
   user       User     @relation(fields: [userId], references: [id])
   @@index([userId, createdAt])
   @@index([createdAt])
+}
+
+// 32. ReturnRequest
+model ReturnRequest {
+  id           String   @id @default(uuid()) @db.Uuid
+  orderId      String   @db.Uuid
+  userId       String   @db.Uuid
+  status       String   @db.VarChar(30)
+  reason       String   @db.VarChar(100)
+  description  String?  @db.Text
+  rejectReason String?  @db.Text
+  refundAmount Decimal? @db.Decimal(18, 2)
+  requestedAt  DateTime @default(now()) @db.Timestamp
+  approvedAt   DateTime? @db.Timestamp
+  rejectedAt   DateTime? @db.Timestamp
+  receivedAt   DateTime? @db.Timestamp
+  completedAt  DateTime? @db.Timestamp
+  createdAt    DateTime @default(now()) @db.Timestamp
+  updatedAt    DateTime @updatedAt @db.Timestamp
+
+  order Order @relation(fields: [orderId], references: [id])
+  user  User  @relation(fields: [userId], references: [id])
+
+  items ReturnRequestItem[]
+
+  @@index([orderId])
+  @@index([userId, createdAt])
+  @@index([status, createdAt])
+}
+
+// 33. ReturnRequestItem
+model ReturnRequestItem {
+  id              String   @id @default(uuid()) @db.Uuid
+  returnRequestId String   @db.Uuid
+  orderItemId     String   @db.Uuid
+  quantity        Int
+
+  returnRequest ReturnRequest @relation( fields: [returnRequestId], references: [id], onDelete: Cascade)
+
+  orderItem OrderItem @relation( fields: [orderItemId], references: [id] )
+
+  @@index([returnRequestId])
+  @@index([orderItemId])
 }

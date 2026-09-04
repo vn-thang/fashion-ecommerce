@@ -10,6 +10,7 @@ const NOTIFICATION_CONSTANTS = {
     // Payment
     PAYMENT_SUCCESS: 'PAYMENT_SUCCESS',
     PAYMENT_FAILED: 'PAYMENT_FAILED',
+    ORDER_PAYMENT_PENDING: 'ORDER_PAYMENT_PENDING',
 
     // Account
     ACCOUNT_LOCKED: 'ACCOUNT_LOCKED',
@@ -71,6 +72,13 @@ const NOTIFICATION_CONSTANTS = {
 
     CANCELLED_CONTENT: orderNumber => `Đơn hàng ${orderNumber} đã được hủy.`
   },
+
+    PAYMENT: {
+      PAYMENT_PENDING_TITLE: 'Đơn hàng chưa thanh toán',
+
+      PAYMENT_PENDING_CONTENT: orderNumber =>
+        `Đơn hàng ${orderNumber} đang chờ thanh toán. Vui lòng hoàn tất thanh toán trước khi đơn hàng bị hủy.`,
+    }, 
 
   ACCOUNT: {
     LOCKED_TITLE: 'Tài khoản đã bị khóa',

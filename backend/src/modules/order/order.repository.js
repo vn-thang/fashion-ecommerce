@@ -67,9 +67,10 @@ const orderRepository = {
   },
 
   checkUserCouponUsage: async (userId, couponId) => {
-    return await prisma.couponUsage.findFirst({
+    const usage = await prisma.couponUsage.findFirst({
       where: { userId: userId, couponId: couponId }
     });
+   return usage;
   },
 
 createOrderTransaction: async ({
@@ -203,7 +204,8 @@ createOrderTransaction: async ({
       originalPrice: item.originalPrice,
       unitPrice: item.unitPrice,
       quantity: item.quantity,
-      subtotal: item.subtotal
+      subtotal: item.subtotal,
+      discountAmount: item.discountAmount
     }));
 
     await tx.orderItem.createMany({
@@ -270,54 +272,80 @@ if (couponId) {
 },
 
 findOrdersByUserId: async (userId, skip, limit, status) => {
-    const whereCondition = { userId: userId };
-    if (status && status.trim() !== '') {
-      whereCondition.status = status; 
-    }
+  const whereCondition = { userId: userId };
+  if (status && status.trim() !== '') {
+    whereCondition.status = status;
+  }
 
-    const total = await prisma.order.count({ where: whereCondition });
-    
-    const data = await prisma.order.findMany({
-      where: whereCondition,
-      skip: skip,
-      take: limit,
-      orderBy: { createdAt: 'desc' },
-      include: { 
-        items: {
-          include: {
-            variant: {
-              include: {
-                product: true
-              }
-            },
-            reviews: true 
-          }
-        }, 
-        payment: true 
+  const total = await prisma.order.count({ where: whereCondition });
+  
+  const data = await prisma.order.findMany({
+    where: whereCondition,
+    skip: skip,
+    take: limit,
+    orderBy: { createdAt: 'desc' },
+    include: {
+      items: {
+        include: {
+          variant: {
+            include: {
+              product: true
+            }
+          },
+          reviews: true
+        }
+      },
+      payment: true,
+      returnRequests: {
+        select: {
+          id: true,
+          status: true,
+          reason: true,
+          refundAmount: true,
+          createdAt: true,
+          completedAt: true
+        },
+        orderBy: {
+          createdAt: 'desc'
+        }
       }
-    });
+    }
+  });
 
-    return { data, total };
-  },
+  return { data, total };
+},
 
   findOrderById: async (orderId, userId) => {
-    return await prisma.order.findFirst({
-      where: { id: orderId, userId },
-      include: { 
-        items: {
-          include: {
-            variant: {
-              include: {
-                product: true
-              }
-            },
-            reviews: true 
-          }
-        }, 
-        payment: true 
+  return await prisma.order.findFirst({
+    where: { id: orderId, userId },
+    include: {
+      items: {
+        include: {
+          variant: {
+            include: {
+              product: true
+            }
+          },
+          reviews: true
+        }
+      },
+      payment: true,
+      returnRequests: {
+        select: {
+          id: true,
+          status: true,
+          reason: true,
+          refundAmount: true,
+          createdAt: true,
+          completedAt: true
+        },
+        orderBy: {
+          createdAt: 'desc'
+        }
       }
-    });
-  },
+    }
+  });
+},
 
 findOrdersForAdmin: async ({ skip, limit, where }) => {
   const [orders, totalItems] = await Promise.all([
@@ -386,7 +414,6 @@ findOrderForCancel: async (orderId) => {
     }
   });
 },
-
 cancelOrderTransaction: async ({
   orderId,
   paymentId,
@@ -407,19 +434,13 @@ cancelOrderTransaction: async ({
       }
     });
 
-    const paymentData = {
-      status: paymentStatus
-    };
-
-    if (paymentStatus === PAYMENT_STATUS.REFUNDED) {
-      paymentData.paidAt = new Date();
-    }
-
     await tx.payment.update({
       where: {
         id: paymentId
       },
-      data: paymentData
+      data: {
+        status: paymentStatus
+      }
     });
 
     return true;
@@ -445,9 +466,8 @@ findExpiredPendingOrders: async (expiredTime) => {
   });
 },
 
-restoreOrderResourcesTransaction: async (orderId) => {
+restoreOrderResourcesTransaction: async (orderId, { restoreCoupon = true } = {}) => {
   return await prisma.$transaction(async tx => {
-
     const order = await tx.order.findUnique({
       where: {
         id: orderId
@@ -468,7 +488,6 @@ restoreOrderResourcesTransaction: async (orderId) => {
     }
 
     for (const item of order.items) {
-
       await tx.productVariant.update({
         where: {
           id: item.productVariantId
@@ -504,7 +523,7 @@ restoreOrderResourcesTransaction: async (orderId) => {
       });
     }
 
-   if (!order.payment || order.payment.status !== PAYMENT_STATUS.SUCCESS) {
+    if (restoreCoupon) {
       const usage = order.couponUsages[0];
 
       if (usage) {
@@ -512,11 +531,11 @@ restoreOrderResourcesTransaction: async (orderId) => {
           where: {
             id: usage.couponId
           },
-       data: {
-  usedCount: {
-    decrement: 1
-  }
-}
+          data: {
+            usedCount: {
+              decrement: 1
+            }
+          }
         });
 
         await tx.couponUsage.delete({
@@ -526,6 +545,7 @@ restoreOrderResourcesTransaction: async (orderId) => {
         });
       }
     }
+
     return true;
   });
 },

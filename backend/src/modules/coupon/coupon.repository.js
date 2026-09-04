@@ -120,6 +120,51 @@ const couponRepository = {
   };
 },
 
+  findAllClient: async ({ userId, skip, take }) => {
+  const now = new Date();
+
+  const where = {
+    isActive: true,
+    startDate: {
+      lte: now
+    },
+    endDate: {
+      gte: now
+    }
+  };
+
+  const [coupons, totalItems] =
+    await prisma.$transaction([
+      prisma.coupon.findMany({
+        where,
+        skip,
+        take,
+        orderBy: {
+          endDate: 'asc'
+        },
+        include: {
+          usages: {
+            where: {
+              userId
+            },
+            select: {
+              id: true
+            }
+          }
+        }
+      }),
+
+      prisma.coupon.count({
+        where
+      })
+    ]);
+
+  return {
+    coupons,
+    totalItems
+  };
+},
+
   findById: async id => {
     return prisma.coupon.findUnique({
       where: { id },

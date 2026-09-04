@@ -35,6 +35,22 @@ createReview: async (reviewData) => {
   });
 },
 
+findCompletedReturnQuantity: async orderItemId => {
+  const result = await prisma.returnRequestItem.aggregate({
+    where: {
+      orderItemId,
+      returnRequest: {
+        status: 'COMPLETED'
+      }
+    },
+    _sum: {
+      quantity: true
+    }
+  });
+
+  return result._sum.quantity || 0;
+},
+
 getReviewsByProductId: async (
   productId,
   skip,
@@ -238,9 +254,19 @@ getAllReviewsForAdmin: async ({
   };
 },
 
-  findReviewById: async (id) => {
-    return await prisma.review.findUnique({ where: { id } });
-  },
+findReviewById: async id => {
+  return await prisma.review.findUnique({
+    where: { id },
+    include: {
+      product: {
+        select: {
+          id: true,
+          name: true
+        }
+      }
+    }
+  });
+},
 
   updateReply: async (id, replyText) => {
     return await prisma.review.update({

@@ -6,7 +6,7 @@ const OrderItemsList = ({
   formatPrice,
   orderStatus,
   onReviewClick
-}) => {
+}) => { 
   return (
     <div className="mb-4 overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm">
       <div className="p-4 sm:p-5">

@@ -6,10 +6,9 @@ const couponController = require('./coupon.controller');
 const couponValidation = require('./coupon.validation');
 
 router.get(
-  '/',
+  '/client',
   authenticate,
-  couponController.getAll
-);
+  couponController.getAllClient);
 
 router.get(
   '/:id',

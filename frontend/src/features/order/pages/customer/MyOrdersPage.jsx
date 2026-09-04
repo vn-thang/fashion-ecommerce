@@ -6,6 +6,7 @@ import { useMyOrders } from '../../hooks/useMyOrders';
 import MyOrderTabs from '../../components/customer/MyOrderTabs';
 import MyOrderItem from '../../components/customer/MyOrderItem';
 import CancelOrderModal from '../../shares/CancelOrderModal';
+import ReturnRequestModal from '../../../return/components/customer/ReturnRequestModal';
 
 import Button from '../../../../shared/components/Button';
 import CreateReviewModal from '../../../review/components/customer/CreateReviewModal';
@@ -19,7 +20,8 @@ const MyOrdersPage = () => {
     handleTabChange,
     handlePageChange,
     refreshOrders,
-     cancelOrder
+    cancelOrder,
+    retryPayment
   } = useMyOrders();
 
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
@@ -27,6 +29,9 @@ const MyOrdersPage = () => {
 
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
+
+  const [isReturnModalOpen, setIsReturnModalOpen] = useState(false);
+  const [selectedReturnOrder, setSelectedReturnOrder] = useState(null);
 
   const formatPrice = price =>
     new Intl.NumberFormat('vi-VN', {
@@ -44,10 +49,10 @@ const MyOrdersPage = () => {
     setIsCancelModalOpen(true);
   };
 
-  const handleCancelSuccess = () => {
-    toast.success('Hủy đơn hàng thành công');
-    refreshOrders();
-  };
+  const handleOpenReturnModal = order => {
+  setSelectedReturnOrder(order);
+  setIsReturnModalOpen(true);
+};
 
   const handleConfirmCancel = async reason => {
   await cancelOrder(selectedOrder.id, reason);
@@ -96,6 +101,8 @@ const MyOrdersPage = () => {
               formatPrice={formatPrice}
               onCancel={() => handleOpenCancelModal(order)}
               onReviewClick={handleOpenReviewModal}
+              onRetryPayment={retryPayment}
+                onReturnClick={handleOpenReturnModal}
             />
           ))
         )}
@@ -157,6 +164,18 @@ const MyOrdersPage = () => {
         loading={loading}
       />
       )}
+
+    {isReturnModalOpen && selectedReturnOrder && (
+      <ReturnRequestModal
+        isOpen={isReturnModalOpen}
+        order={selectedReturnOrder}
+        onClose={() => {
+          setIsReturnModalOpen(false);
+          setSelectedReturnOrder(null);
+        }}
+        onSuccess={refreshOrders}
+      />
+    )}
     </div>
   );
 };
