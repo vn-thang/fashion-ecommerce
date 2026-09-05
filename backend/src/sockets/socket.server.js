@@ -3,12 +3,18 @@ const socketAuth = require('./socket.auth');
 const registerChatSocket = require('./chat.socket');
 
 const initSocket = (server) => {
-  const io = new Server(server, {
-    cors: {
-      origin: process.env.FRONTEND_URL || 'http://localhost:5173',
-      credentials: true
-    }
-  });
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:4173',
+  process.env.FRONTEND_URL,
+].filter(Boolean);
+
+const io = new Server(server, {
+  cors: {
+    origin: allowedOrigins,
+    credentials: true,
+  },
+});
 
   io.use(socketAuth);
 
