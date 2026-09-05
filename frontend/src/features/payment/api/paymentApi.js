@@ -28,16 +28,16 @@ export const paymentApi = {
       });
 
       return response;
-    } catch (error) {
-      console.error('[VNPAY] error', {
-        status: error.response?.status,
-        data: error.response?.data,
-        message: error.message,
-        url: error.config?.url
-      });
+    }catch (error) {
+  console.error('[VNPAY] error', {
+    status: error.response?.status,
+    data: JSON.stringify(error.response?.data, null, 2),
+    message: error.message,
+    url: error.config?.url
+  });
 
-      throw error;
-    }
+  throw error;
+}
   },
 
   verifyPayment: async params => {
@@ -56,14 +56,14 @@ export const paymentApi = {
 
       return response;
     } catch (error) {
-      console.error('[VNPAY VERIFY] error', {
-        status: error.response?.status,
-        data: error.response?.data,
-        message: error.message,
-        url: error.config?.url
-      });
+  console.error('[VNPAY] error', {
+    status: error.response?.status,
+    data: JSON.stringify(error.response?.data, null, 2),
+    message: error.message,
+    url: error.config?.url
+  });
 
-      throw error;
-    }
+  throw error;
+}
   }
 };

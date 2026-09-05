@@ -48,6 +48,8 @@ console.log('[VNPAY CONFIG]', {
   returnUrl: paymentConfig.returnUrl
 });
 
+const createDate = paymentUtils.createDate();
+const expireDate = paymentUtils.createExpireDate();
 console.log('[VNPAY TIME]', {
   serverNow: new Date().toISOString(),
   createDate,
