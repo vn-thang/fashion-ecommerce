@@ -21,14 +21,8 @@ const {
 
 
 const paymentService = {
-  createPaymentUrl: async ({ orderId, ipAddress }) => { console.log('[VNPAY CREATE] called');
-    console.log(
-  '[VNPAY SECRET FINGERPRINT]',
-  crypto
-    .createHash('sha256')
-    .update(paymentConfig.hashSecret)
-    .digest('hex')
-);
+
+  createPaymentUrl: async ({ orderId, ipAddress }) => {
   const order = await paymentRepository.findOrderById(orderId);
 
   if (!order)
@@ -48,22 +42,7 @@ const paymentService = {
 
   const txnRef = order.orderNumber;
   const clientIp = ipAddress === '::1' ? '127.0.0.1' : ipAddress;
-console.log('[VNPAY CONFIG]', {
-  tmnCode: paymentConfig.tmnCode,
-  hashSecretLength: paymentConfig.hashSecret?.length,
-  hashSecretHasQuotes:
-    paymentConfig.hashSecret?.startsWith('"') ||
-    paymentConfig.hashSecret?.endsWith('"'),
-  returnUrl: paymentConfig.returnUrl
-});
 
-const createDate = paymentUtils.createDate();
-const expireDate = paymentUtils.createExpireDate();
-console.log('[VNPAY TIME]', {
-  serverNow: new Date().toISOString(),
-  createDate,
-  expireDate
-});
   const params = {
     vnp_Version: paymentConfig.version,
     vnp_Command: paymentConfig.command,
@@ -91,8 +70,6 @@ return {
 },
 
 handleReturn: async query => {
-    console.log('===== VNPAY RETURN =====');
-  console.log(query);
   if (!paymentUtils.verifySecureHash(query)) {
     throw new Error(PAYMENT_MESSAGES.INVALID_SIGNATURE);
   }

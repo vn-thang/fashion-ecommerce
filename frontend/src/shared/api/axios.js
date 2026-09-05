@@ -5,7 +5,6 @@ const axiosInstance = axios.create({
   timeout: 10000,
   withCredentials: true
 });
-console.log('[AXIOS BASE URL]', import.meta.env.VITE_API_URL);
 
 let isRefreshing = false;
 let failedQueue = [];

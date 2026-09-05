@@ -8,9 +8,6 @@ const {
 const paymentController = {
 
   createPaymentUrl: async (req, res) => {
-     console.log('[VNPAY CONTROLLER] called', {
-    body: req.body
-  });
     try {
       const { orderId } = req.body;
 

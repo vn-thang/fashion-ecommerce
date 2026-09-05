@@ -35,13 +35,6 @@ const buildPaymentUrl = (params) => {
     .update(Buffer.from(signData, 'utf-8'))
     .digest('hex');
 
-  console.log('[VNPAY SIGN DEBUG]', {
-    signData,
-    secureHash,
-    tmnCode: paymentConfig.tmnCode,
-    hashSecretLength: paymentConfig.hashSecret?.length
-  });
-
   sortedParams.vnp_SecureHash = secureHash;
 
   return (

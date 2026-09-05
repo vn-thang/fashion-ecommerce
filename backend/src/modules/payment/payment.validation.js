@@ -37,17 +37,10 @@ const validateCallback = (req, res, next) => {
 
 const paymentValidation = {
   validateCreatePayment(req, res, next) {
-    const { orderId, paymentMethod } = req.body;
-  console.log('[VNPAY VALIDATION]', {
-    orderId,
-    paymentMethod
-  });
 
+    const { orderId, paymentMethod } = req.body;
     if (!orderId || !validateUUID(orderId)) {
 
-       console.log('[VNPAY VALIDATION FAILED]', {
-      orderId
-    });
       return res.status(400).json({
         success: false,
         message: PAYMENT_MESSAGES.INVALID_ORDER
@@ -59,9 +52,7 @@ const paymentValidation = {
       !Object.values(PAYMENT_METHOD).includes(
         paymentMethod.toUpperCase()
       )
-    ) {   console.log('[VNPAY VALIDATION FAILED]', {
-      paymentMethod
-    });
+    ) {  
       return res.status(400).json({
         success: false,
         message: PAYMENT_MESSAGES.INVALID_PAYMENT_METHOD
