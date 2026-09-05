@@ -11,8 +11,7 @@ import { useAuth } from '../../auth/store/authContext';
 const SocketContext = createContext(null);
 
 const SOCKET_URL =
-  import.meta.env.VITE_SOCKET_URL ||
-  'http://localhost:3000';
+  import.meta.env.VITE_SOCKET_URL;
 
 export const SocketProvider = ({ children }) => {
   const { token } = useAuth();
