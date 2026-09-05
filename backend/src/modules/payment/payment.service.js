@@ -39,7 +39,14 @@ const paymentService = {
 
   const txnRef = order.orderNumber;
   const clientIp = ipAddress === '::1' ? '127.0.0.1' : ipAddress;
-
+console.log('[VNPAY CONFIG]', {
+  tmnCode: paymentConfig.tmnCode,
+  hashSecretLength: paymentConfig.hashSecret?.length,
+  hashSecretHasQuotes:
+    paymentConfig.hashSecret?.startsWith('"') ||
+    paymentConfig.hashSecret?.endsWith('"'),
+  returnUrl: paymentConfig.returnUrl
+});
   const params = {
     vnp_Version: paymentConfig.version,
     vnp_Command: paymentConfig.command,
