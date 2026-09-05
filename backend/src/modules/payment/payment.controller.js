@@ -8,48 +8,40 @@ const {
 const paymentController = {
 
   createPaymentUrl: async (req, res) => {
-  //    console.log('[VNPAY CONTROLLER] called', {
-  //   body: req.body
-  // });
-  //   try {
-  //     const { orderId } = req.body;
-
-  //     const ipAddress =
-  //       req.headers['x-forwarded-for'] ||
-  //       req.socket.remoteAddress ||
-  //       req.ip;
-
-  //     const result =
-  //       await paymentService.createPaymentUrl({
-  //         orderId,
-  //         ipAddress
-  //       });
-
-  //     return sendSuccess(
-  //       res,
-  //       200,
-  //       'Tạo URL thanh toán thành công.',
-  //       result
-  //     );
-  //   } catch (err) {
-  //      console.error('[VNPAY CONTROLLER ERROR]', {
-  //     message: err.message,
-  //     stack: err.stack
-  //   });
-  //     return sendError(
-  //       res,
-  //       400,
-  //       err.message
-  //     );
-  //   }
-
-   console.log('========== VNPAY TEST 999 ==========');
-
-  return res.status(200).json({
-    success: true,
-    test: 'RENDER-VNPAY-999',
-    time: new Date().toISOString()
+     console.log('[VNPAY CONTROLLER] called', {
+    body: req.body
   });
+    try {
+      const { orderId } = req.body;
+
+      const ipAddress =
+        req.headers['x-forwarded-for'] ||
+        req.socket.remoteAddress ||
+        req.ip;
+
+      const result =
+        await paymentService.createPaymentUrl({
+          orderId,
+          ipAddress
+        });
+
+      return sendSuccess(
+        res,
+        200,
+        'Tạo URL thanh toán thành công.',
+        result
+      );
+    } catch (err) {
+       console.error('[VNPAY CONTROLLER ERROR]', {
+      message: err.message,
+      stack: err.stack
+    });
+      return sendError(
+        res,
+        400,
+        err.message
+      );
+    }
   },
 
   handleReturn: async (req, res) => {
