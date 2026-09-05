@@ -14,10 +14,11 @@ const paymentController = {
     try {
       const { orderId } = req.body;
 
-      const ipAddress =
-        req.headers['x-forwarded-for'] ||
-        req.socket.remoteAddress ||
-        req.ip;
+const forwardedFor = req.headers['x-forwarded-for'];
+
+const ipAddress = forwardedFor
+  ? forwardedFor.split(',')[0].trim()
+  : req.socket.remoteAddress || req.ip;
 
       const result =
         await paymentService.createPaymentUrl({
