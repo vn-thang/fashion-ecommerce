@@ -12,6 +12,7 @@ const SocketContext = createContext(null);
 
 const SOCKET_URL =
   import.meta.env.VITE_SOCKET_URL;
+console.log('[SOCKET URL]', SOCKET_URL);
 
 export const SocketProvider = ({ children }) => {
   const { token } = useAuth();
@@ -39,7 +40,7 @@ export const SocketProvider = ({ children }) => {
 
     socketRef.current = socket;
 
-    socket.on('connect', () => {
+    socket.on('connect', () => {  console.log('[SOCKET CONNECTED]', socket.id);
 
       setIsConnected(true);
     });

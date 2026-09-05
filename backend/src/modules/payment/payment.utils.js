@@ -49,22 +49,28 @@ const verifySecureHash = (query) => {
 };
 
 const createDate = (date = new Date()) => {
-  const pad = (n) => String(n).padStart(2, '0');
+  const vnDate = new Date(
+    date.toLocaleString('en-US', {
+      timeZone: 'Asia/Ho_Chi_Minh'
+    })
+  );
+
+  const pad = n => String(n).padStart(2, '0');
 
   return (
-    date.getFullYear() +
-    pad(date.getMonth() + 1) +
-    pad(date.getDate()) +
-    pad(date.getHours()) +
-    pad(date.getMinutes()) +
-    pad(date.getSeconds())
+    vnDate.getFullYear() +
+    pad(vnDate.getMonth() + 1) +
+    pad(vnDate.getDate()) +
+    pad(vnDate.getHours()) +
+    pad(vnDate.getMinutes()) +
+    pad(vnDate.getSeconds())
   );
 };
 
 const createExpireDate = () => {
-  const expire = new Date();
-
-  expire.setMinutes(expire.getMinutes() + 15);
+  const expire = new Date(
+    Date.now() + 15 * 60 * 1000
+  );
 
   return createDate(expire);
 };
