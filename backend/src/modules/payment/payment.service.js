@@ -18,16 +18,17 @@ const {
   VNPAY_RESPONSE_CODE
 } = require('./payment.constants');
 
-console.log(
+
+
+const paymentService = {
+  createPaymentUrl: async ({ orderId, ipAddress }) => { console.log('[VNPAY CREATE] called');
+    console.log(
   '[VNPAY SECRET FINGERPRINT]',
   crypto
     .createHash('sha256')
     .update(paymentConfig.hashSecret)
     .digest('hex')
 );
-
-const paymentService = {
-  createPaymentUrl: async ({ orderId, ipAddress }) => { console.log('[VNPAY CREATE] called');
   const order = await paymentRepository.findOrderById(orderId);
 
   if (!order)
