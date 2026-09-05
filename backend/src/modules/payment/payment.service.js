@@ -3,7 +3,7 @@ const paymentRepository = require('./payment.repository');
 const paymentConfig = require('./payment.config');
 const paymentUtils = require('./payment.utils');
 const axios = require('axios');
-const crypto = require('crypto');
+const crypto = require('crypto'); 
 
 const { ORDER_STATUS } = require('../../constants/orderStatus.constant');
 const orderRepository = require('../order/order.repository');
@@ -17,6 +17,14 @@ const {
   PAYMENT_STATUS,
   VNPAY_RESPONSE_CODE
 } = require('./payment.constants');
+
+console.log(
+  '[VNPAY SECRET FINGERPRINT]',
+  crypto
+    .createHash('sha256')
+    .update(paymentConfig.hashSecret)
+    .digest('hex')
+);
 
 const paymentService = {
   createPaymentUrl: async ({ orderId, ipAddress }) => { console.log('[VNPAY CREATE] called');
