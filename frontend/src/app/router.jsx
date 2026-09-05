@@ -4,7 +4,7 @@ import LoginPage from '../features/auth/pages/LoginPage';
 import RegisterPage from '../features/auth/pages/RegisterPage';
 import ForgotPasswordPage from '../features/auth/pages/ForgotPasswordPage';
 import ResetPasswordPage from '../features/auth/pages/ResetPasswordPage';
-import CategoryPage from '../features/category/pages/admin/categoryPage';
+import CategoryPage from '../features/category/pages/admin/CategoryPage';
 import AdminLayout from '../layouts/AdminLayout';
 import BrandPage from '../features/brand/pages/admin/BrandPage';
 import ProductPage from '../features/product/pages/admin/ProductPage';
