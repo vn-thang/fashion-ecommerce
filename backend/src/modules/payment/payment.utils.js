@@ -28,11 +28,27 @@ const signData = querystring.stringify(sortedParams);
 const buildPaymentUrl = (params) => {
   const sortedParams = sortObject(params);
 
-  const secureHash = createSecureHash(sortedParams);
+  const signData = querystring.stringify(sortedParams);
+
+  const secureHash = crypto
+    .createHmac('sha512', paymentConfig.hashSecret)
+    .update(Buffer.from(signData, 'utf-8'))
+    .digest('hex');
+
+  console.log('[VNPAY SIGN DEBUG]', {
+    signData,
+    secureHash,
+    tmnCode: paymentConfig.tmnCode,
+    hashSecretLength: paymentConfig.hashSecret?.length
+  });
 
   sortedParams.vnp_SecureHash = secureHash;
 
-return paymentConfig.vnpUrl + '?' + querystring.stringify(sortedParams);
+  return (
+    paymentConfig.vnpUrl +
+    '?' +
+    querystring.stringify(sortedParams)
+  );
 };
 
 const verifySecureHash = (query) => {
