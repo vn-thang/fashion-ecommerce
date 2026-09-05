@@ -19,7 +19,7 @@ const {
 } = require('./payment.constants');
 
 const paymentService = {
-  createPaymentUrl: async ({ orderId, ipAddress }) => {
+  createPaymentUrl: async ({ orderId, ipAddress }) => { console.log('[VNPAY CREATE] called');
   const order = await paymentRepository.findOrderById(orderId);
 
   if (!order)
@@ -46,6 +46,12 @@ console.log('[VNPAY CONFIG]', {
     paymentConfig.hashSecret?.startsWith('"') ||
     paymentConfig.hashSecret?.endsWith('"'),
   returnUrl: paymentConfig.returnUrl
+});
+
+console.log('[VNPAY TIME]', {
+  serverNow: new Date().toISOString(),
+  createDate,
+  expireDate
 });
   const params = {
     vnp_Version: paymentConfig.version,

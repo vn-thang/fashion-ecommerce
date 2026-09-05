@@ -49,30 +49,34 @@ const verifySecureHash = (query) => {
 };
 
 const createDate = (date = new Date()) => {
-  const vnDate = new Date(
-    date.toLocaleString('en-US', {
-      timeZone: 'Asia/Ho_Chi_Minh'
-    })
-  );
+  const parts = new Intl.DateTimeFormat('en-GB', {
+    timeZone: 'Asia/Ho_Chi_Minh',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hourCycle: 'h23'
+  }).formatToParts(date);
 
-  const pad = n => String(n).padStart(2, '0');
+  const get = type =>
+    parts.find(part => part.type === type)?.value;
 
   return (
-    vnDate.getFullYear() +
-    pad(vnDate.getMonth() + 1) +
-    pad(vnDate.getDate()) +
-    pad(vnDate.getHours()) +
-    pad(vnDate.getMinutes()) +
-    pad(vnDate.getSeconds())
+    get('year') +
+    get('month') +
+    get('day') +
+    get('hour') +
+    get('minute') +
+    get('second')
   );
 };
 
 const createExpireDate = () => {
-  const expire = new Date(
-    Date.now() + 15 * 60 * 1000
+  return createDate(
+    new Date(Date.now() + 15 * 60 * 1000)
   );
-
-  return createDate(expire);
 };
 
 const generateTxnRef = () => {
