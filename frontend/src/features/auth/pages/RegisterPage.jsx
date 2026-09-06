@@ -30,8 +30,8 @@ const RegisterPage = () => {
       arrow="›"
     >
       <AuthHeader
-        title="Create Account"
-        subtitle="Get started for free"
+       title="Tạo tài khoản"
+  subtitle="Đăng ký để bắt đầu mua sắm"
         activeStep={1}
       />
 
@@ -79,15 +79,15 @@ const RegisterPage = () => {
           disabled={loading}
           className="mt-2 w-full py-3 text-sm font-black tracking-wide"
         >
-          {loading
-            ? 'CREATING ACCOUNT...'
-            : 'REGISTER'}
+         {loading
+  ? 'ĐANG TẠO TÀI KHOẢN...'
+  : 'ĐĂNG KÝ'}
         </Button>
       </form>
 
       <AuthFooter
-        text="Already have an account?"
-        linkText="Sign In"
+         text="Đã có tài khoản?"
+  linkText="Đăng nhập"
         to="/login"
       />
     </AuthLayout>

@@ -26,12 +26,12 @@ const ResetPasswordPage = () => {
     <AuthLayout
       height="min-h-[500px]"
       brandIcon="🔐"
-   brandDescription="Thiết lập mật khẩu mới để bảo vệ tài khoản và tiếp tục trải nghiệm mua sắm thời trang cùng chúng tôi."
+      brandDescription="Thiết lập mật khẩu mới để bảo vệ tài khoản và tiếp tục trải nghiệm mua sắm thời trang cùng chúng tôi."
       arrow="‹"
     >
       <AuthHeader
-        title="New Password"
-        subtitle="Create a new password"
+        title="Mật khẩu mới"
+  subtitle="Thiết lập mật khẩu mới"
         activeStep={2}
       />
 
@@ -51,7 +51,7 @@ const ResetPasswordPage = () => {
           <Input
             variant="auth"
             type="password"
-            placeholder="Enter new password"
+              placeholder="Nhập mật khẩu mới"
             value={newPassword}
             onChange={e =>
               setNewPassword(e.target.value)
@@ -62,7 +62,7 @@ const ResetPasswordPage = () => {
           <Input
             variant="auth"
             type="password"
-            placeholder="Confirm new password"
+           placeholder="Xác nhận mật khẩu mới"
             value={confirmPassword}
             onChange={e =>
               setConfirmPassword(e.target.value)
@@ -80,16 +80,24 @@ const ResetPasswordPage = () => {
             disabled={loading}
             className="mt-2 w-full py-3 text-sm font-black tracking-wide"
           >
-            {loading
-              ? 'RESETTING...'
-              : 'RESET PASSWORD'}
+        {loading
+  ? 'ĐANG CẬP NHẬT...'
+  : 'ĐỔI MẬT KHẨU'}
           </Button>
         </form>
       )}
 
+      {message && (
+        <div className="mt-4 text-center">
+          <p className="text-sm text-slate-600">
+            Mật khẩu của bạn đã được cập nhật thành công.
+          </p>
+        </div>
+      )}
+
       <AuthFooter
-        text="Remembered your password?"
-        linkText="Back to Sign In"
+         text="Bạn đã nhớ mật khẩu?"
+  linkText="Quay lại đăng nhập"
         to="/login"
       />
     </AuthLayout>

@@ -14,7 +14,8 @@ export const useLogin = () => {
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [verificationRequired, setVerificationRequired] = useState(false);
+  const [verificationRequired, setVerificationRequired] =
+    useState(false);
   const [resending, setResending] = useState(false);
 
   const handleLogin = async e => {
@@ -24,7 +25,9 @@ export const useLogin = () => {
     setVerificationRequired(false);
 
     if (!username.trim()) {
-      setError('Vui lòng nhập Email hoặc Số điện thoại!');
+      setError(
+        'Vui lòng nhập Email hoặc Số điện thoại!'
+      );
       return;
     }
 
@@ -80,7 +83,9 @@ export const useLogin = () => {
 
   const handleVerifyEmail = async () => {
     const email = username.trim();
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    const emailRegex =
+      /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     if (!emailRegex.test(email)) {
       setError(
@@ -94,22 +99,35 @@ export const useLogin = () => {
 
     try {
       const response =
-        await authApi.resendVerificationEmail(email);
+        await authApi.resendVerificationEmail(
+          email
+        );
+
+      const verificationLink =
+        response?.data?.verificationLink;
+
+      if (!verificationLink) {
+        throw new Error(
+          'Không tìm thấy link xác thực.'
+        );
+      }
 
       toast.success(
         response?.data?.message ||
-        'Email xác thực đã được gửi!'
+        'Đã tạo link xác thực mới!'
       );
 
       navigate('/verify-email', {
         state: {
-          email
+          email,
+          verificationLink
         }
       });
     } catch (err) {
       const message =
+        err.response?.data?.message ||
         err.message ||
-        'Không thể gửi email xác thực!';
+        'Không thể tạo link xác thực!';
 
       setError(message);
       toast.error(message);

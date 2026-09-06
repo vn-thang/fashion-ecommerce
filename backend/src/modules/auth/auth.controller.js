@@ -28,22 +28,25 @@ const authController = {
     }
   },
 
-  resendVerificationEmail: async (req, res) => {
-    try {
-      const { email } = req.body;
+resendVerificationEmail: async (req, res) => {
+  try {
+    const { email } = req.body;
 
-      const result =
-        await authService.resendVerificationEmail(email);
+    const result =
+      await authService.resendVerificationEmail(email);
 
-      return sendSuccess(
-        res,
-        200,
-        result.message
-      );
-    } catch (error) {
-      return sendError(res, 400, error.message);
-    }
-  },
+    return sendSuccess(
+      res,
+      200,
+      result.message,
+      {
+        verificationLink: result.verificationLink
+      }
+    );
+  } catch (error) {
+    return sendError(res, 400, error.message);
+  }
+},
 
   login: async (req, res) => {
     try {
@@ -88,14 +91,25 @@ const authController = {
     }
   }, 
 
-  forgotPassword: async (req, res) => {
-    try {
-      const result = await authService.forgotPassword(req.body.email);
-      return sendSuccess(res, 200, 'Đã gửi email khôi phục mật khẩu!', result);
-    } catch (error) {
-      return sendError(res, 400, error.message);
-    }
-  },
+forgotPassword: async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    const result =
+      await authService.forgotPassword(email);
+
+    return sendSuccess(
+      res,
+      200,
+      result.message,
+      {
+        resetLink: result.resetLink
+      }
+    );
+  } catch (error) {
+    return sendError(res, 400, error.message);
+  }
+},
 
   resetPassword: async (req, res) => {
     try {

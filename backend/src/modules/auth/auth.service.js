@@ -28,7 +28,6 @@ const signResetToken = (userId) => {
 const authService = {
   
 register: async ({ fullName, email, password }) => {
-
   const existingUser =
     await authRepository.findUserByEmailOrPhone(email);
 
@@ -68,29 +67,12 @@ register: async ({ fullName, email, password }) => {
   const verifyLink =
     `${process.env.FRONTEND_URL}/verify-email?token=${token}`;
 
-  try {
-    await mailService.sendEmailVerificationEmail(
-      newUser.email,
-      verifyLink
-    );
-
-  } catch (error) {
-    console.error('10. GỬI EMAIL THẤT BẠI:', error);
-
-    await authRepository.deleteEmailVerificationToken(
-      tokenHash
-    );
-
-    throw new Error(
-      'Không thể gửi email xác thực. Vui lòng thử lại sau.'
-    );
-  }
-
   return {
     id: newUser.id,
     email: newUser.email,
     message:
-      'Đăng ký thành công! Vui lòng kiểm tra email để xác thực tài khoản.'
+      'Đăng ký thành công! Vui lòng xác thực tài khoản.',
+    verificationLink: verifyLink
   };
 },
 
@@ -153,70 +135,55 @@ register: async ({ fullName, email, password }) => {
   },
 
   resendVerificationEmail: async email => {
-    const user =
-      await authRepository.findUserByEmailOrPhone(email);
+  const user =
+    await authRepository.findUserByEmailOrPhone(email);
 
-    if (!user) {
-      throw new Error(
-        'Email này không tồn tại trên hệ thống!'
-      );
-    }
-    if (!user.isActive) {
-      throw new Error(
-        MESSAGES.ACCOUNT_LOCKED
-      );
-    }
-    if (user.emailVerified) {
-      throw new Error(
-        'Email của tài khoản này đã được xác thực!'
-      );
-    }
-    await authRepository.deleteEmailVerificationTokensByUserId(
-      user.id
+  if (!user) {
+    throw new Error(
+      'Email này không tồn tại trên hệ thống!'
     );
-    const {
-      token,
-      tokenHash
-    } = generateEmailVerificationToken();
+  }
 
-    const expiresAt = new Date(
-      Date.now() + 15 * 60 * 1000
+  if (!user.isActive) {
+    throw new Error(
+      MESSAGES.ACCOUNT_LOCKED
     );
+  }
 
-    await authRepository.createEmailVerificationToken({
-      userId: user.id,
-      tokenHash,
-      expiresAt
-    });
+  if (user.emailVerified) {
+    throw new Error(
+      'Email của tài khoản này đã được xác thực!'
+    );
+  }
 
-    const verifyLink =
-      `${process.env.FRONTEND_URL}/verify-email?token=${token}`;
+  await authRepository.deleteEmailVerificationTokensByUserId(
+    user.id
+  );
 
-    try {
-      await mailService.sendEmailVerificationEmail(
-        user.email,
-        verifyLink
-      );
-    } catch (error) {
-      console.error(
-        '❌ Gửi lại email xác thực thất bại:',
-        error
-      );
+  const {
+    token,
+    tokenHash
+  } = generateEmailVerificationToken();
 
-      await authRepository.deleteEmailVerificationToken(
-        tokenHash
-      );
+  const expiresAt = new Date(
+    Date.now() + 15 * 60 * 1000
+  );
 
-      throw new Error(
-        'Không thể gửi email xác thực. Vui lòng thử lại sau.'
-      );
-    }
+  await authRepository.createEmailVerificationToken({
+    userId: user.id,
+    tokenHash,
+    expiresAt
+  });
 
-    return {
-      message:
-        'Email xác thực mới đã được gửi. Vui lòng kiểm tra hộp thư của bạn.'
-    };
-  },
+  const verifyLink =
+    `${process.env.FRONTEND_URL}/verify-email?token=${token}`;
+
+  return {
+    message:
+      'Đã tạo link xác thực mới.',
+    verificationLink: verifyLink
+  };
+},
 
   login: async (username, password) => {
     const user =
@@ -286,18 +253,26 @@ register: async ({ fullName, email, password }) => {
 
 
 forgotPassword: async email => {
-  const user = await authRepository.findUserByEmailOrPhone(email);
+  const user =
+    await authRepository.findUserByEmailOrPhone(email);
 
   if (!user) {
-    throw new Error('Email này không tồn tại trên hệ thống!');
+    throw new Error(
+      'Email này không tồn tại trên hệ thống!'
+    );
   }
 
   if (!user.isActive) {
-    throw new Error('Tài khoản hiện đang bị khóa!');
+    throw new Error(
+      'Tài khoản hiện đang bị khóa!'
+    );
   }
 
-  const { token, tokenHash } =
-    generatePasswordResetToken();
+  const {
+    token,
+    tokenHash
+  } = generatePasswordResetToken();
+
   await otpRedis.setResetToken(
     tokenHash,
     user.id
@@ -306,25 +281,10 @@ forgotPassword: async email => {
   const resetLink =
     `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
 
-  try {
-    await mailService.sendPasswordResetEmail(
-      user.email,
-      resetLink
-    );
-  } catch (error) {
-    console.error(
-      '❌ Gửi email reset password thất bại:',
-      error
-    );
-    await otpRedis.deleteResetToken(tokenHash);
-    throw new Error(
-      'Không thể gửi email khôi phục mật khẩu. Vui lòng kiểm tra cấu hình email.'
-    );
-  }
-
   return {
     message:
-      'Link đặt lại mật khẩu đã được gửi vào email của bạn!'
+      'Đã tạo link đặt lại mật khẩu. Vui lòng sử dụng link bên dưới.',
+    resetLink
   };
 },
 

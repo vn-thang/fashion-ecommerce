@@ -1,20 +1,14 @@
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 
-const transporter = nodemailer.createTransport({
-  host: process.env.MAIL_HOST,
-  port: Number(process.env.MAIL_PORT),
-  secure: false,
-  auth: {
-    user: process.env.MAIL_USER,
-    pass: process.env.MAIL_PASSWORD
-  }
-});
+const resend = new Resend(process.env.RESEND_API_KEY);
+
+const from = process.env.MAIL_FROM || 'onboarding@resend.dev';
 
 const sendPasswordResetEmail = async (email, resetLink) => {
   try {
-    const info = await transporter.sendMail({
-      from: `"Fashion Ecommerce" <${process.env.MAIL_USER}>`,
-      to: email,
+    const { data, error } = await resend.emails.send({
+      from: `"FashionHub" <${from}>`,
+      to: [email],
       subject: 'Đặt lại mật khẩu - FashionHub',
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto;">
@@ -64,14 +58,17 @@ const sendPasswordResetEmail = async (email, resetLink) => {
       `
     });
 
-    return info;
+    if (error) {
+      console.error('❌ Resend error:', error);
+      throw new Error(error.message);
+    }
+
+    console.log('✅ Password reset email sent:', data);
+
+    return data;
   } catch (error) {
-    console.error('❌ Nodemailer error:', {
-      message: error.message,
-      code: error.code,
-      response: error.response,
-      responseCode: error.responseCode,
-      command: error.command
+    console.error('❌ Gửi email đặt lại mật khẩu thất bại:', {
+      message: error.message
     });
 
     throw error;
@@ -83,9 +80,9 @@ const sendEmailVerificationEmail = async (
   verifyLink
 ) => {
   try {
-    const info = await transporter.sendMail({
-      from: `"FashionHub" <${process.env.MAIL_USER}>`,
-      to: email,
+    const { data, error } = await resend.emails.send({
+      from: `"FashionHub" <${from}>`,
+      to: [email],
       subject: 'Xác thực tài khoản - FashionHub',
       html: `
         <div style="
@@ -149,16 +146,19 @@ const sendEmailVerificationEmail = async (
       `
     });
 
-    return info;
+    if (error) {
+      console.error('❌ Resend error:', error);
+      throw new Error(error.message);
+    }
+
+    console.log('✅ Verification email sent:', data);
+
+    return data;
   } catch (error) {
     console.error(
       '❌ Gửi email xác thực thất bại:',
       {
-        message: error.message,
-        code: error.code,
-        response: error.response,
-        responseCode: error.responseCode,
-        command: error.command
+        message: error.message
       }
     );
 

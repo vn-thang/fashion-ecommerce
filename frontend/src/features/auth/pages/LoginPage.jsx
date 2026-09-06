@@ -34,8 +34,8 @@ const LoginPage = () => {
       arrow="‹"
     >
       <AuthHeader
-        title="Welcome Back!"
-        subtitle="Sign in to continue"
+      title="Chào mừng trở lại!"
+      subtitle="Đăng nhập để tiếp tục"
         activeStep={2}
       />
 
@@ -76,14 +76,14 @@ const LoginPage = () => {
               disabled={loading || resending}
               className="h-3.5 w-3.5 accent-[#c36374]"
             />
-            Remember me
+            Ghi nhớ đăng nhập
           </label>
 
           <Link
             to="/forgot-password"
             className="transition hover:text-[#c36374] hover:underline"
           >
-            Forgot Password?
+              Quên mật khẩu?
           </Link>
         </div>
 
@@ -93,45 +93,45 @@ const LoginPage = () => {
           disabled={loading || resending}
           className="mt-2 w-full py-3 text-sm font-black tracking-wide"
         >
-          {loading ? 'SIGNING IN...' : 'LOGIN'}
+          {loading ? 'ĐANG ĐĂNG NHẬP...' : 'ĐĂNG NHẬP'}
         </Button>
       </form>
 
-      {verificationRequired && (
-        <div className="mt-4 rounded-2xl border border-amber-100 bg-amber-50/70 p-4">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-lg shadow-sm">
-              ✉
-            </div>
+{verificationRequired && (
+  <div className="mt-4 rounded-2xl border border-amber-100 bg-amber-50/70 p-4">
+    <div className="flex items-center gap-3">
+      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-lg shadow-sm">
+        ✉
+      </div>
 
-            <div className="min-w-0 flex-1">
-              <p className="text-xs font-bold text-slate-700">
-                Email chưa được xác thực
-              </p>
+      <div className="min-w-0 flex-1">
+        <p className="text-xs font-bold text-slate-700">
+          Email chưa được xác thực
+        </p>
 
-              <p className="mt-1 text-[10px] leading-relaxed text-slate-500">
-                Xác thực email để kích hoạt tài khoản của bạn.
-              </p>
-            </div>
-          </div>
+        <p className="mt-1 text-[10px] leading-relaxed text-slate-500">
+          Xác thực email để kích hoạt tài khoản của bạn.
+        </p>
+      </div>
+    </div>
 
-          <Button
-            type="button"
-            variant="auth"
-            onClick={handleVerifyEmail}
-            disabled={resending}
-            className="mt-3 w-full py-2.5 text-xs font-black tracking-wide"
-          >
-            {resending
-              ? 'ĐANG GỬI EMAIL...'
-              : 'XÁC THỰC EMAIL'}
-          </Button>
-        </div>
-      )}
+    <Button
+      type="button"
+      variant="auth"
+      onClick={handleVerifyEmail}
+      disabled={resending}
+      className="mt-3 w-full py-2.5 text-xs font-black tracking-wide"
+    >
+      {resending
+        ? 'ĐANG TẠO LINK...'
+        : 'XÁC THỰC EMAIL'}
+    </Button>
+  </div>
+)}
 
       <AuthFooter
-        text="Don't have an account?"
-        linkText="Register"
+         text="Chưa có tài khoản?"
+  linkText="Đăng ký"
         to="/register"
       />
     </AuthLayout>
