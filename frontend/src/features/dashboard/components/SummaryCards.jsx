@@ -125,18 +125,18 @@ const SummaryCards = ({ summary }) => {
 
               <div className="flex-1">
 
-                <p className="text-sm font-medium text-gray-500">
+                <p className="text-xs font-medium text-gray-500">
                   {card.title}
                 </p>
 
-                <h3 className="mt-3 break-words text-2xl font-bold text-slate-800">
+                <h3 className="mt-3 break-words text-xl font-bold text-slate-800">
                   {card.isMoney
                     ? formatMoney(summary?.[card.key])
                     : summary?.[card.key] ?? 0}
                 </h3>
 
                 {card.path && (
-                  <div className="mt-4 flex items-center gap-1 text-sm font-medium text-indigo-600 opacity-0 transition-all duration-300 group-hover:opacity-100">
+                  <div className="mt-4 flex items-center gap-1 text-xs font-medium text-indigo-600 opacity-0 transition-all duration-300 group-hover:opacity-100">
                     <span>Xem chi tiết</span>
 
                     <ChevronRight
@@ -149,13 +149,13 @@ const SummaryCards = ({ summary }) => {
 
               <div
                 className={`
-                  flex h-14 w-14 items-center justify-center rounded-2xl
+                  flex h-10 w-10 items-center justify-center rounded-xl
                   ${card.color}
                   transition-transform duration-300
                   group-hover:scale-110
                 `}
               >
-                <Icon size={26} />
+                <Icon size={24} />
               </div>
             </div>
           </div>

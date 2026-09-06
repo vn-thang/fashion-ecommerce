@@ -26,11 +26,11 @@ const BannerCard = ({
         <div className="flex justify-between items-start">
           <div>
 
-            <h3 className="font-bold text-lg text-slate-800">
+            <h3 className="font-bold text-sm text-slate-800">
               {banner.title || 'Không có tiêu đề'}
             </h3>
 
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-xs text-gray-500 mt-1">
               {banner.description || 'Không có mô tả'}
             </p>
 
@@ -47,7 +47,7 @@ const BannerCard = ({
           </span>
         </div>
 
-        <div className="flex justify-between text-sm text-gray-500">
+        <div className="flex justify-between text-xs text-gray-500">
 
           <span>
             Thứ tự: <b>{banner.displayOrder}</b>

@@ -72,11 +72,11 @@ const UserStatusModal = ({
             className="w-20 h-20 rounded-full object-cover border-4 border-white shadow-md"
           />
 
-          <h3 className="mt-3 text-lg font-bold text-slate-800">
+          <h3 className="mt-3 text-sm font-bold text-slate-800">
             {user.fullName || 'Chưa cập nhật'}
           </h3>
 
-          <p className="text-sm text-gray-500">
+          <p className="text-xs text-gray-500">
             {user.email}
           </p>
         </div>
@@ -99,7 +99,7 @@ const UserStatusModal = ({
               : 'Bạn sắp mở khóa tài khoản này'}
           </h4>
 
-          <p className="mt-3 text-sm leading-6 text-gray-600">
+          <p className="mt-3 text-xs leading-6 text-gray-600">
             {willLock
               ? 'Khách hàng sẽ không thể đăng nhập, đặt hàng hoặc sử dụng bất kỳ chức năng nào của hệ thống cho đến khi tài khoản được mở khóa.'
               : 'Khách hàng sẽ có thể đăng nhập và tiếp tục sử dụng tất cả các chức năng của hệ thống.'}

@@ -280,6 +280,7 @@ getBrandRevenue: async (startDate, endDate) => {
 
     ORDER BY
       "revenue" DESC;
+    LIMIT 5;
   `;
 },
 
@@ -323,6 +324,7 @@ getCategoryRevenue: async (startDate, endDate) => {
 
     ORDER BY
       "revenue" DESC;
+    LIMIT 5;
   `;
 }
 };

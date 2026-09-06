@@ -30,26 +30,26 @@ const HomePage = () => {
         banners={banners}
       />
 
-    <section className="relative overflow-hidden rounded-xl border border-orange-100 bg-gradient-to-br from-orange-50 via-white to-orange-50 py-16 text-center shadow-sm">
-      <div className="pointer-events-none absolute -left-12 -top-12 h-32 w-32 rounded-full bg-orange-200/30 blur-2xl" />
-      <div className="pointer-events-none absolute -bottom-16 -right-10 h-40 w-40 rounded-full bg-orange-100/50 blur-2xl" />
+<section className="relative overflow-hidden rounded-xl border border-orange-100 bg-gradient-to-r from-orange-50 via-white to-orange-50 px-6 py-10 text-center shadow-sm sm:py-12">
+  <div className="pointer-events-none absolute -left-10 top-1/2 h-24 w-24 -translate-y-1/2 rounded-full bg-orange-200/30 blur-2xl" />
+  <div className="pointer-events-none absolute -right-10 top-1/2 h-28 w-28 -translate-y-1/2 rounded-full bg-orange-100/40 blur-2xl" />
 
-      <div className="relative">
-        <span className="inline-block rounded-full bg-orange-100 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-[#ee4d2d]">
-          FashionHub
-        </span>
+  <div className="relative mx-auto max-w-3xl">
+    <span className="inline-flex rounded-full bg-orange-100 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#ee4d2d]">
+      FashionHub
+    </span>
 
-        <h2 className="mt-4 text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
-          Phong cách riêng,
-          <span className="text-[#ee4d2d]"> dấu ấn riêng.</span>
-        </h2>
+    <h2 className="mt-3 text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">
+      Phong cách riêng,
+      <span className="text-[#ee4d2d]"> dấu ấn riêng.</span>
+    </h2>
 
-        <p className="mx-auto mt-4 max-w-2xl px-4 text-base leading-7 text-gray-500 sm:text-lg">
-          Khám phá những xu hướng thời trang mới nhất,
-          được tuyển chọn để đồng hành cùng phong cách của bạn.
-        </p>
-      </div>
-    </section>
+    <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-gray-500 sm:text-base">
+      Khám phá những xu hướng thời trang mới nhất,
+      được tuyển chọn để đồng hành cùng phong cách của bạn.
+    </p>
+  </div>
+</section>
 
       {loading ? (
         <FlashSaleSkeleton />

@@ -28,8 +28,8 @@ const ProfileInfo = ({ user, onSave, isSubmitLoading }) => {
   return (
     <div className="text-left">
       <div className="border-b border-gray-100 pb-4 mb-6">
-        <h3 className="text-lg font-medium text-gray-800">Hồ sơ của tôi</h3>
-        <p className="text-sm text-gray-500 mt-0.5">Quản lý thông tin hồ sơ để bảo mật tài khoản</p>
+        <h3 className="text-sm font-medium text-gray-800">Hồ sơ của tôi</h3>
+        <p className="text-xs text-gray-500 mt-0.5">Quản lý thông tin hồ sơ để bảo mật tài khoản</p>
       </div>
       <form onSubmit={handleSubmit} className="flex flex-col-reverse md:flex-row gap-8">
     

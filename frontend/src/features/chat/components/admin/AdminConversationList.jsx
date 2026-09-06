@@ -63,7 +63,7 @@ return (
     <div className="border-b border-gray-100 px-4 pb-3 pt-4 sm:px-5 sm:pb-4 sm:pt-5">
       <div className="mb-3 flex items-center justify-between sm:mb-4">
         <div className="min-w-0">
-          <h2 className="text-base font-bold tracking-tight text-gray-800 sm:text-lg">
+          <h2 className="text-base font-bold tracking-tight text-gray-800 sm:text-sm">
             Tin nhắn
           </h2>
 
@@ -117,7 +117,7 @@ return (
 
     <div className="min-h-0 flex-1 overflow-y-auto">
       {loading && !conversations.length ? (
-        <div className="flex h-32 items-center justify-center px-4 text-center text-sm text-gray-400">
+        <div className="flex h-32 items-center justify-center px-4 text-center text-xs text-gray-400">
           Đang tải cuộc trò chuyện...
         </div>
       ) : conversations.length === 0 ? (
@@ -138,7 +138,7 @@ return (
             </svg>
           </div>
 
-          <p className="text-sm font-medium text-gray-600">
+          <p className="text-xs font-medium text-gray-600">
             Không có cuộc trò chuyện
           </p>
 
@@ -185,7 +185,7 @@ return (
                       className="h-11 w-11 rounded-full object-cover sm:h-12 sm:w-12"
                     />
                   ) : (
-                    <div className="flex h-11 w-11 items-center justify-center rounded-full bg-indigo-100 text-sm font-bold text-indigo-600 sm:h-12 sm:w-12">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-full bg-indigo-100 text-xs font-bold text-indigo-600 sm:h-12 sm:w-12">
                       {getInitial(item.customer?.fullName)}
                     </div>
                   )}
@@ -200,7 +200,7 @@ return (
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center justify-between gap-2">
                     <p
-                      className={`min-w-0 truncate text-sm ${
+                      className={`min-w-0 truncate text-xs ${
                         hasUnread
                           ? 'font-bold text-gray-900'
                           : isSelected

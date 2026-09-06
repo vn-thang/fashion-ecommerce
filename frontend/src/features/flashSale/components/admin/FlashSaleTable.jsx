@@ -16,10 +16,10 @@ const FlashSaleTable = ({
   if (!flashSales.length) {
     return (
       <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-12 text-center">
-        <h3 className="text-lg font-semibold text-slate-700">
+        <h3 className="text-sm font-semibold text-slate-700">
           Chưa có chương trình Flash Sale nào
         </h3>
-        <p className="text-sm text-gray-500 mt-2">
+        <p className="text-xs text-gray-500 mt-2">
           Hãy tạo Flash Sale đầu tiên.
         </p>
       </div>
@@ -62,7 +62,7 @@ const FlashSaleTable = ({
                   </div>
                 </td>
                 <td className="px-6 py-5 text-center">
-                  <div className="text-sm">
+                  <div className="text-xs">
                     <div>
                       {new Date(item.startDate).toLocaleString('vi-VN')}
                     </div>

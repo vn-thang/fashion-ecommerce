@@ -47,12 +47,12 @@ const MyOrderItem = ({ order, formatPrice, onCancel, onReviewClick, onRetryPayme
 return (
   <div className="mb-4 overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm">
     <div className="flex flex-col gap-2 border-b border-gray-100 p-4 sm:flex-row sm:items-center sm:justify-between">
-      <span className="truncate text-sm font-semibold text-gray-800">
+      <span className="truncate text-xs font-semibold text-gray-800">
         Mã đơn: {order.orderNumber || order.id}
       </span>
 
       <span
-        className={`shrink-0 text-xs font-bold uppercase sm:text-sm ${statusConfig.color}`}
+        className={`shrink-0 text-xs font-bold uppercase sm:text-xs ${statusConfig.color}`}
       >
         {statusConfig.label}
       </span>
@@ -90,7 +90,7 @@ return (
               className="h-16 w-16 shrink-0 rounded-lg border border-gray-100 object-cover sm:h-20 sm:w-20"
             />
 
-            <div className="flex min-w-0 flex-1 flex-col justify-between text-sm">
+            <div className="flex min-w-0 flex-1 flex-col justify-between text-xs">
               <div className="min-w-0">
                 <h4 className="line-clamp-2 font-medium text-gray-800">
                   {item.productName || product.name || 'Sản phẩm'}
@@ -125,10 +125,10 @@ return (
     </div>
 
     <div className="flex flex-col gap-4 bg-gray-50/50 p-4 sm:flex-row sm:items-center sm:justify-between">
-      <div className="flex items-center justify-between gap-2 text-sm text-gray-600 sm:justify-start">
+      <div className="flex items-center justify-between gap-2 text-xs text-gray-600 sm:justify-start">
         <span>Thành tiền:</span>
 
-        <span className="text-lg font-bold text-[#ee4d2d] sm:text-xl">
+        <span className="text-sm font-bold text-[#ee4d2d] sm:text-lg">
           {formatPrice(order.totalAmount)}
         </span>
       </div>

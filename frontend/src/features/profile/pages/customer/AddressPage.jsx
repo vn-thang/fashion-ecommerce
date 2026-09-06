@@ -18,7 +18,7 @@ const AddressPage = () => {
     <div className="w-full">
       <div className="flex justify-between items-center border-b border-gray-100 pb-5 mb-5">
         <div>
-          <h2 className="text-xl font-semibold text-gray-800">Địa chỉ của tôi</h2>
+          <h2 className="text-lg font-semibold text-gray-800">Địa chỉ của tôi</h2>
           <p className="text-sm text-gray-500 mt-1">Quản lý thông tin nhận hàng</p>
         </div>
         <Button 

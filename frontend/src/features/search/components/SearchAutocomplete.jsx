@@ -8,7 +8,7 @@ const SearchAutocomplete = ({
   if (loading) {
     return (
       <div className="absolute top-full mt-1 w-full rounded-md border bg-white shadow-lg z-50">
-        <div className="px-4 py-3 text-sm text-gray-400">
+        <div className="px-4 py-3 text-xs text-gray-400">
           Đang tìm kiếm...
         </div>
       </div>
@@ -18,7 +18,7 @@ const SearchAutocomplete = ({
   if (suggestions.length === 0) {
     return (
       <div className="absolute top-full mt-1 w-full rounded-md border bg-white shadow-lg z-50">
-        <div className="px-4 py-3 text-sm text-gray-400">
+        <div className="px-4 py-3 text-xs text-gray-400">
           Không có gợi ý
         </div>
       </div>
@@ -36,7 +36,7 @@ const SearchAutocomplete = ({
           key={item}
           type="button"
           onClick={() => onSelect(item)}
-          className="flex w-full items-center gap-3 px-4 py-3 text-left text-sm text-gray-700 hover:bg-gray-50"
+          className="flex w-full items-center gap-3 px-4 py-3 text-left text-xs text-gray-700 hover:bg-gray-50"
         >
           <span>🔍</span>
           <span className="truncate">{item}</span>

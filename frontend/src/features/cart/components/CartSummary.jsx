@@ -12,7 +12,7 @@ const CartSummary = ({ summaryData, formatPrice }) => {
 
   return (
     <div className="w-full lg:w-80 h-fit bg-white rounded-lg shadow-sm p-6 sticky top-24">
-      <h3 className="text-lg font-medium text-gray-800 mb-4 border-b pb-4">Tóm tắt đơn hàng</h3>
+      <h3 className="text-sm font-medium text-gray-800 mb-4 border-b pb-4">Tóm tắt đơn hàng</h3>
       
       <div className="flex justify-between items-center mb-4 text-gray-600">
         <span>Tổng số lượng:</span>
@@ -21,7 +21,7 @@ const CartSummary = ({ summaryData, formatPrice }) => {
       
       <div className="flex justify-between items-center mb-6 text-gray-800">
         <span className="font-medium">Tạm tính:</span>
-        <span className="text-xl font-bold text-[#ee4d2d]">{formatPrice(totalPrice)}</span>
+        <span className="text-sm font-bold text-[#ee4d2d]">{formatPrice(totalPrice)}</span>
       </div>
 
       <Button 

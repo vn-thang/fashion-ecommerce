@@ -118,7 +118,7 @@ const OrderStatusChart = ({
             {chartData.map((item, index) => (
               <div
                 key={item.name}
-                className="flex items-center gap-2 text-sm"
+                className="flex items-center gap-2 text-xs"
               >
                 <span
                   className="h-3 w-3 rounded-full"

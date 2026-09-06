@@ -4,7 +4,7 @@ const ShippingAddress = ({ order }) => {
   return (
     <div>
       <h2 className="text-base font-semibold text-gray-800 mb-2">Địa chỉ nhận hàng</h2>
-      <div className="text-sm text-gray-600 space-y-1.5">
+      <div className="text-xs text-gray-600 space-y-1.5">
         <p>
           <span className="font-semibold text-gray-800">{order.receiverName}</span> | {order.phoneNumber}
         </p>

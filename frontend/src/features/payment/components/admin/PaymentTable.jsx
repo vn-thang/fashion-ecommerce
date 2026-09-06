@@ -143,7 +143,7 @@ const PaymentTable = ({
                       </div>
                     </td>
 
-                    <td className="px-4 py-4 text-sm text-gray-600">
+                    <td className="px-4 py-4 text-xs text-gray-600">
                       {payment.order?.user?.email}
                     </td>
 

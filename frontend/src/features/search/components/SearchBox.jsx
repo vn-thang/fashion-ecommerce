@@ -92,7 +92,7 @@ const SearchBox = () => {
   return (
     <div
       ref={containerRef}
-      className="relative w-full max-w-2xl"
+      className="relative w-full max-w-xl"
     >
       <form
         onSubmit={handleSubmit}
@@ -107,7 +107,7 @@ const SearchBox = () => {
           onFocus={() => setIsFocused(true)}
           placeholder="Tìm kiếm sản phẩm..."
           className="
-            h-11
+            h-10
             w-full
             rounded-md
             border
@@ -115,7 +115,7 @@ const SearchBox = () => {
             bg-white
             pl-4
             pr-12
-            text-sm
+            text-xs
             text-gray-700
             outline-none
             transition-all
@@ -132,8 +132,8 @@ const SearchBox = () => {
     right-0
     top-0
     flex
-    h-11
-    w-12
+    h-10
+    w-10
     items-center
     justify-center
     rounded-r-md

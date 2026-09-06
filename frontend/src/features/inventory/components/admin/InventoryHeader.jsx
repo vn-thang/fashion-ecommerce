@@ -8,7 +8,7 @@ const InventoryHeader = ({
   return (
     <div className="flex items-center justify-between bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-800">
+        <h1 className="text-xl font-bold text-gray-800">
           Quản lý kho
         </h1>
 

@@ -139,7 +139,7 @@ const NotificationDetailModal = ({
               )}
             </div>
             <div className="min-w-0 flex-1">
-              <h2 className="text-lg font-bold text-gray-900">
+              <h2 className="text-sm font-bold text-gray-900">
                 {notification.title}
               </h2>
               <p className="mt-1 text-xs text-gray-400">
@@ -150,7 +150,7 @@ const NotificationDetailModal = ({
             </div>
           </div>
           <div className="rounded-xl bg-gray-50 p-4">
-            <p className="whitespace-pre-wrap text-sm leading-7 text-gray-700">
+            <p className="whitespace-pre-wrap text-xs leading-7 text-gray-700">
               {notification.content}
             </p>
           </div>

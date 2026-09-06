@@ -44,7 +44,7 @@ const DeleteBannerModal = ({
 
         </p>
 
-        <p className="text-center text-sm text-rose-500">
+        <p className="text-center text-xs text-rose-500">
 
           Hành động này không thể hoàn tác.
 

@@ -25,7 +25,7 @@ const BannerPreviewModal = ({
 
       <div className="mt-6 space-y-3">
         <div>
-          <h2 className="font-bold text-xl">
+          <h2 className="font-bold text-sm">
             {banner.title}
           </h2>
         </div>
@@ -35,12 +35,12 @@ const BannerPreviewModal = ({
         </p>
 
         <div className="flex gap-3">
-          <span className="px-3 py-1 rounded-full bg-indigo-100 text-indigo-700 text-sm">
+          <span className="px-3 py-1 rounded-full bg-indigo-100 text-indigo-700 text-xs">
             Thứ tự: {banner.displayOrder}
           </span>
 
           <span
-            className={`px-3 py-1 rounded-full text-sm ${
+            className={`px-3 py-1 rounded-full text-xs ${
               banner.isActive
                 ? 'bg-emerald-100 text-emerald-700'
                 : 'bg-gray-200 text-gray-700'

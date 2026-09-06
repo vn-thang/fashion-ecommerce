@@ -53,7 +53,7 @@ const FlashSaleForm = ({
     >
       <div className="space-y-5 py-2">
         <div>
-          <label className="block mb-2 text-sm font-semibold text-gray-700">
+          <label className="block mb-2 text-xs font-semibold text-gray-700">
             Tên chương trình
           </label>
 
@@ -66,7 +66,7 @@ const FlashSaleForm = ({
           />
         </div>
         <div>
-          <label className="block mb-2 text-sm font-semibold text-gray-700">
+          <label className="block mb-2 text-xs font-semibold text-gray-700">
             Thời gian bắt đầu
           </label>
 
@@ -79,7 +79,7 @@ const FlashSaleForm = ({
           />
         </div>
         <div>
-          <label className="block mb-2 text-sm font-semibold text-gray-700">
+          <label className="block mb-2 text-xs font-semibold text-gray-700">
             Thời gian kết thúc
           </label>
           <input
@@ -95,7 +95,7 @@ const FlashSaleForm = ({
             <p className="font-semibold text-gray-800">
               Kích hoạt chương trình
             </p>
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-xs text-gray-500 mt-1">
               Nếu tắt, chương trình sẽ không được áp dụng.
             </p>
           </div>

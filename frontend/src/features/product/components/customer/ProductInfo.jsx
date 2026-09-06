@@ -41,7 +41,7 @@ const ProductInfo = ({
   const renderPrice = () => {
     if (!isFlashSale) {
       return (
-        <div className="text-3xl font-medium text-[#ee4d2d]">
+        <div className="text-2xl font-medium text-[#ee4d2d]">
           {formatDisplayPrice(displayPrice)}
         </div>
       );
@@ -49,7 +49,7 @@ const ProductInfo = ({
 
     return (
       <div className="flex flex-wrap items-end gap-3">
-        <div className="text-3xl font-semibold text-[#ee4d2d]">
+        <div className="text-2xl font-semibold text-[#ee4d2d]">
           {formatDisplayPrice(displayPrice)}
         </div>
 
@@ -81,7 +81,7 @@ const ProductInfo = ({
       </span>
     </div>
 
-      <h1 className="text-xl md:text-2xl font-medium text-gray-800 leading-8 mb-3">
+      <h1 className="text-xl md:text-xl font-medium text-gray-800 leading-8 mb-3">
         <span className="bg-[#ee4d2d] text-white text-xs px-2 py-1 rounded-sm mr-2 font-semibold">
           Yêu thích
         </span>
@@ -134,7 +134,7 @@ const ProductInfo = ({
                     setSelectedColor(prev =>
                       prev === color ? null : color
                     )}
-                  className={`px-4 py-2 border rounded text-sm transition ${
+                  className={`px-4 py-2 border rounded text-xs transition ${
                     selectedColor === color
                       ? 'border-[#ee4d2d] text-[#ee4d2d]'
                       : 'border-gray-300 hover:border-[#ee4d2d]'
@@ -161,7 +161,7 @@ const ProductInfo = ({
                   setSelectedSize(prev =>
                     prev === size ? null : size
                   )}
-                  className={`px-4 py-2 border rounded text-sm transition ${
+                  className={`px-4 py-2 border rounded text-xs transition ${
                     selectedSize === size
                       ? 'border-[#ee4d2d] text-[#ee4d2d]'
                       : 'border-gray-300 hover:border-[#ee4d2d]'
@@ -182,7 +182,7 @@ const ProductInfo = ({
           <div className="flex items-center">
             <button
               onClick={() => handleQuantityChange('minus')}
-              className="w-8 h-8 border"
+              className="w-8 h-7 border"
             >
               -
             </button>
@@ -190,12 +190,12 @@ const ProductInfo = ({
             <input
               readOnly
               value={quantity}
-              className="w-12 h-8 border-y text-center"
+              className="w-10 h-7 border-y text-center"
             />
 
             <button
               onClick={() => handleQuantityChange('plus')}
-              className="w-8 h-8 border"
+              className="w-8 h-7 border"
             >
               +
             </button>
@@ -210,14 +210,14 @@ const ProductInfo = ({
       <div className="flex gap-4">
         <button
           onClick={handleAddToCart}
-          className="h-12 px-6 border border-[#ee4d2d] bg-[#ffeee8] text-[#ee4d2d] rounded hover:bg-[#ffe3d8]"
+          className="h-10 px-6 border border-[#ee4d2d] bg-[#ffeee8] text-[#ee4d2d] rounded hover:bg-[#ffe3d8]"
         >
           🛒 Thêm vào giỏ hàng
         </button>
 
         <button
           onClick={handleBuyNow}
-          className="h-12 w-40 bg-[#ee4d2d] text-white rounded hover:bg-[#d74123]"
+          className="h-10 w-40 bg-[#ee4d2d] text-white rounded hover:bg-[#d74123]"
         >
           Mua ngay
         </button>

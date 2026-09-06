@@ -26,7 +26,7 @@ const ReturnPage = () => {
   return (
     <div className="mx-auto max-w-[1200px] space-y-6 animate-fadeIn">
       <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
-        <h1 className="text-2xl font-bold tracking-tight text-slate-800">
+        <h1 className="text-xl font-bold tracking-tight text-slate-800">
           Yêu cầu trả hàng
         </h1>
         <p className="mt-1 text-sm text-gray-500">

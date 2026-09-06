@@ -5,7 +5,7 @@ const StoreSettingHeader = ({ onSave, saving }) => {
   return (
     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-gray-200/60 pb-5">
       <div>
-        <h1 className="text-2xl font-bold text-slate-800 tracking-tight">
+        <h1 className="text-xl font-bold text-slate-800 tracking-tight">
           Thông tin cửa hàng
         </h1>
         <p className="text-sm text-gray-500 mt-1">

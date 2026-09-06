@@ -15,7 +15,7 @@ const ChangePassword = () => {
   return (
     <div className="text-left max-w-xl">
       <div className="border-b border-gray-100 pb-4 mb-6">
-        <h3 className="text-lg font-medium text-gray-800">
+        <h3 className="text-sm font-medium text-gray-800">
           Đổi mật khẩu
         </h3>
 
@@ -30,7 +30,7 @@ const ChangePassword = () => {
         className="space-y-4"
       >
         {error && (
-          <div className="p-3 bg-rose-50 text-rose-500 rounded-lg text-sm font-medium">
+          <div className="p-3 bg-rose-50 text-rose-500 rounded-lg text-xs font-medium">
             ⚠️ {error}
           </div>
         )}

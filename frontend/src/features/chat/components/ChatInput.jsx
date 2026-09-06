@@ -128,7 +128,7 @@ const ChatInput = ({
           )}
 
           <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-medium text-gray-700">
+            <p className="truncate text-xs font-medium text-gray-700">
               {file.name}
             </p>
             <p className="text-xs text-gray-400">
@@ -188,7 +188,7 @@ const ChatInput = ({
           }
           disabled={disabled || !!file}
           rows={1}
-          className="max-h-24 min-h-[38px] flex-1 resize-none bg-transparent py-2 text-sm text-gray-800 outline-none placeholder:text-gray-400 disabled:opacity-50"
+          className="max-h-24 min-h-[38px] flex-1 resize-none bg-transparent py-2 text-xs text-gray-800 outline-none placeholder:text-gray-400 disabled:opacity-50"
         />
 
         <button

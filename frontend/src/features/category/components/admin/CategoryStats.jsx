@@ -8,12 +8,12 @@ const StatCard = ({
 }) => (
   <div className="flex items-center justify-between rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
     <div>
-      <p className="text-xs font-bold uppercase tracking-wider text-slate-400">
+      <p className="text-xs font-bold tracking-wider text-slate-400">
         {title}
       </p>
 
       <h3
-        className={`mt-2 text-3xl font-extrabold ${color}`}
+        className={`mt-2 text-xl font-extrabold ${color}`}
       >
         {value}
       </h3>

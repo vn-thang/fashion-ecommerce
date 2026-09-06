@@ -51,7 +51,7 @@ const CustomerChat = ({
 }) => {
   if (loading && !conversation) {
     return (
-      <div className="flex h-full items-center justify-center bg-white text-sm text-gray-400">
+      <div className="flex h-full items-center justify-center bg-white text-xs text-gray-400">
         Đang tải cuộc trò chuyện...
       </div>
     );
@@ -59,7 +59,7 @@ const CustomerChat = ({
 
   if (!conversation) {
     return (
-      <div className="flex h-full items-center justify-center bg-white px-6 text-center text-sm text-gray-400">
+      <div className="flex h-full items-center justify-center bg-white px-6 text-center text-xs text-gray-400">
         Không tìm thấy cuộc trò chuyện.
       </div>
     );
@@ -79,7 +79,7 @@ const CustomerChat = ({
                 className="h-10 w-10 rounded-full object-cover"
               />
             ) : (
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-100 text-sm font-semibold text-indigo-600">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-100 text-xs font-semibold text-indigo-600">
                 {conversation.store?.storeName?.trim()?.charAt(0)?.toUpperCase() || 'S'}
               </div>
             )}
@@ -92,7 +92,7 @@ const CustomerChat = ({
           </div>
 
           <div className="min-w-0">
-            <h3 className="truncate text-sm font-bold text-gray-800">
+            <h3 className="truncate text-xs font-bold text-gray-800">
               {conversation.store?.storeName || 'FashionHub'}
             </h3>
 

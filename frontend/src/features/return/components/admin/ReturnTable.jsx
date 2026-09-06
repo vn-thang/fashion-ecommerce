@@ -15,7 +15,7 @@ const ReturnTable = ({
 }) => {
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-12 text-sm text-gray-500">
+      <div className="flex items-center justify-center py-12 text-xs text-gray-500">
         Đang tải danh sách yêu cầu hoàn hàng...
       </div>
     );
@@ -24,7 +24,7 @@ const ReturnTable = ({
   if (returns.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-gray-400">
-        <div className="mb-3 text-4xl">📦</div>
+        <div className="mb-3 text-2xl">📦</div>
         <p className="font-medium">
           Không tìm thấy yêu cầu hoàn hàng nào.
         </p>
@@ -96,7 +96,7 @@ const ReturnTable = ({
                     {item.items?.map(returnItem => (
                       <div
                         key={returnItem.id}
-                        className="text-sm text-gray-700"
+                        className="text-xs text-gray-700"
                       >
                         {returnItem.orderItem?.productName}
                         {' × '}

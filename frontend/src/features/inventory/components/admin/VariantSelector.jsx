@@ -64,11 +64,11 @@ const VariantSelector = ({
         <div className="absolute left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-lg max-h-72 overflow-y-auto z-50">
 
           {loading ? (
-            <div className="px-4 py-6 text-center text-sm text-gray-500">
+            <div className="px-4 py-6 text-center text-xs text-gray-500">
               Đang tìm kiếm...
             </div>
           ) : variants.length === 0 ? (
-            <div className="px-4 py-6 text-center text-sm text-gray-500">
+            <div className="px-4 py-6 text-center text-xs text-gray-500">
               Không tìm thấy sản phẩm.
             </div>
           ) : (

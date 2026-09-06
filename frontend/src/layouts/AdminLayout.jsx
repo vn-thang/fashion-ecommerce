@@ -72,7 +72,7 @@ const AdminLayout = () => {
       />
 
       <main className="flex min-w-0 flex-1 flex-col lg:ml-64">
-        <header className="sticky top-0 z-30 flex min-h-16 items-center justify-between gap-3 border-b border-gray-200 bg-white px-4 py-3 shadow-sm sm:px-6 lg:px-8">
+        <header className="sticky top-0 z-30 flex min-h-14 items-center justify-between gap-3 border-b border-gray-200 bg-white px-4 py-2.5 shadow-sm sm:px-6 lg:px-7">
         
           <div className="flex min-w-0 items-center gap-3">
             <button
@@ -85,7 +85,7 @@ const AdminLayout = () => {
             </button>
 
             <div className="min-w-0">
-              <h1 className="truncate text-base font-bold text-gray-800 sm:text-lg">
+              <h1 className="truncate text-base font-bold text-gray-800 xs:text-lg">
                 Admin Dashboard
               </h1>
 
@@ -131,7 +131,7 @@ const AdminLayout = () => {
                 </div>
 
                 <div className="hidden text-left md:block">
-                  <p className="max-w-32 truncate text-sm font-semibold text-gray-800">
+                  <p className="max-w-32 truncate text-xs font-semibold text-gray-800">
                     {displayName}
                   </p>
 
@@ -159,7 +159,7 @@ const AdminLayout = () => {
                   <button
                     type="button"
                     onClick={handleChangePassword}
-                    className="flex w-full items-center gap-3 px-4 py-3 text-sm text-gray-700 transition-colors hover:bg-gray-50"
+                    className="flex w-full items-center gap-3 px-4 py-3 text-xs text-gray-700 transition-colors hover:bg-gray-50"
                     role="menuitem"
                   >
                     <LockKeyhole
@@ -172,7 +172,7 @@ const AdminLayout = () => {
                   <button
                     type="button"
                     onClick={handleLogout}
-                    className="flex w-full items-center gap-3 border-t border-gray-100 px-4 py-3 text-sm text-red-600 transition-colors hover:bg-red-50"
+                    className="flex w-full items-center gap-3 border-t border-gray-100 px-4 py-3 text-xs text-red-600 transition-colors hover:bg-red-50"
                     role="menuitem"
                   >
                     <LogOut size={17} />
@@ -185,9 +185,9 @@ const AdminLayout = () => {
           </div>
         </header>
 
-        <div className="min-w-0 flex-1 overflow-x-hidden p-4 sm:p-6 lg:p-8">
-          <Outlet />
-        </div>
+      <div className="min-w-0 flex-1 overflow-x-hidden p-4 sm:p-5 lg:p-6">
+        <Outlet />
+      </div>
       </main>
     </div>
   );

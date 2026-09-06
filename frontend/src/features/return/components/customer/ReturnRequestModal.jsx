@@ -151,7 +151,7 @@ const ReturnRequestModal = ({
     >
       <div className="space-y-6">
         <div>
-          <div className="text-sm text-gray-500">
+          <div className="text-xs text-gray-500">
             Đơn hàng
           </div>
           <div className="mt-1 font-semibold text-slate-800">
@@ -160,7 +160,7 @@ const ReturnRequestModal = ({
         </div>
 
         <div>
-          <div className="mb-3 text-sm font-semibold text-slate-800">
+          <div className="mb-3 text-xs font-semibold text-slate-800">
             Chọn sản phẩm muốn trả
           </div>
 
@@ -181,7 +181,7 @@ const ReturnRequestModal = ({
         <div>
           <label
             htmlFor="return-reason"
-            className="mb-2 block text-sm font-semibold text-slate-800"
+            className="mb-2 block text-xs font-semibold text-slate-800"
           >
             Lý do trả hàng
           </label>
@@ -190,7 +190,7 @@ const ReturnRequestModal = ({
             id="return-reason"
             value={reason}
             onChange={e => setReason(e.target.value)}
-            className="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
+            className="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-xs outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
           >
             <option value="">
               Chọn lý do trả hàng
@@ -210,7 +210,7 @@ const ReturnRequestModal = ({
         <div>
           <label
             htmlFor="return-description"
-            className="mb-2 block text-sm font-semibold text-slate-800"
+            className="mb-2 block text-xs font-semibold text-slate-800"
           >
             Mô tả chi tiết
           </label>
@@ -223,17 +223,17 @@ const ReturnRequestModal = ({
             }
             rows={4}
             placeholder="Mô tả tình trạng hoặc lý do bạn muốn trả sản phẩm..."
-            className="w-full resize-none rounded-xl border border-gray-300 px-4 py-3 text-sm outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
+            className="w-full resize-none rounded-xl border border-gray-300 px-4 py-3 text-xs outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
           />
         </div>
 
         <div className="rounded-xl border border-orange-200 bg-orange-50 p-4">
           <div className="flex items-center justify-between gap-4">
-            <span className="text-sm font-medium text-gray-700">
+            <span className="text-xs font-medium text-gray-700">
               Số tiền hoàn
             </span>
 
-            <span className="text-lg font-bold text-orange-600">
+            <span className="text-sm font-bold text-orange-600">
               {Math.round(
                 refundAmount
               ).toLocaleString('vi-VN')}đ

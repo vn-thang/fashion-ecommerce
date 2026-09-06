@@ -89,7 +89,7 @@ const FlashSaleHeader = ({ flashSale }) => {
           </span>
 
           <div>
-            <h2 className="text-2xl font-bold text-[#ee4d2d] uppercase tracking-wide">
+            <h2 className="text-2xl font-bold text-[#ee4d2d]  tracking-wide">
               Flash Sale
             </h2>
 

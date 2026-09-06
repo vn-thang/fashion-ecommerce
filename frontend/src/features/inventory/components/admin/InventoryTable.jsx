@@ -53,7 +53,7 @@ const InventoryTable = ({
 
           <thead className="bg-gray-50 border-b border-gray-200">
 
-            <tr className="text-left text-sm font-semibold text-gray-700">
+            <tr className="text-left text-xs font-semibold text-gray-700">
 
               <th className="px-6 py-4">
                 Sản phẩm
@@ -112,7 +112,7 @@ const InventoryTable = ({
 
                 <td className="px-6 py-4">
 
-                  <div className="font-medium text-gray-800">
+                  <div className="font-normal   text-gray-800">
                     {item.variant.product.name}
                   </div>
 
@@ -122,7 +122,7 @@ const InventoryTable = ({
 
                 </td>
 
-                <td className="px-4 py-4 text-sm text-gray-600">
+                <td className="px-4 py-4 text-xs text-gray-600">
                   {item.variant.sku}
                 </td>
 
@@ -151,7 +151,7 @@ const InventoryTable = ({
 
                 <td className="px-4 py-4">
 
-                  <div className="text-sm text-gray-800">
+                  <div className="text-xs text-gray-800">
                     {item.user.fullName}
                   </div>
 
@@ -161,7 +161,7 @@ const InventoryTable = ({
 
                 </td>
 
-                <td className="px-4 py-4 text-sm text-gray-600">
+                <td className="px-4 py-4 text-xs text-gray-600">
                   {formatDate(item.createdAt)}
                 </td>
 

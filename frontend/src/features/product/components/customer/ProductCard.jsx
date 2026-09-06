@@ -29,7 +29,7 @@ const renderNormalPrice = () => (
       Từ
     </span>
 
-    <span className="text-xl font-bold text-[#ee4d2d]">
+    <span className="text-sm font-bold text-[#ee4d2d]">
       {formatPrice(product.minPrice)}
     </span>
   </div>
@@ -41,7 +41,7 @@ const renderFlashPrice = () => (
       Từ
     </span>
 
-    <span className="text-xl font-bold text-[#ee4d2d]">
+    <span className="text-sm font-bold text-[#ee4d2d]">
       {formatPrice(flash.minFlashPrice)}
     </span>
   </div>

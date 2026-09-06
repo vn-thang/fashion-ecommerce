@@ -11,7 +11,7 @@ const ReviewHeader = ({
   return (
     <div className="space-y-5 border-b border-gray-200/60 pb-5">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight text-slate-800">
+        <h1 className="text-xl font-bold tracking-tight text-slate-800">
           Quản lý Đánh giá
         </h1>
 
@@ -61,7 +61,7 @@ const ReviewHeader = ({
                 placeholder="Tên khách hàng, email, sản phẩm..."
                 className="
                   h-10 w-full rounded-lg border border-gray-300
-                  bg-white pl-9 pr-3 text-sm text-slate-700
+                  bg-white pl-9 pr-3 text-xs text-slate-700
                   outline-none transition
                   placeholder:text-gray-400
                   focus:border-indigo-500
@@ -85,7 +85,7 @@ const ReviewHeader = ({
               }
               className="
                 h-10 w-full rounded-lg border border-gray-300
-                bg-white px-3 text-sm text-slate-700
+                bg-white px-3 text-xs text-slate-700
                 outline-none transition
                 focus:border-indigo-500
                 focus:ring-2 focus:ring-indigo-100
@@ -117,7 +117,7 @@ const ReviewHeader = ({
               }
               className="
                 h-10 w-full rounded-lg border border-gray-300
-                bg-white px-3 text-sm text-slate-700
+                bg-white px-3 text-xs text-slate-700
                 outline-none transition
                 focus:border-indigo-500
                 focus:ring-2 focus:ring-indigo-100
@@ -161,7 +161,7 @@ const ReviewHeader = ({
               }
               className="
                 h-10 w-full rounded-lg border border-gray-300
-                bg-white px-3 text-sm text-slate-700
+                bg-white px-3 text-xs text-slate-700
                 outline-none transition
                 focus:border-indigo-500
                 focus:ring-2 focus:ring-indigo-100
@@ -184,7 +184,7 @@ const ReviewHeader = ({
               }
               className="
                 h-10 w-full rounded-lg border border-gray-300
-                bg-white px-3 text-sm text-slate-700
+                bg-white px-3 text-xs text-slate-700
                 outline-none transition
                 focus:border-indigo-500
                 focus:ring-2 focus:ring-indigo-100

@@ -114,7 +114,7 @@ const AvailableVariantModal = ({
                   Selected
                 </div>
 
-                <div className="text-lg font-semibold text-rose-600">
+                <div className="text-sm font-semibold text-rose-600">
                   {selectedVariants.length} variants
                 </div>
               </div>

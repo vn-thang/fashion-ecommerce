@@ -14,7 +14,7 @@ const ProductImageGallery = ({ productId }) => {
 
   return (
     <div>
-      <h4 className="text-sm font-bold text-slate-700 mb-3 uppercase tracking-wider">
+      <h4 className="text-xs font-bold text-slate-700 mb-3 uppercase tracking-wider">
         Ảnh đã tải lên ({images.length})
       </h4>
 
@@ -26,7 +26,7 @@ const ProductImageGallery = ({ productId }) => {
         />
 
         {isUploading && (
-          <p className="mt-2 text-sm text-indigo-600">
+          <p className="mt-2 text-xs text-indigo-600">
             Đang tải ảnh lên...
           </p>
         )}
@@ -36,7 +36,7 @@ const ProductImageGallery = ({ productId }) => {
           Đang tải danh sách ảnh...
         </div>
       ) : images.length === 0 ? (
-        <div className="text-center p-6 bg-slate-50 border border-gray-100 rounded-xl text-gray-400 text-sm italic">
+        <div className="text-center p-6 bg-slate-50 border border-gray-100 rounded-xl text-gray-400 text-xs italic">
           Chưa có ảnh nào trong album
         </div>
       ) : (

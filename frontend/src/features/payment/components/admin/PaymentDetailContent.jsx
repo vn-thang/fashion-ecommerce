@@ -60,11 +60,11 @@ const PaymentDetailContent = ({ payment }) => {
       <div className="space-y-5">
 
         <div className="bg-slate-50 rounded-xl border border-gray-200 p-5">
-          <h4 className="text-sm font-bold uppercase tracking-wider text-gray-500 mb-4">
+          <h4 className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-4">
             💳 Thông tin giao dịch
           </h4>
 
-          <div className="space-y-3 text-sm">
+          <div className="space-y-3 text-xs">
 
             <div className="flex justify-between">
               <span className="text-gray-500">Phương thức</span>
@@ -118,11 +118,11 @@ const PaymentDetailContent = ({ payment }) => {
         </div>
 
         <div className="bg-slate-50 rounded-xl border border-gray-200 p-5">
-          <h4 className="text-sm font-bold uppercase tracking-wider text-gray-500 mb-4">
+          <h4 className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-4">
             👤 Thông tin khách hàng
           </h4>
 
-          <div className="space-y-3 text-sm">
+          <div className="space-y-3 text-xs">
 
             <div className="flex justify-between">
               <span className="text-gray-500">Họ tên</span>
@@ -145,7 +145,7 @@ const PaymentDetailContent = ({ payment }) => {
               </span>
             </div>
 
-            <div className="pt-2 border-t text-sm">
+            <div className="pt-2 border-t text-xs">
               <span className="text-gray-500">Địa chỉ</span>
 
               <p className="mt-1">
@@ -161,11 +161,11 @@ const PaymentDetailContent = ({ payment }) => {
       <div className="space-y-5">
 
         <div className="bg-slate-50 rounded-xl border border-gray-200 p-5">
-          <h4 className="text-sm font-bold uppercase tracking-wider text-gray-500 mb-4">
+          <h4 className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-4">
             📦 Thông tin đơn hàng
           </h4>
 
-          <div className="space-y-3 text-sm">
+          <div className="space-y-3 text-xs">
 
             <div className="flex justify-between">
               <span className="text-gray-500">Mã đơn hàng</span>
@@ -214,7 +214,7 @@ const PaymentDetailContent = ({ payment }) => {
         </div>
 
         <div className="bg-slate-50 rounded-xl border border-gray-200 p-5">
-          <h4 className="text-sm font-bold uppercase tracking-wider text-gray-500 mb-4">
+          <h4 className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-4">
             🛍️ Sản phẩm
           </h4>
 

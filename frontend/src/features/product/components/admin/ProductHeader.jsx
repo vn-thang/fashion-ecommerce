@@ -5,7 +5,7 @@ const ProductHeader = ({ onAdd }) => {
   return (
     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-gray-200/60 pb-5">
       <div>
-        <h1 className="text-2xl font-bold text-slate-800 tracking-tight">
+        <h1 className="text-xl font-bold text-slate-800 tracking-tight">
           Quản lý Sản phẩm
         </h1>
         <p className="text-sm text-gray-500 mt-1">
@@ -18,7 +18,7 @@ const ProductHeader = ({ onAdd }) => {
         className="shadow-md shadow-indigo-600/10 hover:shadow-lg font-semibold px-5 bg-indigo-600 hover:bg-indigo-700 text-white"
         onClick={onAdd}
       >
-        <span className="text-lg leading-none mr-1">+</span> Thêm sản phẩm mới
+        <span className="text-sm leading-none mr-1">+</span> Thêm sản phẩm mới
       </Button>
     </div>
   );

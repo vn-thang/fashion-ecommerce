@@ -10,7 +10,7 @@ const InfoItem = ({ label, value }) => (
       {label}
     </p>
 
-    <p className="mt-2 text-sm font-semibold text-slate-700 break-all">
+    <p className="mt-2 text-xs font-semibold text-slate-700 break-all">
       {value || '---'}
     </p>
   </div>
@@ -69,7 +69,7 @@ const UserDetailModal = ({
           />
 
           <div className="flex-1">
-            <h2 className="text-2xl font-bold">
+            <h2 className="text-xl font-bold">
               {user.fullName || 'Chưa cập nhật'}
             </h2>
 
@@ -101,7 +101,7 @@ const UserDetailModal = ({
           </div>
         </div>
         <div>
-          <h3 className="mb-4 text-lg font-bold text-slate-700">
+          <h3 className="mb-4 text-sm font-bold text-slate-700">
             Thông tin tài khoản
           </h3>
 
@@ -156,7 +156,7 @@ const UserDetailModal = ({
 
         {user.addresses?.length > 0 && (
           <div>
-            <h3 className="mb-4 text-lg font-bold text-slate-700">
+            <h3 className="mb-4 text-sm font-bold text-slate-700">
               Danh sách địa chỉ
             </h3>
 
@@ -172,7 +172,7 @@ const UserDetailModal = ({
                         {address.receiverName}
                       </p>
 
-                      <p className="text-sm text-gray-500">
+                      <p className="text-xs text-gray-500">
                         {address.phoneNumber}
                       </p>
                     </div>
@@ -184,7 +184,7 @@ const UserDetailModal = ({
                     )}
                   </div>
 
-                  <p className="mt-3 text-sm text-gray-600">
+                  <p className="mt-3 text-xs text-gray-600">
                     {address.addressLine},{' '}
                     {address.ward},{' '}
                     {address.province}

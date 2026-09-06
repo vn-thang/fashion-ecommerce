@@ -88,7 +88,7 @@ const RevenueChart = ({
   dataKey="date"
   tickFormatter={formatDate}
   tick={{
-    fontSize: 12,
+    fontSize: 11,
     fill: '#374151',
     fontWeight: 600
   }}
@@ -105,7 +105,7 @@ const RevenueChart = ({
 <YAxis
   tickFormatter={formatYAxis}
   tick={{
-    fontSize: 12,
+    fontSize: 11,
     fill: '#374151',
     fontWeight: 600
   }}
@@ -123,7 +123,7 @@ const RevenueChart = ({
               dataKey="date"
               tickFormatter={formatDate}
               tick={{
-                fontSize: 12
+                fontSize: 11
               }}
               tickLine={false}
               axisLine={false}
@@ -134,7 +134,7 @@ const RevenueChart = ({
               tickCount={6}
               tickFormatter={formatYAxis}
               tick={{
-                fontSize: 12
+                fontSize: 11
               }}
               tickLine={false}
               axisLine={false}

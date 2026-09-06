@@ -36,7 +36,7 @@ const AuthLayout = ({
               )}
             </div>
 
-            <h1 className="text-3xl font-black uppercase tracking-widest">
+            <h1 className="text-2xl font-black uppercase tracking-widest">
               {storeName}
             </h1>
 
@@ -47,7 +47,7 @@ const AuthLayout = ({
         </div>
 
         <div className="absolute left-[42.5%] top-1/2 z-30 flex h-12 w-12 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-4 border-[#eaecf0] bg-[#c36374] text-white shadow-xl transition hover:scale-110 active:scale-95">
-          <span className="mb-0.5 select-none text-lg font-black leading-none">
+          <span className="mb-0.5 select-none text-sm font-black leading-none">
             {arrow}
           </span>
         </div>

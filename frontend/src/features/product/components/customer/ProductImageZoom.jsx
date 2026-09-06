@@ -54,7 +54,7 @@ const ProductImageZoom = ({ image, onClose }) => {
           bg-white/10
           hover:bg-white/20
           text-white
-          text-3xl
+          text-2xl
           flex
           items-center
           justify-center

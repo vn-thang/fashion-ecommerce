@@ -6,7 +6,7 @@ const PaymentHeader = ({ filters, onFilterChange }) => {
     <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5 space-y-5">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-slate-800">
+          <h2 className="text-xl font-bold text-slate-800">
             Quản lý thanh toán
           </h2>
           <p className="text-sm text-gray-500 mt-1">
@@ -25,7 +25,7 @@ const PaymentHeader = ({ filters, onFilterChange }) => {
         <select
           value={filters.paymentMethod}
           onChange={e => onFilterChange('paymentMethod', e.target.value)}
-          className="w-full px-4 py-2.5 text-sm bg-white border border-gray-300 rounded-lg outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+          className="w-full px-4 py-2.5 text-xs bg-white border border-gray-300 rounded-lg outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
         >
           <option value="">Tất cả phương thức</option>
           <option value="COD">COD</option>
@@ -35,7 +35,7 @@ const PaymentHeader = ({ filters, onFilterChange }) => {
         <select
           value={filters.status}
           onChange={e => onFilterChange('status', e.target.value)}
-          className="w-full px-4 py-2.5 text-sm bg-white border border-gray-300 rounded-lg outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+          className="w-full px-4 py-2.5 text-xs bg-white border border-gray-300 rounded-lg outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
         >
           <option value="">Tất cả trạng thái thanh toán</option>
           <option value="PENDING">Chờ thanh toán</option>
@@ -48,7 +48,7 @@ const PaymentHeader = ({ filters, onFilterChange }) => {
         <select
           value={filters.orderStatus}
           onChange={e => onFilterChange('orderStatus', e.target.value)}
-          className="w-full px-4 py-2.5 text-sm bg-white border border-gray-300 rounded-lg outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+          className="w-full px-4 py-2.5 text-xs bg-white border border-gray-300 rounded-lg outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
         >
           <option value="">Tất cả trạng thái đơn</option>
           <option value="PENDING">Chờ xác nhận</option>

@@ -73,7 +73,7 @@ const ChatMessageList = ({
             </svg> 
           </div> 
  
-          <p className="text-sm font-semibold text-gray-700"> 
+          <p className="text-xs font-semibold text-gray-700"> 
             Chưa có tin nhắn 
           </p> 
  
@@ -191,7 +191,7 @@ const ChatMessageList = ({
                             </svg> 
                           </div> 
  
-                          <span className="max-w-[220px] truncate text-sm"> 
+                          <span className="max-w-[220px] truncate text-xs"> 
                             {message.attachmentName || 
                               'Tập tin'} 
                           </span> 
@@ -200,7 +200,7 @@ const ChatMessageList = ({
  
                       {message.type === 'TEXT' && 
                         message.content && ( 
-                          <p className="whitespace-pre-wrap break-words text-sm leading-5"> 
+                          <p className="whitespace-pre-wrap break-words text-xs leading-5"> 
                             {message.content} 
                           </p> 
                         )} 

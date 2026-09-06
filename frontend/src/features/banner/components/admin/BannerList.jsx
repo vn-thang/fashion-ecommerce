@@ -16,7 +16,7 @@ const BannerList = ({
           🖼️
         </div>
 
-        <h2 className="text-xl font-bold text-slate-700">
+        <h2 className="text-sm font-bold text-slate-700">
           Chưa có Banner nào
         </h2>
 

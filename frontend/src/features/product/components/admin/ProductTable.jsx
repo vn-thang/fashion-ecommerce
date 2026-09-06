@@ -28,7 +28,7 @@ const ProductTable = ({
   if (!products || !Array.isArray(products) || products.length === 0) {
     return (
       <div className="bg-white rounded-2xl border border-gray-200/80 p-12 text-center shadow-sm">
-        <div className="w-16 h-16 bg-slate-50 text-slate-400 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl border">
+        <div className="w-16 h-16 bg-slate-50 text-slate-400 rounded-full flex items-center justify-center mx-auto mb-4 text- xl border">
           🛍️
         </div>
         <h3 className="text-base font-bold text-slate-800">Chưa có sản phẩm nào</h3>
@@ -107,25 +107,25 @@ const ProductTable = ({
                           {item.thumbnailUrl ? (
                             <img src={item.thumbnailUrl} alt={item.name} className="w-full h-full object-cover" />
                           ) : (
-                            <span className="flex items-center justify-center h-full w-full text-gray-300 text-xl">🖼️</span>
+                            <span className="flex items-center justify-center h-full w-full text-gray-300 text-lg">🖼️</span>
                           )}
                         </div>
                         <div>
-                          <div className="font-bold text-slate-800 text-sm group-hover:text-indigo-600 transition-colors">{item.name}</div>
+                          <div className="font-bold text-slate-800 text-xs group-hover:text-indigo-600 transition-colors">{item.name}</div>
                           <div className="text-xs text-gray-400 mt-1 font-mono">{item.slug}</div>
                         </div>
                       </div>
                     </td>
 
                     <td className="px-6 py-4.5">
-                      <div className="text-sm">
+                      <div className="text-xs">
                         <span className="font-semibold text-slate-700">{item.category?.name || '---'}</span>
                         <div className="text-xs text-gray-400 mt-0.5">Thương hiệu: <span className="text-slate-500 font-medium">{item.brand?.name || '---'}</span></div>
                       </div>
                     </td>
 
                     <td className="px-6 py-4.5 text-center">
-                      <div className="text-sm font-semibold text-slate-800">
+                      <div className="text-xs font-semibold text-slate-800">
                         {minPrice === maxPrice ? formatCurrency(minPrice) : `${formatCurrency(minPrice)} - ${formatCurrency(maxPrice)}`}
                       </div>
                       <div className="text-xs mt-1">
@@ -135,111 +135,71 @@ const ProductTable = ({
                       </div>
                     </td>
 
-                    <td className="px-6 py-4.5 text-center">
-                      <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold border ${
-                        item.status === 'ACTIVE' 
-                          ? 'bg-emerald-50 text-emerald-600 border-emerald-200/60' 
-                          : 'bg-slate-100 text-slate-500 border-slate-200'
-                      }`}>
-                        {item.status === 'ACTIVE' ? '● Hoạt động' : '○ Đã ẩn'}
-                      </span>
-                    </td>
+<td className="px-4 py-3 text-center">
+  <span
+    className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-medium ${
+      item.status === 'ACTIVE'
+        ? 'border-emerald-200/60 bg-emerald-50 text-emerald-600'
+        : 'border-slate-200 bg-slate-100 text-slate-500'
+    }`}
+  >
+    {item.status === 'ACTIVE' ? '● Hoạt động' : '○ Đã ẩn'}
+  </span>
+</td>
 
                   <td className="px-6 py-4.5 text-center">
-                  <div className="flex justify-center items-center gap-2">
+                 <div className="flex items-center justify-center gap-1.5">
+  {isActive ? (
+    <>
+      <Button
+        size="sm"
+        variant="outline"
+        className="border-gray-200 bg-white text-sky-600 shadow-none hover:border-sky-500 hover:text-sky-700"
+        onClick={() => onManageImages(item)}
+      >
+        📸 Album
+      </Button>
 
-                    {/* Sản phẩm ACTIVE */}
-                    {isActive ? (
-                      <>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="
-                            border-gray-200
-                            text-sky-600
-                            hover:border-sky-500
-                            hover:text-sky-700
-                            shadow-sm
-                            bg-white
-                          "
-                          onClick={() => onManageImages(item)}
-                        >
-                          📸 Album
-                        </Button>
+      <Button
+        size="sm"
+        variant="outline"
+        className="border-gray-200 bg-white text-amber-600 shadow-none hover:border-amber-500 hover:text-amber-700"
+        onClick={() => onManageVariants(item)}
+      >
+        📦 Phân loại
+      </Button>
 
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="
-                            border-gray-200
-                            text-amber-600
-                            hover:border-amber-500
-                            hover:text-amber-700
-                            shadow-sm
-                            bg-white
-                          "
-                          onClick={() => onManageVariants(item)}
-                        >
-                          📦 Phân loại
-                        </Button>
+      <div className="mx-1 h-5 w-px bg-gray-200" />
 
-                        <div className="w-px h-6 bg-gray-200 mx-1" />
+      <Button
+        size="sm"
+        variant="outline"
+        className="border-gray-200 bg-white text-slate-600 shadow-none hover:border-indigo-500 hover:text-indigo-600"
+        onClick={() => onEdit(item)}
+      >
+        ✏️ Sửa
+      </Button>
 
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="
-                            border-gray-200
-                            text-slate-600
-                            hover:border-indigo-500
-                            hover:text-indigo-600
-                            shadow-sm
-                            bg-white
-                          "
-                          onClick={() => onEdit(item)}
-                        >
-                          ✏️ Sửa
-                        </Button>
-
-                        <Button
-                          size="sm"
-                          variant="danger"
-                          className="
-                            bg-rose-50
-                            border border-rose-200
-                            text-rose-600
-                            hover:bg-rose-600
-                            hover:text-white
-                            shadow-sm
-                          "
-                          onClick={() => onDelete(item.id)}
-                        >
-                          🗑️ Ẩn
-                        </Button>
-                      </>
-                    ) : (
-
-                      /* Sản phẩm INACTIVE */
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="
-                          border-indigo-200
-                          bg-indigo-50
-                          text-indigo-600
-                          hover:border-indigo-500
-                          hover:bg-indigo-600
-                          hover:text-white
-                          shadow-sm
-                        "
-                        onClick={() => onEdit(item)}
-                      >
-                        ✏️ Kích hoạt lại
-                      </Button>
-
-                    )}
-
-                  </div>
+      <Button
+        size="sm"
+        variant="danger"
+        className="border border-rose-200 bg-rose-50 text-rose-600 shadow-none hover:bg-rose-600 hover:text-white"
+        onClick={() => onDelete(item.id)}
+      >
+        🗑️ Ẩn
+      </Button>
+    </>
+  ) : (
+    <Button
+      size="sm"
+      variant="outline"
+      className="border-indigo-200 bg-indigo-50 text-indigo-600 shadow-none hover:border-indigo-500 hover:bg-indigo-600 hover:text-white"
+      onClick={() => onEdit(item)}
+    >
+      ✏️ Kích hoạt lại
+    </Button>
+  )}
+</div>
                 </td>
                   </tr>
                   {isExpanded && (
@@ -251,11 +211,11 @@ const ProductTable = ({
                           </div>
                           
                           {variantCount === 0 ? (
-                            <div className="p-4 text-sm text-gray-400 italic text-center">
+                            <div className="p-4 text-xs text-gray-400 italic text-center">
                               Sản phẩm này hiện tại chưa được khởi tạo bất kỳ phân loại biến thể nào. Hãy bấm vào nút "📦 Phân loại" ở trên để thêm.
                             </div>
                           ) : (
-                            <table className="w-full text-left text-sm divide-y divide-gray-100">
+                            <table className="w-full text-left text-xs divide-y divide-gray-100">
                               <thead className="bg-slate-50 text-xs font-semibold text-gray-500">
                                 <tr>
                                   <th className="px-4 py-2.5">Mã SKU</th>
@@ -279,7 +239,7 @@ const ProductTable = ({
                                       </span>
                                     </td>
                                     <td className="px-4 py-2.5 text-center">
-                                      <span className={`inline-flex px-2 py-0.5 text-2xs rounded font-semibold ${variant.status === 'ACTIVE' ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'}`}>
+                                      <span className={`inline-flex px-2 py-0.5 text-xs rounded font-semibold ${variant.status === 'ACTIVE' ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'}`}>
                                         {variant.status === 'ACTIVE' ? 'Bán' : 'Dừng bán'}
                                       </span>
                                     </td>

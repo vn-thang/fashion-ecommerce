@@ -92,7 +92,7 @@ const handleApplyManualCode = () => {
 
   const modalFooter = (
     <div className="w-full flex justify-between items-center px-1">
-      <div className="text-sm text-gray-700">
+      <div className="text-xs text-gray-700">
         {tempSelectedCoupon ? (
           <span>1 Voucher đã được chọn</span>
         ) : (
@@ -121,7 +121,7 @@ const handleApplyManualCode = () => {
   return (
     <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 text-left">
       <div className="flex justify-between items-center mb-3">
-        <h3 className="text-sm font-bold text-gray-700">Mã giảm giá (Coupon)</h3>
+        <h3 className="text-xs font-bold text-gray-700">Mã giảm giá (Coupon)</h3>
         <button
           type="button"
           onClick={() => setIsModalOpen(true)}
@@ -138,7 +138,7 @@ const handleApplyManualCode = () => {
           value={couponInput}
           onChange={(e) => setCouponInput(e.target.value)}
           disabled={!!appliedCoupon}
-          className="flex-1 text-sm px-4 py-2 bg-gray-50 border border-gray-300 rounded focus:bg-white outline-none focus:border-[#ee4d2d] disabled:bg-gray-100 uppercase font-medium"
+          className="flex-1 text-xs px-4 py-2 bg-gray-50 border border-gray-300 rounded focus:bg-white outline-none focus:border-[#ee4d2d] disabled:bg-gray-100 uppercase font-medium"
         />
         {!appliedCoupon ? (
           <Button variant="outline" size="sm" onClick={handleApplyManualCode} disabled={!couponInput.trim()} className="rounded">
@@ -153,14 +153,14 @@ const handleApplyManualCode = () => {
 
       {appliedCoupon && (
         <p className="text-xs text-emerald-600 font-semibold text-left mt-2 flex items-center gap-1">
-          ✓ Đã áp dụng thành công mã: <span className="underline font-bold text-sm">{appliedCoupon}</span>
+          ✓ Đã áp dụng thành công mã: <span className="underline font-bold text-xs">{appliedCoupon}</span>
         </p>
       )}
 
       <Modal 
         isOpen={isModalOpen} 
         onClose={() => setIsModalOpen(false)} 
-        title={<span className="text-gray-800 font-normal text-lg">Chọn Shopee Voucher</span>} 
+        title={<span className="text-gray-800 font-normal text-sm">Chọn Shopee Voucher</span>} 
         size="lg"
         footer={modalFooter}
         className="bg-[#f5f5f5]" 
@@ -168,7 +168,7 @@ const handleApplyManualCode = () => {
         <div className="-mx-6 -mt-5 flex flex-col h-full bg-[#f5f5f5]">
           
           <div className="bg-[#f8f8f8] p-4 flex items-center gap-4 border-b border-gray-100 shadow-sm z-10">
-            <span className="text-sm font-normal text-gray-700 whitespace-nowrap">
+            <span className="text-xs font-normal text-gray-700 whitespace-nowrap">
               Mã Voucher
             </span>
             <input 
@@ -176,12 +176,12 @@ const handleApplyManualCode = () => {
               placeholder="Mã Shopee Voucher" 
               value={couponInput}
               onChange={(e) => setCouponInput(e.target.value)}
-              className="flex-1 text-sm px-3 py-2.5 border border-gray-300 rounded-sm outline-none focus:border-[#ee4d2d] uppercase bg-white placeholder:text-gray-300"
+              className="flex-1 text-xs px-3 py-2.5 border border-gray-300 rounded-sm outline-none focus:border-[#ee4d2d] uppercase bg-white placeholder:text-gray-300"
             />
           <button
             onClick={handleApplyManualCode}
             disabled={!couponInput.trim()}
-            className={`px-6 py-2.5 rounded-sm text-sm font-normal transition ${
+            className={`px-6 py-2.5 rounded-sm text-xs font-normal transition ${
               couponInput.trim()
                 ? 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
                 : 'bg-gray-50 text-gray-300 border border-gray-200 cursor-not-allowed'
@@ -192,11 +192,11 @@ const handleApplyManualCode = () => {
           </div>
 
           <div className="p-4 overflow-y-auto space-y-4 max-h-[50vh]">
-            <h4 className="text-sm font-normal text-gray-700 mb-1">Mã Khuyến Mãi Khả Dụng</h4>
+            <h4 className="text-xs font-normal text-gray-700 mb-1">Mã Khuyến Mãi Khả Dụng</h4>
             
             {availableCoupons.length === 0 ? (
               <div className="text-center py-10 bg-white rounded border border-gray-200">
-                <p className="text-sm text-gray-400">Không tìm thấy mã giảm giá nào phù hợp.</p>
+                <p className="text-xs text-gray-400">Không tìm thấy mã giảm giá nào phù hợp.</p>
               </div>
             ) : (
               availableCoupons.map((coupon) => {

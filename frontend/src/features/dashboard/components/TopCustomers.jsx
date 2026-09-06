@@ -69,7 +69,7 @@ const TopCustomers = ({
         </div>
 
         <Users
-          size={22}
+          size={20}
           className="text-indigo-600"
         />
 
@@ -111,7 +111,7 @@ const TopCustomers = ({
                     encodeURIComponent(customer.fullName)
                 }
                 alt={customer.fullName}
-                className="h-12 w-12 rounded-full border border-gray-200 object-cover"
+                className="h-11 w-11 rounded-full border border-gray-200 object-cover"
               />
 
               <div className="min-w-0 flex-1">

@@ -87,7 +87,7 @@ const AddressFormModal = ({ isOpen, onClose, addressToEdit, onSuccess }) => {
           <select 
             value={formData.province} 
             onChange={(e) => setFormData({...formData, province: e.target.value, ward: ''})} 
-            className="w-full text-sm px-4 py-2.5 bg-white border border-gray-300 rounded-lg"
+            className="w-full text-xs px-4 py-2.5 bg-white border border-gray-300 rounded-lg"
           >
             <option value="">Tỉnh/Thành phố</option>
             {provincesData.map(p => (
@@ -98,7 +98,7 @@ const AddressFormModal = ({ isOpen, onClose, addressToEdit, onSuccess }) => {
             disabled={!formData.province} 
             value={formData.ward} 
             onChange={(e) => setFormData({...formData, ward: e.target.value})} 
-            className="w-full text-sm px-4 py-2.5 bg-white border border-gray-300 rounded-lg"
+            className="w-full text-xs px-4 py-2.5 bg-white border border-gray-300 rounded-lg"
           >
             <option value="">Phường/Xã</option>
             {availableWards.map(w => (
@@ -115,7 +115,7 @@ const AddressFormModal = ({ isOpen, onClose, addressToEdit, onSuccess }) => {
         
         <div className="flex items-center gap-2 pt-2">
           <input type="checkbox" id="isDef" checked={formData.isDefault} disabled={addressToEdit?.isDefault} onChange={(e) => setFormData({...formData, isDefault: e.target.checked})} className="w-4 h-4 accent-[#ee4d2d]" />
-          <label htmlFor="isDef" className="text-sm text-gray-600">Đặt làm địa chỉ mặc định</label>
+          <label htmlFor="isDef" className="text-xs text-gray-600">Đặt làm địa chỉ mặc định</label>
         </div>
       </form>
     </Modal>

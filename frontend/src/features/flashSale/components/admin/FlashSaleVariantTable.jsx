@@ -17,10 +17,10 @@ const FlashSaleVariantTable = ({
   if (!variants.length) {
     return (
       <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-12 text-center">
-        <h3 className="text-lg font-semibold text-slate-700">
+        <h3 className="text-sm font-semibold text-slate-700">
           Chưa có sản phẩm nào trong Flash Sale
         </h3>
-        <p className="text-sm text-gray-500 mt-2">
+        <p className="text-xs text-gray-500 mt-2">
           Hãy thêm sản phẩm đầu tiên vào chương trình Flash Sale.
         </p>
       </div>
@@ -84,7 +84,7 @@ const FlashSaleVariantTable = ({
                   </td>
 
                   <td className="px-4 py-5 text-center">
-                    <div className="text-sm text-slate-700">
+                    <div className="text-xs text-slate-700">
                       <div>{variant.color || '-' }</div>
                       <div className="text-gray-400 mt-1">
                         {variant.size || '-' }

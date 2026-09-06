@@ -33,7 +33,7 @@ const AuditLogFilter = ({
        <div>
   <label
     htmlFor="audit-log-action"
-    className="mb-1.5 block text-sm font-semibold text-gray-700"
+    className="mb-1.5 block text-xs font-semibold text-gray-700"
   >
     Hành động
   </label>
@@ -42,7 +42,7 @@ const AuditLogFilter = ({
     id="audit-log-action"
     value={filters.action}
     onChange={e => onFilterChange('action', e.target.value)}
-    className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 outline-none transition-all focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+    className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-xs text-gray-900 outline-none transition-all focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
   >
     <option value="">Tất cả hành động</option>
 
@@ -65,7 +65,7 @@ const AuditLogFilter = ({
 <div>
   <label
     htmlFor="audit-log-entity"
-    className="mb-1.5 block text-sm font-semibold text-gray-700"
+    className="mb-1.5 block text-xs font-semibold text-gray-700"
   >
     Đối tượng
   </label>
@@ -74,7 +74,7 @@ const AuditLogFilter = ({
     id="audit-log-entity"
     value={filters.entityName}
     onChange={e => onFilterChange('entityName', e.target.value)}
-    className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 outline-none transition-all focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+    className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-xs text-gray-900 outline-none transition-all focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
   >
     <option value="">Tất cả đối tượng</option>
 

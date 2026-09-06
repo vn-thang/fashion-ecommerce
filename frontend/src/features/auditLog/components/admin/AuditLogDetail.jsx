@@ -74,7 +74,7 @@ const ValuesCard = ({ values, type }) => {
 
   if (typeof parsedValues !== 'object' || Array.isArray(parsedValues)) {
     return (
-      <div className="rounded-xl border border-gray-200 bg-gray-50 p-4 text-sm text-slate-700">
+      <div className="rounded-xl border border-gray-200 bg-gray-50 p-4 text-xs text-slate-700">
         {formatValue(parsedValues)}
       </div>
     );
@@ -87,12 +87,12 @@ const ValuesCard = ({ values, type }) => {
           key={key}
           className="flex items-center justify-between gap-4 border-b border-gray-100 px-4 py-3 last:border-b-0"
         >
-          <span className="text-sm font-medium text-gray-500">
+          <span className="text-xs font-medium text-gray-500">
             {formatFieldName(key)}
           </span>
 
           <span
-            className={`text-right text-sm font-semibold ${
+            className={`text-right text-xs font-semibold ${
               type === 'new'
                 ? 'text-emerald-600'
                 : 'text-slate-700'
@@ -109,7 +109,7 @@ const ValuesCard = ({ values, type }) => {
 const AuditLogDetail = ({ detail, loading }) => {
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-12 text-sm text-gray-500">
+      <div className="flex items-center justify-center py-12 text-xs text-gray-500">
         Đang tải chi tiết audit log...
       </div>
     );
@@ -117,7 +117,7 @@ const AuditLogDetail = ({ detail, loading }) => {
 
   if (!detail) {
     return (
-      <div className="py-12 text-center text-sm text-gray-500">
+      <div className="py-12 text-center text-xs text-gray-500">
         Không có dữ liệu audit log.
       </div>
     );
@@ -197,7 +197,7 @@ const AuditLogDetail = ({ detail, loading }) => {
           <div className="mb-2 flex items-center gap-2">
             <span className="h-2 w-2 rounded-full bg-slate-400" />
 
-            <p className="text-sm font-semibold text-slate-700">
+            <p className="text-xs font-semibold text-slate-700">
               Giá trị trước thay đổi
             </p>
           </div>
@@ -212,7 +212,7 @@ const AuditLogDetail = ({ detail, loading }) => {
           <div className="mb-2 flex items-center gap-2">
             <span className="h-2 w-2 rounded-full bg-emerald-500" />
 
-            <p className="text-sm font-semibold text-slate-700">
+            <p className="text-xs font-semibold text-slate-700">
               Giá trị sau thay đổi
             </p>
           </div>

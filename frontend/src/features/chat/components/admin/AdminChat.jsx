@@ -167,7 +167,7 @@ const ChatHeader = ({ conversation, onBack }) => {
               className="h-10 w-10 rounded-full object-cover sm:h-11 sm:w-11"
             />
           ) : (
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-100 text-sm font-semibold text-indigo-600 sm:h-11 sm:w-11">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-100 text-xs font-semibold text-indigo-600 sm:h-11 sm:w-11">
               {customer?.fullName?.trim()?.charAt(0)?.toUpperCase() || 'C'}
             </div>
           )}
@@ -179,7 +179,7 @@ const ChatHeader = ({ conversation, onBack }) => {
           />
         </div>
         <div className="min-w-0">
-          <h2 className="truncate text-sm font-bold text-gray-800">
+          <h2 className="truncate text-xs font-bold text-gray-800">
             {customer?.fullName || 'Khách hàng'}
           </h2>
 
@@ -244,7 +244,7 @@ const EmptyChat = () => (
       Tin nhắn hỗ trợ
     </h2>
 
-    <p className="mt-1 max-w-sm text-xs leading-6 text-gray-400 sm:text-sm">
+    <p className="mt-1 max-w-sm text-xs leading-6 text-gray-400 sm:text-xs">
       Chọn một cuộc trò chuyện bên trái để bắt đầu hỗ trợ khách hàng.
     </p>
   </div>

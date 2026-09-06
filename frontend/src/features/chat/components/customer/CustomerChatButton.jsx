@@ -101,7 +101,7 @@ const CustomerChatButton = ({
             className="
               flex h-full w-full items-center justify-center
               bg-indigo-100
-              text-lg font-bold
+              text-sm font-bold
               text-indigo-600
             "
           >

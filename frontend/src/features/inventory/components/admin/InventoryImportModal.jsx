@@ -77,7 +77,7 @@ const InventoryImportModal = ({
         />
 
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1">
+          <label className="block text-xs font-semibold text-gray-700 mb-1">
             Ghi chú
           </label>
 
@@ -87,7 +87,7 @@ const InventoryImportModal = ({
             value={form.note}
             onChange={handleChange}
             placeholder="Ví dụ: Nhập hàng từ nhà cung cấp..."
-            className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+            className="w-full rounded-lg border border-gray-300 px-4 py-3 text-xs outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
           />
         </div>
       </div>

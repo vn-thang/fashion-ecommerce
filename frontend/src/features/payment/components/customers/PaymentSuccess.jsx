@@ -17,10 +17,10 @@ const PaymentSuccess = ({ payment }) => {
     <div className="mx-auto max-w-2xl rounded-xl border border-gray-200 bg-white p-8 shadow-sm">
       <div className="flex flex-col items-center">
         <div className="flex h-20 w-20 items-center justify-center rounded-full bg-emerald-100">
-          <span className="text-4xl text-emerald-600">✓</span>
+          <span className="text-2xl text-emerald-600">✓</span>
         </div>
 
-        <h1 className="mt-5 text-2xl font-bold text-gray-900">
+        <h1 className="mt-5 text-xl font-bold text-gray-900">
           Thanh toán thành công
         </h1>
 
@@ -29,7 +29,7 @@ const PaymentSuccess = ({ payment }) => {
         </p>
       </div>
 
-      <div className="mt-8 space-y-4 rounded-xl bg-gray-50 p-5 text-sm">
+      <div className="mt-8 space-y-4 rounded-xl bg-gray-50 p-5 text-xs">
         <div className="flex justify-between gap-4">
           <span className="text-gray-500">Mã đơn hàng</span>
           <span className="font-semibold text-indigo-600">
@@ -86,7 +86,7 @@ const PaymentSuccess = ({ payment }) => {
             <span className="font-bold text-gray-900">
               Tổng tiền đơn hàng
             </span>
-            <span className="text-lg font-bold text-emerald-600">
+            <span className="text-sm font-bold text-emerald-600">
               {formatPrice(payment.totalAmount)}
             </span>
           </div>

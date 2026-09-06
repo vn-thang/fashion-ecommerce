@@ -9,12 +9,12 @@ const PaymentFailed = ({ payment }) => {
       <div className="flex flex-col items-center">
 
         <div className="w-20 h-20 rounded-full bg-rose-100 flex items-center justify-center">
-          <span className="text-4xl text-rose-600">
+          <span className="text-2xl text-rose-600">
             ✕
           </span>
         </div>
 
-        <h1 className="mt-5 text-2xl font-bold text-gray-900">
+        <h1 className="mt-5 text-xl font-bold text-gray-900">
           Thanh toán thất bại
         </h1>
 

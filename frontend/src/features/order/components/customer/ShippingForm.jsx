@@ -12,14 +12,14 @@ const ShippingForm = ({
   return (
     <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 space-y-4">
       <div className="flex justify-between items-center pb-3 border-b border-gray-150">
-        <h2 className="text-lg font-bold text-gray-800">
+        <h2 className="text-sm font-bold text-gray-800">
           Thông tin nhận hàng
         </h2>
 
         <button
           type="button"
           onClick={onOpenSelectModal}
-          className="text-blue-600 hover:text-blue-800 text-sm font-semibold transition"
+          className="text-blue-600 hover:text-blue-800 text-xs font-semibold transition"
         >
           {shippingAddress?.id
             ? 'Thay đổi'
@@ -79,7 +79,7 @@ const ShippingForm = ({
       <div className="text-left space-y-1.5 pt-2">
         <label
           htmlFor="note"
-          className="block text-sm font-semibold text-gray-700"
+          className="block text-xs font-semibold text-gray-700"
         >
           Ghi chú (Tùy chọn)
         </label>
@@ -89,13 +89,13 @@ const ShippingForm = ({
           rows="2"
           value={note}
           onChange={e => setNote(e.target.value)}
-          className="w-full text-sm p-3 bg-white border border-gray-300 rounded-lg focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none shadow-sm transition-all"
+          className="w-full text-xs p-3 bg-white border border-gray-300 rounded-lg focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none shadow-sm transition-all"
           placeholder="Ghi chú cho shipper..."
         />
       </div>
 
       <div className="pt-2">
-        <h3 className="text-sm font-semibold text-gray-700 mb-3">
+        <h3 className="text-xs font-semibold text-gray-700 mb-3">
           Phương thức thanh toán
         </h3>
 

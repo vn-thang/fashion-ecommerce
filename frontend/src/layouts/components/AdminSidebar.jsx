@@ -125,15 +125,15 @@ const AdminSidebar = ({ isOpen, onClose }) => {
         }`}
       >
         <div className="flex items-center justify-between border-b border-gray-700/50 p-6">
-          <div className="flex min-w-0 items-center gap-4">
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-lg font-bold text-white shadow-md ring-2 ring-indigo-500/30">
+          <div className="flex min-w-0 items-center gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-lg font-bold text-white shadow-md ring-2 ring-indigo-500/30">
               {(user?.fullName || user?.username || 'A')
                 .charAt(0)
                 .toUpperCase()}
             </div>
 
             <div className="min-w-0">
-              <h3 className="truncate text-sm font-bold tracking-wide text-white">
+              <h3 className="truncate text-xs font-bold tracking-wide text-white">
                 {user?.fullName || user?.username || 'Admin'}
               </h3>
 
@@ -143,7 +143,7 @@ const AdminSidebar = ({ isOpen, onClose }) => {
                   <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-500" />
                 </span>
 
-                <span className="truncate text-[11px] font-medium uppercase tracking-wider text-emerald-400">
+                <span className="truncate text-[10px] font-medium uppercase tracking-wider text-emerald-400">
                   Đang hoạt động
                 </span>
               </div>
@@ -161,7 +161,7 @@ const AdminSidebar = ({ isOpen, onClose }) => {
         </div>
 
         <nav className="custom-scrollbar flex-1 overflow-y-auto py-6">
-          <ul className="space-y-1.5 px-3">
+          <ul className="space-y-1 px-2.5">
             {menuItems.map(item => {
               if (item.children) {
                 const isOpen = openMenu === item.title;
@@ -176,14 +176,14 @@ const AdminSidebar = ({ isOpen, onClose }) => {
                       onClick={() =>
                         setOpenMenu(isOpen ? '' : item.title)
                       }
-                      className={`group flex w-full items-center justify-between rounded-xl border px-4 py-3 text-sm font-medium transition-all duration-300 ${
+                     className={`group flex w-full items-center justify-between rounded-lg border px-3 py-2.5 text-xs font-medium transition-all duration-200 ${
                         hasActiveChild
                           ? 'border-indigo-500/20 bg-indigo-500/10 text-indigo-400'
                           : 'border-transparent text-gray-400 hover:bg-gray-800 hover:text-gray-200'
                       }`}
                     >
                       <div className="flex min-w-0 items-center gap-3">
-                        <span className="shrink-0 text-xl">
+                        <span className="shrink-0 text-lg">
                           {item.icon}
                         </span>
 
@@ -217,7 +217,7 @@ const AdminSidebar = ({ isOpen, onClose }) => {
                     </button>
 
                     {isOpen && (
-                      <ul className="relative ml-6 mt-2 space-y-1 border-l border-gray-700 pl-4">
+                      <ul className="relative ml-5 mt-1.5 space-y-0.5 border-l border-gray-700 pl-4">
                         {item.children.map(child => {
                           const active =
                             location.pathname === child.path;
@@ -227,7 +227,7 @@ const AdminSidebar = ({ isOpen, onClose }) => {
                               <Link
                                 to={child.path}
                                 onClick={handleLinkClick}
-                                className={`relative flex items-center rounded-lg px-4 py-2 text-sm transition-all duration-200 before:absolute before:-left-[21px] before:top-1/2 before:h-px before:w-3 before:bg-gray-700 ${
+                                className={`relative flex items-center rounded-lg px-4 py-2 text-xs transition-all duration-200 before:absolute before:-left-[21px] before:top-1/2 before:h-px before:w-3 before:bg-gray-700 ${
                                   active
                                     ? 'bg-indigo-500/10 font-medium text-indigo-400'
                                     : 'text-gray-400 hover:bg-gray-800 hover:text-white'
@@ -253,14 +253,14 @@ const AdminSidebar = ({ isOpen, onClose }) => {
                   <Link
                     to={item.path}
                     onClick={handleLinkClick}
-                    className={`flex items-center gap-3 rounded-lg border px-4 py-3 text-sm font-medium transition-all duration-200 ${
+                    className={`flex items-center gap-3 rounded-lg border px-3 py-2.5 text-xs font-medium transition-all duration-200 ${
                       isActive
                         ? 'border-indigo-500/20 bg-indigo-500/10 text-indigo-400 shadow-sm'
                         : 'border-transparent text-gray-400 hover:bg-gray-800 hover:text-gray-200'
                     }`}
                   >
                     <span
-                      className={`shrink-0 text-xl ${
+                      className={`shrink-0 text-lg ${
                         isActive ? 'scale-110' : ''
                       }`}
                     >

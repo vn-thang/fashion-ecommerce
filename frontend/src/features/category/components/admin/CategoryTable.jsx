@@ -33,9 +33,9 @@ const CategoryTable = ({
   if (treeData.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-12">
-        <span className="text-4xl">📁</span>
+        <span className="text-2xl">📁</span>
 
-        <h3 className="mt-4 text-lg font-semibold text-slate-800">
+        <h3 className="mt-4 text-sm font-semibold text-slate-800">
           Chưa có danh mục
         </h3>
 
@@ -89,7 +89,7 @@ return (
               >
                 <td className="px-4 py-3 sm:px-6 sm:py-4">
                   <div
-                    className={`flex items-center font-medium text-sm sm:text-base ${
+                    className={`flex items-center font-medium text-xs sm:text-base ${
                       isActive
                         ? 'text-slate-800'
                         : 'text-slate-400'
@@ -133,7 +133,7 @@ return (
                 </td>
 
                 <td
-                  className={`max-w-sm truncate px-4 py-3 text-sm sm:px-6 sm:py-4 ${
+                  className={`max-w-sm truncate px-4 py-3 text-xs sm:px-6 sm:py-4 ${
                     isActive
                       ? 'text-gray-500'
                       : 'text-gray-400 opacity-60'

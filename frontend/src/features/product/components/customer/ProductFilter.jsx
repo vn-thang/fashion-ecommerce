@@ -44,53 +44,42 @@ const displayedCategories = showAllCategories
   ? finalCategoriesToRender
   : finalCategoriesToRender.slice(0, 5);
 
-  return (
-    <aside className="w-full md:w-64 lg:w-72 shrink-0">
-      <div className="bg-white rounded-lg border border-gray-100 shadow-sm overflow-hidden">
-        <div className="px-5 py-4 border-b border-gray-100">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-full bg-orange-50 flex items-center justify-center">
-              <span className="text-base">⚙️</span>
-            </div>
-            <div>
-              <h2 className="text-base font-semibold text-gray-800">
-                Bộ lọc tìm kiếm
-              </h2>
-              <p className="text-xs text-gray-400 mt-0.5">
-                Lọc sản phẩm theo nhu cầu
-              </p>
-            </div>
-          </div>
-        </div>
+return (
+  <aside className="w-full shrink-0 md:w-[220px] lg:w-[230px]">
+    <div className="overflow-hidden rounded-md border border-gray-200 bg-white">
+      <div className="border-b border-gray-100 px-4 py-3">
+        <h2 className="text-sm font-semibold text-gray-800">
+          Bộ lọc tìm kiếm
+        </h2>
+      </div>
 
-        <div className="px-5 py-5 border-b border-gray-100">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-semibold text-gray-800">
-              Danh mục
-            </h3>
-            {isFilteringByParent && (
-              <button
-                onClick={() => setSearchParams({})}
-                className="text-xs text-[#ee4d2d] hover:underline transition-colors"
-              >
-                Tất cả
-              </button>
-            )}
-          </div>
+      <div className="border-b border-gray-100 px-4 py-4">
+        <div className="mb-3 flex items-center justify-between">
+          <h3 className="text-sm font-semibold text-gray-800">
+            Danh mục
+          </h3>
 
           {isFilteringByParent && (
-            <div className="flex items-center gap-2 mb-3 px-3 py-2 bg-orange-50 rounded-md">
-              <span className="text-xs text-gray-500">
-                Nhóm:
-              </span>
-              <span className="text-xs font-medium text-[#ee4d2d] truncate">
-                {currentParentObj?.name}
-              </span>
-            </div>
+            <button
+              onClick={() => setSearchParams({})}
+              className="text-xs text-[#ee4d2d] transition-colors hover:underline"
+            >
+              Tất cả
+            </button>
           )}
+        </div>
 
-          <ul className="space-y-2.5">
-           {displayedCategories.length > 0 ? (
+        {isFilteringByParent && (
+          <div className="mb-3 flex items-center gap-1.5 rounded-md bg-orange-50 px-2.5 py-1.5">
+            <span className="text-xs text-gray-500">Nhóm:</span>
+            <span className="truncate text-xs font-medium text-[#ee4d2d]">
+              {currentParentObj?.name}
+            </span>
+          </div>
+        )}
+
+        <ul className="space-y-2">
+          {displayedCategories.length > 0 ? (
             displayedCategories.map(cat => {
               const catId = cat.id || cat._id;
               const isParentOnly =
@@ -99,7 +88,7 @@ const displayedCategories = showAllCategories
               return (
                 <li key={catId}>
                   {isFilteringByParent && !isParentOnly ? (
-                    <label className="group flex items-center gap-3 cursor-pointer select-none">
+                    <label className="group flex cursor-pointer select-none items-center gap-2.5">
                       <input
                         type="checkbox"
                         checked={
@@ -107,9 +96,10 @@ const displayedCategories = showAllCategories
                           urlCategory === catId
                         }
                         onChange={() => handleCategoryChange(catId)}
-                        className="w-4 h-4 rounded border-gray-300 text-[#ee4d2d] focus:ring-2 focus:ring-orange-100 cursor-pointer"
+                        className="h-3.5 w-3.5 cursor-pointer rounded border-gray-300 text-[#ee4d2d] focus:ring-2 focus:ring-orange-100"
                       />
-                      <span className="text-sm text-gray-600 group-hover:text-[#ee4d2d] transition-colors">
+
+                      <span className="text-sm text-gray-600 transition-colors group-hover:text-[#ee4d2d]">
                         {cat.name}
                       </span>
                     </label>
@@ -118,164 +108,163 @@ const displayedCategories = showAllCategories
                       onClick={() =>
                         setSearchParams({ category: catId })
                       }
-                      className="group flex items-center gap-2.5 w-full text-left text-sm text-gray-600 hover:text-[#ee4d2d] transition-colors"
+                      className="group flex w-full items-center gap-2 text-left text-sm text-gray-600 transition-colors hover:text-[#ee4d2d]"
                     >
-                      <span className="text-gray-400 group-hover:text-[#ee4d2d] transition-colors">
+                      <span className="text-gray-400 transition-colors group-hover:text-[#ee4d2d]">
                         ›
                       </span>
-                      <span>{cat.name}</span>
+
+                      <span className="truncate">{cat.name}</span>
                     </button>
                   )}
                 </li>
               );
             })
           ) : (
-            <li className="py-2">
-              <p className="text-xs text-gray-400 italic">
+            <li>
+              <p className="text-xs italic text-gray-400">
                 Không có danh mục phù hợp
               </p>
             </li>
           )}
-          </ul>
+        </ul>
 
-          {finalCategoriesToRender.length > 5 && (
-            <button
-              type="button"
-              onClick={() =>
-                setShowAllCategories(prev => !prev)
-              }
-              className="mt-4 text-xs font-medium text-[#ee4d2d] hover:text-[#d74123] transition-colors"
-            >
-              {showAllCategories
-                ? 'Thu gọn ↑'
-                : `Xem thêm (${finalCategoriesToRender.length - 5}) ↓`}
-            </button>
+        {finalCategoriesToRender.length > 5 && (
+          <button
+            type="button"
+            onClick={() =>
+              setShowAllCategories(prev => !prev)
+            }
+            className="mt-3 text-xs font-medium text-[#ee4d2d] transition-colors hover:text-[#d74123]"
+          >
+            {showAllCategories
+              ? 'Thu gọn ↑'
+              : `Xem thêm (${finalCategoriesToRender.length - 5}) ↓`}
+          </button>
+        )}
+      </div>
+
+      <div className="border-b border-gray-100 px-4 py-4">
+        <h3 className="mb-3 text-sm font-semibold text-gray-800">
+          Thương hiệu
+        </h3>
+
+        <ul className="space-y-2">
+          {brands.length > 0 ? (
+            (showAllBrands ? brands : brands.slice(0, 5)).map(brand => {
+              const brandId = brand._id || brand.id;
+
+              return (
+                <li key={brandId}>
+                  <label className="group flex cursor-pointer select-none items-center gap-2.5">
+                    <input
+                      type="checkbox"
+                      checked={selectedBrands.includes(brandId)}
+                      onChange={() => handleBrandChange(brandId)}
+                      className="h-3.5 w-3.5 cursor-pointer rounded border-gray-300 text-[#ee4d2d] focus:ring-2 focus:ring-orange-100"
+                    />
+
+                    <span className="truncate text-sm text-gray-600 transition-colors group-hover:text-[#ee4d2d]">
+                      {brand.name}
+                    </span>
+                  </label>
+                </li>
+              );
+            })
+          ) : (
+            <li>
+              <p className="text-xs italic text-gray-400">
+                Đang tải...
+              </p>
+            </li>
           )}
-        </div>
+        </ul>
 
-        <div className="px-5 py-5 border-b border-gray-100">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-semibold text-gray-800">
-              Thương hiệu
-            </h3>
+        {brands.length > 5 && (
+          <button
+            type="button"
+            onClick={() =>
+              setShowAllBrands(prev => !prev)
+            }
+            className="mt-3 text-xs font-medium text-[#ee4d2d] transition-colors hover:text-[#d74123]"
+          >
+            {showAllBrands
+              ? 'Thu gọn ↑'
+              : `Xem thêm (${brands.length - 5}) ↓`}
+          </button>
+        )}
+      </div>
+
+      <div className="border-b border-gray-100 px-4 py-4">
+        <h3 className="mb-3 text-sm font-semibold text-gray-800">
+          Khoảng giá
+        </h3>
+
+        <div className="flex items-center gap-1.5">
+          <div className="relative min-w-0 flex-1">
+            <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] text-gray-400">
+              ₫
+            </span>
+
+            <input
+              type="number"
+              min="0"
+              placeholder="Từ"
+              value={priceRange.min}
+              onChange={e =>
+                setPriceRange({
+                  ...priceRange,
+                  min: e.target.value
+                })
+              }
+              className="w-full rounded-md border border-gray-200 py-1.5 pl-5 pr-1.5 text-[11px] text-gray-700 outline-none transition-all focus:border-[#ee4d2d] focus:ring-1 focus:ring-orange-100"
+            />
           </div>
 
-          <ul className="space-y-2.5">
-            {brands.length > 0 ? (
-              (showAllBrands
-                ? brands
-                : brands.slice(0, 5)
-              ).map(brand => {
-                const brandId = brand._id || brand.id;
+          <span className="shrink-0 text-xs text-gray-300">
+            —
+          </span>
 
-                return (
-                  <li key={brandId}>
-                    <label className="group flex items-center gap-3 cursor-pointer select-none">
-                      <input
-                        type="checkbox"
-                        checked={selectedBrands.includes(brandId)}
-                        onChange={() =>
-                          handleBrandChange(brandId)
-                        }
-                        className="w-4 h-4 rounded border-gray-300 text-[#ee4d2d] focus:ring-2 focus:ring-orange-100 cursor-pointer"
-                      />
-                      <span className="text-sm text-gray-600 group-hover:text-[#ee4d2d] transition-colors truncate">
-                        {brand.name}
-                      </span>
-                    </label>
-                  </li>
-                );
-              })
-            ) : (
-              <li className="py-2">
-                <p className="text-xs text-gray-400 italic">
-                  Đang tải...
-                </p>
-              </li>
-            )}
-          </ul>
+          <div className="relative min-w-0 flex-1">
+            <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] text-gray-400">
+              ₫
+            </span>
 
-          {brands.length > 5 && (
-            <button
-              type="button"
-              onClick={() =>
-                setShowAllBrands(prev => !prev)
+            <input
+              type="number"
+              min="0"
+              placeholder="Đến"
+              value={priceRange.max}
+              onChange={e =>
+                setPriceRange({
+                  ...priceRange,
+                  max: e.target.value
+                })
               }
-              className="mt-4 text-xs font-medium text-[#ee4d2d] hover:text-[#d74123] transition-colors"
-            >
-              {showAllBrands
-                ? 'Thu gọn ↑'
-                : `Xem thêm (${brands.length - 5}) ↓`}
-            </button>
-          )}
-        </div>
-
-        <div className="px-5 py-5 border-b border-gray-100">
-          <h3 className="text-sm font-semibold text-gray-800 mb-4">
-            Khoảng giá
-          </h3>
-
-          <div className="flex items-center gap-2">
-            <div className="relative flex-1">
-              <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[10px] text-gray-400">
-                ₫
-              </span>
-              <input
-                type="number"
-                min="0"
-                placeholder="Từ"
-                value={priceRange.min}
-                onChange={e =>
-                  setPriceRange({
-                    ...priceRange,
-                    min: e.target.value
-                  })
-                }
-                className="w-full border border-gray-200 rounded-md pl-6 pr-2 py-2 text-xs text-gray-700 outline-none focus:border-[#ee4d2d] focus:ring-1 focus:ring-orange-100 transition-all"
-              />
-            </div>
-
-            <span className="text-gray-300">—</span>
-
-            <div className="relative flex-1">
-              <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[10px] text-gray-400">
-                ₫
-              </span>
-              <input
-                type="number"
-                min="0"
-                placeholder="Đến"
-                value={priceRange.max}
-                onChange={e =>
-                  setPriceRange({
-                    ...priceRange,
-                    max: e.target.value
-                  })
-                }
-                className="w-full border border-gray-200 rounded-md pl-6 pr-2 py-2 text-xs text-gray-700 outline-none focus:border-[#ee4d2d] focus:ring-1 focus:ring-orange-100 transition-all"
-              />
-            </div>
+              className="w-full rounded-md border border-gray-200 py-1.5 pl-5 pr-1.5 text-[11px] text-gray-700 outline-none transition-all focus:border-[#ee4d2d] focus:ring-1 focus:ring-orange-100"
+            />
           </div>
-        </div>
-
-        <div className="px-5 py-5">
-          <button
-            onClick={handleApplyFilter}
-            className="w-full bg-[#ee4d2d] hover:bg-[#d74123] text-white py-2.5 rounded-md text-sm font-semibold shadow-sm hover:shadow transition-all"
-          >
-            ÁP DỤNG
-          </button>
-
-          <button
-            onClick={handleClearFilters}
-            className="w-full mt-2 bg-white text-gray-600 border border-gray-200 hover:bg-gray-50 hover:border-gray-300 py-2.5 rounded-md text-sm font-medium transition-all"
-          >
-            XÓA TẤT CẢ
-          </button>
         </div>
       </div>
-    </aside>
-  );
+
+      <div className="px-4 py-4">
+        <button
+          onClick={handleApplyFilter}
+          className="w-full rounded-md bg-[#ee4d2d] py-2 text-xs font-semibold text-white transition-colors hover:bg-[#d74123]"
+        >
+          ÁP DỤNG
+        </button>
+
+        <button
+          onClick={handleClearFilters}
+          className="mt-2 w-full rounded-md border border-gray-200 bg-white py-2 text-xs font-medium text-gray-600 transition-colors hover:border-gray-300 hover:bg-gray-50"
+        >
+          XÓA TẤT CẢ
+        </button>
+      </div>
+    </div>
+  </aside>
+);
 };
 
 export default ProductFilter;

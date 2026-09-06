@@ -106,7 +106,7 @@ const paymentStatus =
 </div>
       <div className="space-y-5">
         <div className="bg-slate-50 p-4 rounded-xl border border-gray-150">
-          <h4 className="font-bold text-sm text-gray-500 uppercase tracking-wider mb-3">📦 Sản phẩm đặt mua</h4>
+          <h4 className="font-bold text-xs text-gray-500 uppercase tracking-wider mb-3">📦 Sản phẩm đặt mua</h4>
           <div className="divide-y divide-gray-200">
             {order.items?.map((item) => (
               <div key={item.id} className="flex items-center gap-4 py-3 first:pt-0 last:pb-0">
@@ -118,15 +118,15 @@ const paymentStatus =
                     className="h-full w-full object-cover"
                   />
                 ) : (
-                  <div className="flex h-full w-full items-center justify-center text-lg">
+                  <div className="flex h-full w-full items-center justify-center text-sm">
                     👕
                   </div>
                 )}
               </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-bold text-slate-800 truncate">{item.productName}</p>
+                  <p className="text-xs font-bold text-slate-800 truncate">{item.productName}</p>
                   <p className="text-xs text-gray-500 mt-0.5">
-                    Phân loại: <span className="font-semibold text-gray-700">{item.color || 'N/A'}</span> / Size <span className="font-semibold text-gray-700">{item.size || 'N/A'}</span>
+                    Phân loại: <span className="font-semibold text-gray-700">{item.color || 'N/A'}</span> / Size <span className="font-semibold text-gray-700">{item.size || 'Freesize'}</span>
                   </p>
                 </div>
               <div className="text-right flex-shrink-0">
@@ -135,12 +135,12 @@ const paymentStatus =
                     <p className="text-xs text-gray-400 line-through">
                       {Number(item.originalPrice).toLocaleString('vi-VN')}đ
                     </p>
-                    <p className="text-sm font-bold text-red-500">
+                    <p className="text-xs font-bold text-red-500">
                       {Number(item.unitPrice).toLocaleString('vi-VN')}đ
                     </p>
                   </>
                 ) : (
-                  <p className="text-sm font-bold">
+                  <p className="text-xs font-bold">
                     {Number(item.unitPrice).toLocaleString('vi-VN')}đ
                   </p>
                 )}
@@ -154,12 +154,12 @@ const paymentStatus =
         </div>
 
         <div className="bg-slate-50 p-4 rounded-xl border border-gray-150 space-y-2">
-          <h4 className="font-bold text-sm text-gray-500 uppercase tracking-wider mb-2">📍 Địa chỉ nhận hàng</h4>
-          <p className="text-sm"><span className="font-semibold text-gray-500">Người nhận:</span> {order.receiverName}</p>
-          <p className="text-sm"><span className="font-semibold text-gray-500">Số điện thoại:</span> {order.phoneNumber}</p>
-          <p className="text-sm"><span className="font-semibold text-gray-500">Địa chỉ detail:</span> {order.addressLine}, {order.ward}, {order.province}</p>
+          <h4 className="font-bold text-xs text-gray-500 uppercase tracking-wider mb-2">📍 Địa chỉ nhận hàng</h4>
+          <p className="text-xs"><span className="font-semibold text-gray-500">Người nhận:</span> {order.receiverName}</p>
+          <p className="text-xs"><span className="font-semibold text-gray-500">Số điện thoại:</span> {order.phoneNumber}</p>
+          <p className="text-xs"><span className="font-semibold text-gray-500">Địa chỉ detail:</span> {order.addressLine}, {order.ward}, {order.province}</p>
           {order.note && (
-            <p className="text-sm bg-amber-50 border border-amber-200 p-2.5 rounded-lg text-amber-800 mt-2 text-xs">
+            <p className="text-xs bg-amber-50 border border-amber-200 p-2.5 rounded-lg text-amber-800 mt-2 text-xs">
               📌 <strong>Khách chú thích:</strong> {order.note}
             </p>
           )}
@@ -171,7 +171,7 @@ const paymentStatus =
   </label>
 
   <select
-    className="w-full rounded-lg border border-gray-300 bg-slate-50 px-3 py-2 text-sm font-bold outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+    className="w-full rounded-lg border border-gray-300 bg-slate-50 px-3 py-2 text-xs font-bold outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
     value={order.status}
     onChange={(e) => onUpdateStatus(order.id, e.target.value)}
   >
@@ -191,7 +191,7 @@ const paymentStatus =
           flex w-full items-center justify-center gap-2
           rounded-lg border border-red-200
           bg-red-50 px-4 py-2.5
-          text-sm font-semibold text-red-600
+          text-xs font-semibold text-red-600
           transition-all
           hover:bg-red-600
           hover:text-white
@@ -205,16 +205,16 @@ const paymentStatus =
 </div>
       </div>
         <div className="bg-slate-50 p-4 rounded-xl border border-gray-150 space-y-2.5">
-          <h4 className="font-bold text-sm text-gray-500 uppercase tracking-wider mb-2">🧾 Tóm tắt tài chính</h4>
-          <div className="flex justify-between text-sm text-gray-600">
+          <h4 className="font-bold text-xs text-gray-500 uppercase tracking-wider mb-2">🧾 Tóm tắt tài chính</h4>
+          <div className="flex justify-between text-xs text-gray-600">
             <span>Tạm tính sản phẩm:</span>
             <span>{Number(order.subtotal).toLocaleString('vi-VN')} đ</span>
           </div>
-          <div className="flex justify-between text-sm text-gray-600">
+          <div className="flex justify-between text-xs text-gray-600">
             <span>Phí giao hàng:</span>
             <span>+{Number(order.shippingFee).toLocaleString('vi-VN')} đ</span>
           </div>
-          <div className="flex justify-between text-sm text-rose-600">
+          <div className="flex justify-between text-xs text-rose-600">
             <span>Mã giảm giá ({order.couponCode || 'Không áp dụng'}):</span>
             <span>-{Number(order.discountAmount).toLocaleString('vi-VN')} đ</span>
           </div>
@@ -222,14 +222,14 @@ const paymentStatus =
             <span>Tổng thanh toán:</span>
             <span className="text-indigo-600">{Number(order.totalAmount).toLocaleString('vi-VN')} đ</span>
           </div>
-          <div className="flex justify-between text-sm">
+          <div className="flex justify-between text-xs">
             <span>Phương thức thanh toán:</span>
             <span className="font-semibold">
               {paymentMethod}
             </span>
           </div>
 
-          <div className="flex justify-between items-center text-sm">
+          <div className="flex justify-between items-center text-xs">
             <span>Trạng thái thanh toán:</span>
 
             <span
@@ -245,7 +245,7 @@ const paymentStatus =
       ❌ Thông tin hủy đơn
     </h5>
 
-    <div className="flex justify-between text-sm">
+    <div className="flex justify-between text-xs">
       <span className="text-gray-500">Người hủy</span>
       <span className="font-medium">
         {order.cancelledBy === 'CUSTOMER'
@@ -256,7 +256,7 @@ const paymentStatus =
       </span>
     </div>
 
-    <div className="flex justify-between text-sm">
+    <div className="flex justify-between text-xs">
       <span className="text-gray-500">Thời gian hủy</span>
       <span className="font-medium">
         {order.cancelledAt
@@ -265,7 +265,7 @@ const paymentStatus =
       </span>
     </div>
 
-    <div className="text-sm">
+    <div className="text-xs">
       <p className="text-gray-500 mb-1">Lý do hủy</p>
 
       <div className="rounded-md bg-white border border-red-100 p-3 text-gray-700">

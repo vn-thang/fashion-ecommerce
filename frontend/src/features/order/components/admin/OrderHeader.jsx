@@ -9,7 +9,7 @@ const OrderHeader = ({
   return (
     <div className="space-y-5 border-b border-gray-200/60 pb-5">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight text-slate-800">
+        <h1 className="text-xl font-bold tracking-tight text-slate-800">
           Quản lý Đơn hàng
         </h1>
 
@@ -64,7 +64,7 @@ const OrderHeader = ({
               onChange={e =>
                 onFilterChange('status', e.target.value)
               }
-              className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm outline-none transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+              className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-xs outline-none transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
             >
               <option value="">-- Tất cả trạng thái --</option>
               <option value="PENDING">⏳ Chờ xác nhận</option>

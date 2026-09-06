@@ -14,7 +14,7 @@ const FlashSaleVariantHeader = ({
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div>
           <div className="flex items-center gap-3 flex-wrap">
-            <h1 className="text-2xl font-bold text-slate-800">
+            <h1 className="text-xl font-bold text-slate-800">
               {flashSale?.name || 'Flash Sale'}
             </h1>
             <span className="px-3 py-1 rounded-full text-xs font-semibold bg-rose-100 text-rose-700">

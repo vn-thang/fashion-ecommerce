@@ -31,7 +31,7 @@ const ReturnProductList = ({ items }) => {
                     className="h-full w-full object-cover"
                   />
                 ) : (
-                  <div className="flex h-full w-full items-center justify-center text-xl text-gray-300">
+                  <div className="flex h-full w-full items-center justify-center text-lg text-gray-300">
                     🖼️
                   </div>
                 )}
@@ -42,7 +42,7 @@ const ReturnProductList = ({ items }) => {
                   {orderItem?.productName || 'Sản phẩm'}
                 </div>
 
-                <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-sm text-gray-500">
+                <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500">
                   {orderItem?.color && (
                     <span>Màu: {orderItem.color}</span>
                   )}
@@ -54,7 +54,7 @@ const ReturnProductList = ({ items }) => {
               </div>
             </div>
 
-            <div className="shrink-0 text-sm font-semibold text-orange-600">
+            <div className="shrink-0 text-xs font-semibold text-orange-600">
               {formatPrice(itemRefund)}
             </div>
           </div>

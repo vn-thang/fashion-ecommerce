@@ -50,7 +50,7 @@ const DashboardFilter = ({
                 onClick={() =>{
                   handlePresetChange(item.value)
                 } }
-                className={`rounded-lg px-4 py-2 text-sm font-medium transition
+                className={`rounded-lg px-4 py-2 text-xs font-medium transition
                   ${
                     filters.range === item.value
                       ? 'bg-indigo-600 text-white shadow'
@@ -79,7 +79,7 @@ const DashboardFilter = ({
                   e.target.value
                 )
               }
-              className="rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+              className="rounded-lg border border-gray-300 px-3 py-2 text-xs outline-none transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
             />
           </div>
 
@@ -97,7 +97,7 @@ const DashboardFilter = ({
                   e.target.value
                 )
               }
-              className="rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+              className="rounded-lg border border-gray-300 px-3 py-2 text-xs outline-none transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
             />
           </div>
 

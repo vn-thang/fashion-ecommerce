@@ -21,7 +21,7 @@ const CartItem = ({ item, updateQuantity, removeItem, formatPrice, isSelected, o
         <div>
           <Link
             to={`/product/${item.product?.slug}`}
-            className="text-sm font-medium text-gray-800 hover:text-[#ee4d2d] line-clamp-2"
+            className="text-xs font-medium text-gray-800 hover:text-[#ee4d2d] line-clamp-2"
           >
             {item.product?.name}
           </Link>
@@ -42,7 +42,7 @@ const CartItem = ({ item, updateQuantity, removeItem, formatPrice, isSelected, o
             </span>
           </div>
         ) : (
-          <span className="text-sm text-gray-600">
+          <span className="text-xs text-gray-600">
             {formatPrice(item.price)}
           </span>
         )}
@@ -58,7 +58,7 @@ const CartItem = ({ item, updateQuantity, removeItem, formatPrice, isSelected, o
             -
           </button>
 
-          <span className="px-4 py-1 w-12 text-sm text-center border-x border-gray-300">
+          <span className="px-4 py-1 w-12 text-xs text-center border-x border-gray-300">
             {item.quantity}
           </span>
 
@@ -72,7 +72,7 @@ const CartItem = ({ item, updateQuantity, removeItem, formatPrice, isSelected, o
         </div>
       </div>
 
-      <div className="col-span-2 text-sm font-medium text-[#ee4d2d]">
+      <div className="col-span-2 text-xs font-medium text-[#ee4d2d]">
         {formatPrice(item.itemTotal)}
       </div>
 

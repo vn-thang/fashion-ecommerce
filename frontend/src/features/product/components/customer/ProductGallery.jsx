@@ -104,7 +104,7 @@ const allImages = product.thumbnailUrl
               rounded-lg
               bg-black/60
               text-white
-              text-sm
+              text-xs
               opacity-0
               group-hover:opacity-100
               transition-opacity

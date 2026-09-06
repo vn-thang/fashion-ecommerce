@@ -45,7 +45,7 @@ const OrderItemsList = ({
   <div className="min-w-0 flex-1">
     <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
       <div className="min-w-0 flex-1">
-        <h4 className="line-clamp-2 break-words text-sm font-medium text-gray-800 sm:text-base">
+        <h4 className="line-clamp-2 break-words text-xs font-medium text-gray-800 sm:text-base">
           {item.productName || product.name || 'Sản phẩm'}
         </h4>
 
@@ -62,12 +62,12 @@ const OrderItemsList = ({
             </span>
           )}
 
-          <span className="text-sm font-semibold text-[#ee4d2d] sm:text-base">
+          <span className="text-xs font-semibold text-[#ee4d2d] sm:text-base">
             {formatPrice(currentPrice)}
           </span>
         </div>
 
-        <span className="text-xs text-gray-500 sm:block sm:text-sm">
+        <span className="text-xs text-gray-500 sm:block sm:text-xs">
           x{item.quantity}
         </span>
       </div>

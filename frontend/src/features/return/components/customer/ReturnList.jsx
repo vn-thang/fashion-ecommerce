@@ -6,7 +6,7 @@ const ReturnList = ({ returns, onDetail, formatPrice }) => {
   if (!returns.length) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-gray-400">
-        <div className="mb-3 text-4xl">📦</div>
+        <div className="mb-3 text-2xl">📦</div>
         <p className="font-medium">Bạn chưa có yêu cầu trả hàng nào.</p>
       </div>
     );
@@ -41,7 +41,7 @@ const ReturnList = ({ returns, onDetail, formatPrice }) => {
               <td className="px-6 py-4">
                 <div className="max-w-xs space-y-1">
                   {returnRequest.items?.map(item => (
-                    <div key={item.id} className="text-sm text-gray-700">
+                    <div key={item.id} className="text-xs text-gray-700">
                       {item.orderItem?.productName} × {item.quantity}
                     </div>
                   ))}

@@ -14,7 +14,7 @@ const BrandTable = ({ brands = [], loading, pagination, onEdit, onDeactivate, on
   if (brands.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-gray-400">
-        <div className="text-4xl mb-3">🏷️</div>
+        <div className="text-2xl mb-3">🏷️</div>
         <p className="font-medium">Không tìm thấy thương hiệu nào.</p>
       </div>
     );
@@ -41,7 +41,7 @@ const BrandTable = ({ brands = [], loading, pagination, onEdit, onDeactivate, on
               return (
                 <tr key={brand.id} className={`transition-colors ${isActive ? 'hover:bg-slate-50' : 'bg-slate-50/70'}`}>
                   <td className={`px-6 py-4 ${!isActive ? 'opacity-50' : ''}`}>
-                    <div className="w-14 h-14 rounded-xl border bg-slate-50 p-2 flex items-center justify-center">
+                    <div className="w-12 h-12 rounded-xl border bg-slate-50 p-2 flex items-center justify-center">
                       {brand.logoUrl ? (
                         <img src={brand.logoUrl} alt={brand.name} className="w-full h-full object-contain" />
                       ) : (

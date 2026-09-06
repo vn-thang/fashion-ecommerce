@@ -38,7 +38,7 @@ const ReviewStatusModal = ({ isOpen, onClose, review, onConfirm, isLoading }) =>
             />
 
             <div className="min-w-0">
-              <p className="truncate text-sm font-semibold text-slate-800">
+              <p className="truncate text-xs font-semibold text-slate-800">
                 {review.user?.fullName || 'Khách hàng'}
               </p>
               {review.user?.email && (
@@ -52,7 +52,7 @@ const ReviewStatusModal = ({ isOpen, onClose, review, onConfirm, isLoading }) =>
           {review.product?.name && (
             <div className="mt-3 border-t border-gray-200 pt-3">
               <p className="text-xs text-gray-400">Sản phẩm</p>
-              <p className="mt-1 line-clamp-2 text-sm font-medium text-slate-700">
+              <p className="mt-1 line-clamp-2 text-xs font-medium text-slate-700">
                 {review.product.name}
               </p>
             </div>
@@ -60,7 +60,7 @@ const ReviewStatusModal = ({ isOpen, onClose, review, onConfirm, isLoading }) =>
 
           <div className="mt-3">
             <div className="flex items-center gap-2">
-              <span className="text-sm tracking-wide text-amber-400">
+              <span className="text-xs tracking-wide text-amber-400">
                 {'★'.repeat(review.rating)}
                 <span className="text-gray-300">
                   {'★'.repeat(5 - review.rating)}
@@ -71,7 +71,7 @@ const ReviewStatusModal = ({ isOpen, onClose, review, onConfirm, isLoading }) =>
               </span>
             </div>
 
-            <p className="mt-2 text-sm leading-6 text-slate-600">
+            <p className="mt-2 text-xs leading-6 text-slate-600">
               {review.comment || (
                 <span className="italic text-gray-400">
                   Khách hàng không để lại bình luận.
@@ -109,7 +109,7 @@ const ReviewStatusModal = ({ isOpen, onClose, review, onConfirm, isLoading }) =>
 
           <div>
             <p
-              className={`text-sm font-semibold ${
+              className={`text-xs font-semibold ${
                 isHidden ? 'text-emerald-700' : 'text-amber-700'
               }`}
             >

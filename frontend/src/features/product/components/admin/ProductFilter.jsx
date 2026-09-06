@@ -36,7 +36,7 @@ const ProductFilter = ({
         />
 
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+          <label className="block text-xs font-semibold text-gray-700 mb-1.5">
             Danh mục
           </label>
 
@@ -44,7 +44,7 @@ const ProductFilter = ({
             name="categoryId"
             value={filters.categoryId}
             onChange={onChange}
-            className="w-full px-4 py-2.5 rounded-lg border border-gray-300 text-sm outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+            className="w-full px-4 py-2.5 rounded-lg border border-gray-300 text-xs outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
           >
             <option value="">
               Tất cả
@@ -55,7 +55,7 @@ const ProductFilter = ({
         </div>
 
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+          <label className="block text-xs font-semibold text-gray-700 mb-1.5">
             Thương hiệu
           </label>
 
@@ -63,7 +63,7 @@ const ProductFilter = ({
             name="brandId"
             value={filters.brandId}
             onChange={onChange}
-            className="w-full px-4 py-2.5 rounded-lg border border-gray-300 text-sm outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+            className="w-full px-4 py-2.5 rounded-lg border border-gray-300 text-xs outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
           >
             <option value="">
               Tất cả
@@ -81,7 +81,7 @@ const ProductFilter = ({
         </div>
 
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+          <label className="block text-xs font-semibold text-gray-700 mb-1.5">
             Trạng thái
           </label>
 
@@ -89,7 +89,7 @@ const ProductFilter = ({
             name="status"
             value={filters.status}
             onChange={onChange}
-            className="w-full px-4 py-2.5 rounded-lg border border-gray-300 text-sm outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+            className="w-full px-4 py-2.5 rounded-lg border border-gray-300 text-xs outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
           >
             <option value="">
               Tất cả

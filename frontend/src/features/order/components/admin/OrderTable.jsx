@@ -33,9 +33,9 @@ const OrderTable = ({ orders, meta, onPageChange, onViewDetails, loading }) => {
   if (orders.length === 0) {
     return (
       <div className="bg-white rounded-2xl border border-gray-200/80 p-16 text-center shadow-sm">
-        <div className="w-16 h-16 bg-slate-50 text-slate-400 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl border">📦</div>
+        <div className="w-16 h-16 bg-slate-50 text-slate-400 rounded-full flex items-center justify-center mx-auto mb-4 text-xl border">📦</div>
         <h3 className="text-base font-bold text-slate-800">Không tìm thấy đơn hàng nào</h3>
-        <p className="text-sm text-gray-400 mt-1 max-w-xs mx-auto">Hệ thống không tìm thấy hóa đơn nào khớp với bộ lọc hiện tại của bạn.</p>
+        <p className="text-xs text-gray-400 mt-1 max-w-xs mx-auto">Hệ thống không tìm thấy hóa đơn nào khớp với bộ lọc hiện tại của bạn.</p>
       </div>
     );
   }
@@ -59,17 +59,17 @@ const OrderTable = ({ orders, meta, onPageChange, onViewDetails, loading }) => {
           <tbody className="divide-y divide-gray-150">
             {orders.map((order) => (
               <tr key={order.id} className="hover:bg-slate-50/40 transition-colors duration-150 group">
-                <td className="px-6 py-4.5 font-mono text-sm font-bold text-indigo-600">
+                <td className="px-6 py-4.5 font-mono text-xs font-bold text-indigo-600">
                   {order.orderNumber}
                 </td>
                 <td className="px-6 py-4.5">
-                  <div className="text-sm font-semibold text-slate-800">{order.receiverName}</div>
+                  <div className="text-xs font-semibold text-slate-800">{order.receiverName}</div>
                   <div className="text-xs text-gray-400 font-mono mt-0.5">{order.phoneNumber}</div>
                 </td>
                 <td className="px-6 py-4.5 text-gray-500 text-sm">
                   {new Date(order.createdAt).toLocaleDateString('vi-VN')}
                 </td>
-                <td className="px-6 py-4.5 font-bold text-slate-900 text-sm">
+                <td className="px-6 py-4.5 font-bold text-slate-900 text-xs">
                   {Number(order.totalAmount).toLocaleString('vi-VN')} đ
                 </td>
                 <td className="px-6 py-4.5">

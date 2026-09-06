@@ -75,7 +75,7 @@ const ReturnDetailModal = ({
       }
     >
       {loading || !returnRequest ? (
-        <div className="flex items-center justify-center py-16 text-sm text-gray-500">
+        <div className="flex items-center justify-center py-16 text-xs text-gray-500">
           Đang tải thông tin yêu cầu...
         </div>
       ) : (
@@ -104,7 +104,7 @@ const ReturnDetailModal = ({
               <div className="mt-1 font-semibold text-slate-800">
                 {returnRequest.user?.fullName || '—'}
               </div>
-              <div className="mt-1 text-sm text-gray-500">
+              <div className="mt-1 text-xs text-gray-500">
                 {returnRequest.user?.email || '—'}
               </div>
             </div>
@@ -115,7 +115,7 @@ const ReturnDetailModal = ({
               <div className="text-xs text-gray-500">
                 Phương thức thanh toán
               </div>
-              <div className="mt-1 text-sm font-semibold text-slate-800">
+              <div className="mt-1 text-xs font-semibold text-slate-800">
                 {PAYMENT_METHOD_LABEL[payment?.paymentMethod] ||
                   'Không xác định'}
               </div>
@@ -125,7 +125,7 @@ const ReturnDetailModal = ({
               <div className="text-xs text-gray-500">
                 Trạng thái thanh toán
               </div>
-              <div className="mt-1 text-sm font-semibold text-slate-800">
+              <div className="mt-1 text-xs font-semibold text-slate-800">
                 {PAYMENT_STATUS_LABEL[payment?.status] ||
                   'Không xác định'}
               </div>
@@ -133,7 +133,7 @@ const ReturnDetailModal = ({
           </div>
 
           <div>
-            <h3 className="mb-3 text-sm font-semibold text-slate-800">
+            <h3 className="mb-3 text-xs font-semibold text-slate-800">
               Sản phẩm
             </h3>
 
@@ -145,7 +145,7 @@ const ReturnDetailModal = ({
               <div className="text-xs text-gray-500">
                 Lý do trả hàng
               </div>
-              <div className="mt-1 text-sm font-medium text-slate-800">
+              <div className="mt-1 text-xs font-medium text-slate-800">
                 {RETURN_REASON_LABEL[returnRequest.reason] || '—'}
               </div>
             </div>
@@ -154,7 +154,7 @@ const ReturnDetailModal = ({
               <div className="text-xs text-gray-500">
                 Số tiền hoàn
               </div>
-              <div className="mt-1 text-lg font-bold text-orange-600">
+              <div className="mt-1 text-sm font-bold text-orange-600">
                 {returnRequest.refundAmount
                   ? formatPrice(returnRequest.refundAmount)
                   : 'Chưa xác định'}
@@ -167,7 +167,7 @@ const ReturnDetailModal = ({
               <div className="text-xs text-gray-500">
                 Mô tả của khách hàng
               </div>
-              <div className="mt-2 rounded-xl border border-gray-100 bg-gray-50 p-4 text-sm leading-6 text-gray-700">
+              <div className="mt-2 rounded-xl border border-gray-100 bg-gray-50 p-4 text-xs leading-6 text-gray-700">
                 {returnRequest.description}
               </div>
             </div>
@@ -175,10 +175,10 @@ const ReturnDetailModal = ({
 
           {returnRequest.rejectReason && (
             <div className="rounded-xl border border-red-100 bg-red-50 p-4">
-              <div className="text-sm font-semibold text-red-700">
+              <div className="text-xs font-semibold text-red-700">
                 Lý do từ chối
               </div>
-              <div className="mt-1 text-sm leading-6 text-red-600">
+              <div className="mt-1 text-xs leading-6 text-red-600">
                 {returnRequest.rejectReason}
               </div>
             </div>
@@ -187,7 +187,7 @@ const ReturnDetailModal = ({
           {status === 'REQUESTED' && (
             <div className="space-y-4 rounded-xl border border-gray-100 bg-slate-50 p-4">
               <div>
-                <h3 className="text-sm font-semibold text-slate-800">
+                <h3 className="text-xs font-semibold text-slate-800">
                   Xử lý yêu cầu
                 </h3>
                 <p className="mt-1 text-xs text-gray-500">
@@ -198,7 +198,7 @@ const ReturnDetailModal = ({
               <div>
                 <label
                   htmlFor="reject-reason"
-                  className="mb-2 block text-sm font-medium text-gray-700"
+                  className="mb-2 block text-xs font-medium text-gray-700"
                 >
                   Lý do từ chối
                 </label>
@@ -209,7 +209,7 @@ const ReturnDetailModal = ({
                   value={rejectReason}
                   onChange={e => setRejectReason(e.target.value)}
                   placeholder="Nhập lý do nếu từ chối..."
-                  className="w-full resize-none rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm outline-none transition focus:border-red-400 focus:ring-2 focus:ring-red-100"
+                  className="w-full resize-none rounded-xl border border-gray-300 bg-white px-4 py-3 text-xs outline-none transition focus:border-red-400 focus:ring-2 focus:ring-red-100"
                 />
               </div>
 
@@ -237,7 +237,7 @@ const ReturnDetailModal = ({
           )}
 
           {status === 'APPROVED' && (
-            <div className="rounded-xl border border-blue-100 bg-blue-50 p-4 text-sm text-blue-700">
+            <div className="rounded-xl border border-blue-100 bg-blue-50 p-4 text-xs text-blue-700">
               Đã duyệt yêu cầu. Đang chờ khách gửi sản phẩm về.
             </div>
           )}
@@ -245,7 +245,7 @@ const ReturnDetailModal = ({
           {status === 'SHIPPING' && (
             <div className="flex flex-col gap-3 rounded-xl border border-indigo-100 bg-indigo-50 p-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <div className="text-sm font-semibold text-indigo-700">
+                <div className="text-xs font-semibold text-indigo-700">
                   Khách đang gửi hàng về
                 </div>
                 <div className="mt-1 text-xs text-indigo-600">
@@ -269,7 +269,7 @@ const ReturnDetailModal = ({
             <div className="rounded-xl border border-emerald-100 bg-emerald-50 p-4">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <div className="text-sm font-semibold text-emerald-700">
+                  <div className="text-xs font-semibold text-emerald-700">
                     Đã nhận hàng hoàn trả
                   </div>
                   <div className="mt-1 text-xs text-emerald-600">
@@ -291,19 +291,19 @@ const ReturnDetailModal = ({
           )}
 
           {status === 'COMPLETED' && (
-            <div className="rounded-xl border border-emerald-100 bg-emerald-50 p-4 text-sm text-emerald-700">
+            <div className="rounded-xl border border-emerald-100 bg-emerald-50 p-4 text-xs text-emerald-700">
               Yêu cầu trả hàng đã được hoàn tất và tiền đã được xử lý.
             </div>
           )}
 
           {status === 'REJECTED' && (
-            <div className="rounded-xl border border-red-100 bg-red-50 p-4 text-sm text-red-700">
+            <div className="rounded-xl border border-red-100 bg-red-50 p-4 text-xs text-red-700">
               Yêu cầu trả hàng đã bị từ chối.
             </div>
           )}
 
           {status === 'CANCELLED' && (
-            <div className="rounded-xl border border-gray-200 bg-gray-50 p-4 text-sm text-gray-600">
+            <div className="rounded-xl border border-gray-200 bg-gray-50 p-4 text-xs text-gray-600">
               Yêu cầu trả hàng đã được khách hàng hủy.
             </div>
           )}

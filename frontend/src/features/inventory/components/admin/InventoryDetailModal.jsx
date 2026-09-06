@@ -57,7 +57,7 @@ const InventoryDetailModal = ({
         <div className="grid grid-cols-2 gap-5">
 
           <div>
-            <p className="text-sm text-gray-500">
+            <p className="text-xs text-gray-500">
               Sản phẩm
             </p>
 
@@ -67,7 +67,7 @@ const InventoryDetailModal = ({
           </div>
 
           <div>
-            <p className="text-sm text-gray-500">
+            <p className="text-xs text-gray-500">
               SKU
             </p>
 
@@ -77,7 +77,7 @@ const InventoryDetailModal = ({
           </div>
 
           <div>
-            <p className="text-sm text-gray-500">
+            <p className="text-xs text-gray-500">
               Màu sắc
             </p>
 
@@ -87,7 +87,7 @@ const InventoryDetailModal = ({
           </div>
 
           <div>
-            <p className="text-sm text-gray-500">
+            <p className="text-xs text-gray-500">
               Kích thước
             </p>
 
@@ -97,7 +97,7 @@ const InventoryDetailModal = ({
           </div>
 
           <div>
-            <p className="text-sm text-gray-500">
+            <p className="text-xs text-gray-500">
               Loại giao dịch
             </p>
 
@@ -105,7 +105,7 @@ const InventoryDetailModal = ({
           </div>
 
           <div>
-            <p className="text-sm text-gray-500">
+            <p className="text-xs text-gray-500">
               Số lượng
             </p>
 
@@ -115,7 +115,7 @@ const InventoryDetailModal = ({
           </div>
 
           <div>
-            <p className="text-sm text-gray-500">
+            <p className="text-xs text-gray-500">
               Tồn kho sau giao dịch
             </p>
 
@@ -125,7 +125,7 @@ const InventoryDetailModal = ({
           </div>
 
           <div>
-            <p className="text-sm text-gray-500">
+            <p className="text-xs text-gray-500">
               Người thực hiện
             </p>
 
@@ -135,7 +135,7 @@ const InventoryDetailModal = ({
           </div>
 
           <div className="col-span-2">
-            <p className="text-sm text-gray-500">
+            <p className="text-xs text-gray-500">
               Ghi chú
             </p>
 
@@ -145,7 +145,7 @@ const InventoryDetailModal = ({
           </div>
 
           <div className="col-span-2">
-            <p className="text-sm text-gray-500">
+            <p className="text-xs text-gray-500">
               Thời gian
             </p>
 

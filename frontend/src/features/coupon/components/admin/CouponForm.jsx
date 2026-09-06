@@ -15,9 +15,9 @@ const CouponForm = ({ form, setForm }) => {
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-1.5">
-          <label className="block text-sm font-semibold text-gray-700">Loại giảm giá</label>
+          <label className="block text-xs font-semibold text-gray-700">Loại giảm giá</label>
           <select
-            className="w-full text-sm outline-none px-4 py-2.5 bg-white border border-gray-300 rounded-lg text-gray-900 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+            className="w-full text-xs outline-none px-4 py-2.5 bg-white border border-gray-300 rounded-lg text-gray-900 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
             value={form.discountType}
             onChange={(e) => setForm({ ...form, discountType: e.target.value })}
           >
@@ -90,7 +90,7 @@ const CouponForm = ({ form, setForm }) => {
           checked={form.isActive}
           onChange={(e) => setForm({ ...form, isActive: e.target.checked })}
         />
-        <label htmlFor="is-active" className="text-sm font-medium text-gray-700">
+        <label htmlFor="is-active" className="text-xs font-medium text-gray-700">
           Kích hoạt ngay (Có thể sử dụng)
         </label>
       </div>

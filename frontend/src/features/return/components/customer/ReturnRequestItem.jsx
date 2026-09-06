@@ -50,7 +50,7 @@ const ReturnRequestItem = ({
               className="h-full w-full object-cover"
             />
           ) : (
-            <div className="flex h-full w-full items-center justify-center text-xl text-gray-300">
+            <div className="flex h-full w-full items-center justify-center text-lg text-gray-300">
               🖼️
             </div>
           )}
@@ -61,7 +61,7 @@ const ReturnRequestItem = ({
             {item.productName}
           </h4>
 
-          <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-sm text-gray-500">
+          <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500">
             {item.color && <span>Màu: {item.color}</span>}
             {item.size && <span>Size: {item.size}</span>}
             <span>
@@ -69,14 +69,14 @@ const ReturnRequestItem = ({
             </span>
           </div>
 
-          <div className="mt-2 text-sm text-gray-500">
+          <div className="mt-2 text-xs text-gray-500">
             Đã mua: <span className="font-medium text-gray-700">{maxQuantity}</span>
           </div>
 
           {selected && (
             <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-center gap-2">
-                <span className="text-sm font-medium text-gray-700">
+                <span className="text-xs font-medium text-gray-700">
                   Số lượng trả:
                 </span>
 
@@ -95,7 +95,7 @@ const ReturnRequestItem = ({
                     −
                   </button>
 
-                  <span className="flex h-9 w-10 items-center justify-center border-x border-gray-300 text-sm font-semibold text-gray-800">
+                  <span className="flex h-9 w-10 items-center justify-center border-x border-gray-300 text-xs font-semibold text-gray-800">
                     {quantity}
                   </span>
 
@@ -115,7 +115,7 @@ const ReturnRequestItem = ({
                 </div>
               </div>
 
-              <div className="text-sm">
+              <div className="text-xs">
                 <span className="text-gray-500">
                   Hoàn dự kiến:{' '}
                 </span>

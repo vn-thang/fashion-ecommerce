@@ -16,7 +16,7 @@ const AccountLayout = () => {
           
           <div className="w-full md:w-60 shrink-0">
             <div className="flex items-center gap-3 mb-6 pb-5 border-b border-gray-200">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gray-200 text-gray-600 font-bold text-lg border border-gray-300 uppercase shadow-sm">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gray-200 text-gray-600 font-bold text-sm border border-gray-300 uppercase shadow-sm">
                 {user?.fullName?.charAt(0) || user?.username?.charAt(0) || 'U'}
               </div>
               <div className="overflow-hidden">
@@ -36,6 +36,9 @@ const AccountLayout = () => {
               </NavLink>
               <NavLink to="/account/orders" className={navLinkClass}>
                 <span>📦</span> Đơn mua
+              </NavLink>
+               <NavLink to="/account/returns" className={navLinkClass}>
+                <span>↩️</span> Đổi trả hàng
               </NavLink>
             </nav>
           </div>

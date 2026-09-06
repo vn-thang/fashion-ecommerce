@@ -56,7 +56,7 @@ const AvailableVariantTable = ({
       className="h-4 w-4 cursor-pointer"
     />
 
-        <span className="text-sm font-medium text-gray-700">
+        <span className="text-xs font-medium text-gray-700">
           Chọn tất cả sản phẩm trong trang
         </span>
       </div>
@@ -97,7 +97,7 @@ const AvailableVariantTable = ({
                         {product.name}
                       </div>
 
-                      <div className="mt-1 text-sm text-gray-500">
+                      <div className="mt-1 text-xs text-gray-500">
                         {product.brand?.name}
                       </div>
 
@@ -118,7 +118,7 @@ const AvailableVariantTable = ({
                   </div>
 
                   <div
-                    className={`text-xl text-gray-500 transition-transform ${
+                    className={`text-sm text-gray-500 transition-transform ${
                       expanded ? 'rotate-90' : ''
                     }`}
                   >

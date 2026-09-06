@@ -223,7 +223,7 @@ const NotificationItem = ({
       <div className="min-w-0 flex-1">
         <div className="flex items-start justify-between gap-3">
           <h3
-            className={`text-sm ${
+            className={`text-xs ${
               notification.isRead
                 ? 'font-medium text-gray-700'
                 : 'font-bold text-gray-900'
@@ -237,7 +237,7 @@ const NotificationItem = ({
           )}
         </div>
 
-        <p className="mt-1 line-clamp-2 text-sm leading-5 text-gray-500">
+        <p className="mt-1 line-clamp-2 text-xs leading-5 text-gray-500">
           {notification.content}
         </p>
 

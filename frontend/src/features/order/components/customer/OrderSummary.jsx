@@ -45,7 +45,7 @@ const OrderSummary = ({ order, formatPrice }) => {
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 sm:p-6 mb-6">
-      <div className="space-y-3 text-sm text-gray-600 border-b border-gray-100 pb-4 mb-4">
+      <div className="space-y-3 text-xs text-gray-600 border-b border-gray-100 pb-4 mb-4">
         <div className="flex justify-between">
           <span>Tổng tiền hàng</span>
           <span>{formatPrice(order.subtotal)}</span>
@@ -68,13 +68,13 @@ const OrderSummary = ({ order, formatPrice }) => {
             Tổng thanh toán
           </span>
 
-          <span className="text-2xl font-bold text-rose-600">
+          <span className="text-xl font-bold text-rose-600">
             {formatPrice(order.totalAmount)}
           </span>
         </div>
       </div>
 
-      <div className="space-y-3 text-sm">
+      <div className="space-y-3 text-xs">
         <div className="flex justify-between items-center">
           <span className="text-gray-500">
             Phương thức thanh toán
@@ -98,13 +98,13 @@ const OrderSummary = ({ order, formatPrice }) => {
       {order.status === 'CANCELLED' && (
         <div className="mt-6 rounded-xl border border-red-200 bg-red-50 p-4">
           <div className="flex items-center gap-2 mb-3">
-            <span className="text-lg">❌</span>
+            <span className="text-sm">❌</span>
             <h3 className="font-semibold text-red-700">
               Thông tin hủy đơn
             </h3>
           </div>
 
-          <div className="space-y-3 text-sm">
+          <div className="space-y-3 text-xs">
             <div className="flex justify-between">
               <span className="text-gray-500">Người hủy</span>
 

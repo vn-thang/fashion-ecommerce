@@ -62,7 +62,7 @@ const CouponTable = ({
   if (!coupons.length) {
     return (
       <div className="flex min-h-[240px] flex-col items-center justify-center rounded-xl border border-gray-100 bg-white text-center">
-        <div className="mb-3 text-4xl">🎟️</div>
+        <div className="mb-3 text-2xl">🎟️</div>
         <h3 className="text-sm font-semibold text-slate-700">
           Chưa có mã giảm giá nào
         </h3>
@@ -109,12 +109,12 @@ const CouponTable = ({
                   className="transition-colors hover:bg-slate-50/60"
                 >
                   <td className="px-5 py-4">
-                    <span className="rounded-lg bg-emerald-50 px-3 py-1.5 text-sm font-bold tracking-wide text-emerald-700">
+                    <span className="rounded-lg bg-emerald-50 px-3 py-1.5 text-xs font-bold tracking-wide text-emerald-700">
                       {item.code}
                     </span>
                   </td>
 
-                  <td className="px-5 py-4 text-sm font-semibold text-slate-700">
+                  <td className="px-5 py-4 text-xs font-semibold text-slate-700">
                     {item.discountType === 'PERCENTAGE'
                       ? `${item.discountValue}%`
                       : formatCurrency(item.discountValue)}
@@ -126,11 +126,11 @@ const CouponTable = ({
                     )}
                   </td>
 
-                  <td className="px-5 py-4 text-sm text-slate-600">
+                  <td className="px-5 py-4 text-xs text-slate-600">
                     {formatCurrency(item.minOrderAmount)}
                   </td>
 
-                  <td className="px-5 py-4 text-sm">
+                  <td className="px-5 py-4 text-xs">
                    <span className="font-semibold text-slate-700">
                       {usedCount}
                     </span>

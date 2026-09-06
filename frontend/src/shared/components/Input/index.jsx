@@ -11,7 +11,7 @@ const Input = ({
   ...props
 }) => {
   const baseInputStyles =
-    'w-full text-sm transition-all duration-200 outline-none';
+    'w-full text-xs transition-all duration-200 outline-none';
 
   const variants = {
     default:
@@ -30,7 +30,7 @@ const Input = ({
       {label && (
         <label
           htmlFor={id}
-          className="block text-sm font-semibold text-gray-700"
+          className="block text-xs font-semibold text-gray-700"
         >
           {label}
           {required && <span className="text-rose-500">*</span>}

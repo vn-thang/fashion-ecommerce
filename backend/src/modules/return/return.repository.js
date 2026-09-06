@@ -336,43 +336,56 @@ completeTransaction: async ({
       return returnRequest;
     }
 
-    for (const item of returnRequest.items) {
-      await tx.productVariant.update({
-        where: {
-          id: item.orderItem.productVariantId
-        },
-        data: {
-          stockQuantity: {
-            increment: item.quantity
-          }
-        }
-      });
-
-      if (item.orderItem.flashSaleVariantId) {
-        await tx.flashSaleVariant.update({
-          where: {
-            id: item.orderItem.flashSaleVariantId
-          },
-          data: {
-            flashSaleStock: {
-              increment: item.quantity
-            }
-          }
-        });
-      }
-
-      await tx.inventoryTransaction.create({
-        data: {
-          productVariantId:
-            item.orderItem.productVariantId,
-          type: 'Import',
-          quantity: item.quantity,
-          note:
-            `Hoàn kho do hoàn hàng ${returnRequest.order.orderNumber}`,
-          createdBy: returnRequest.userId
-        }
-      });
+for (const item of returnRequest.items) {
+  const variant = await tx.productVariant.findUnique({
+    where: {
+      id: item.orderItem.productVariantId
+    },
+    select: {
+      stockQuantity: true
     }
+  });
+
+  if (!variant) {
+    throw new Error('Không tìm thấy biến thể sản phẩm.');
+  }
+
+  const newStock =
+    variant.stockQuantity + item.quantity;
+
+  await tx.productVariant.update({
+    where: {
+      id: item.orderItem.productVariantId
+    },
+    data: {
+      stockQuantity: newStock
+    }
+  });
+
+  if (item.orderItem.flashSaleVariantId) {
+    await tx.flashSaleVariant.update({
+      where: {
+        id: item.orderItem.flashSaleVariantId
+      },
+      data: {
+        flashSaleStock: {
+          increment: item.quantity
+        }
+      }
+    });
+  }
+
+  await tx.inventoryTransaction.create({
+    data: {
+      productVariantId: item.orderItem.productVariantId,
+      type: 'Import',
+      quantity: item.quantity,
+      balanceAfter: newStock,
+      note: `Hoàn kho do hoàn hàng ${returnRequest.order.orderNumber}`,
+      createdBy: returnRequest.userId
+    }
+  });
+}
 const orderItems = await tx.orderItem.findMany({
   where: {
     orderId: returnRequest.order.id

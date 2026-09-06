@@ -3,7 +3,7 @@ import React from 'react';
 const DashboardHeader = () => {
   return (
     <div className="space-y-1">
-      <h1 className="text-2xl font-bold tracking-tight text-slate-800">
+      <h1 className="text-xl font-bold tracking-tight text-slate-800">
         Dashboard
       </h1>
 

@@ -168,6 +168,7 @@ createOrderTransaction: async ({
           productVariantId: item.productVariantId,
           type: 'Export',
           quantity: item.quantity,
+          balanceAfter: remainingStock,
           note: `Xuất kho tự động phục vụ đơn hàng: ${orderData.orderNumber}`,
           createdBy: userId
         }
@@ -466,7 +467,10 @@ findExpiredPendingOrders: async (expiredTime) => {
   });
 },
 
-restoreOrderResourcesTransaction: async (orderId, { restoreCoupon = true } = {}) => {
+restoreOrderResourcesTransaction: async (
+  orderId,
+  { restoreCoupon = true } = {}
+) => {
   return await prisma.$transaction(async tx => {
     const order = await tx.order.findUnique({
       where: {
@@ -488,14 +492,28 @@ restoreOrderResourcesTransaction: async (orderId, { restoreCoupon = true } = {})
     }
 
     for (const item of order.items) {
+      const variant = await tx.productVariant.findUnique({
+        where: {
+          id: item.productVariantId
+        },
+        select: {
+          stockQuantity: true
+        }
+      });
+
+      if (!variant) {
+        throw new Error('Không tìm thấy biến thể sản phẩm.');
+      }
+
+      const newStock =
+        variant.stockQuantity + item.quantity;
+
       await tx.productVariant.update({
         where: {
           id: item.productVariantId
         },
         data: {
-          stockQuantity: {
-            increment: item.quantity
-          }
+          stockQuantity: newStock
         }
       });
 
@@ -517,6 +535,7 @@ restoreOrderResourcesTransaction: async (orderId, { restoreCoupon = true } = {})
           productVariantId: item.productVariantId,
           type: 'Import',
           quantity: item.quantity,
+          balanceAfter: newStock,
           note: `Hoàn kho do hủy đơn ${order.orderNumber}`,
           createdBy: order.userId
         }
@@ -549,7 +568,6 @@ restoreOrderResourcesTransaction: async (orderId, { restoreCoupon = true } = {})
     return true;
   });
 },
-
 deleteCartItemsByOrder: async (orderId) => {
 
   const order = await prisma.order.findUnique({

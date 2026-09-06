@@ -77,7 +77,7 @@ const NotificationDropdown = ({ onClose }) => {
         <button
           type="button"
           onClick={handleViewAll}
-          className="w-full rounded-lg py-2.5 text-center text-sm font-semibold text-indigo-600 transition-colors hover:bg-indigo-50"
+          className="w-full rounded-lg py-2.5 text-center text-xs font-semibold text-indigo-600 transition-colors hover:bg-indigo-50"
         >
           Xem tất cả thông báo
         </button>

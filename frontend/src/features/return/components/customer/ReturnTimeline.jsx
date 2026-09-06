@@ -31,7 +31,7 @@ const ReturnTimeline = ({ status }) => {
           <div key={step.status} className="flex gap-3">
             <div className="flex flex-col items-center">
               <div
-                className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold ${
+                className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold ${
                   completed
                     ? 'bg-orange-500 text-white'
                     : 'border border-gray-300 bg-white text-gray-400'
@@ -53,7 +53,7 @@ const ReturnTimeline = ({ status }) => {
 
             <div className="pb-5">
               <div
-                className={`text-sm font-semibold ${
+                className={`text-xs font-semibold ${
                   current
                     ? 'text-orange-600'
                     : completed

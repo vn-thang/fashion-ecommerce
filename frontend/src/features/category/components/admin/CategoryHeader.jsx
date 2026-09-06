@@ -13,7 +13,7 @@ const CategoryHeader = ({
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
 
         <div>
-          <h1 className="text-2xl font-bold text-slate-800 tracking-tight">
+          <h1 className="text-xl font-bold text-slate-800 tracking-tight">
             Quản lý Danh mục
           </h1>
 
@@ -52,7 +52,7 @@ const CategoryHeader = ({
             border-gray-300
             px-4
             py-2.5
-            text-sm
+            text-xs
             focus:border-indigo-500
             focus:ring-2
             focus:ring-indigo-100

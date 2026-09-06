@@ -75,8 +75,8 @@ const CustomerHeader = () => {
     navigate('/login');
   };
  return (
-  <header className="sticky top-0 z-50 bg-white border-b border-gray-150 shadow-sm">
-    <div className="w-[95%] max-w-[1600px] mx-auto py-3 md:py-4">
+<header className="sticky top-0 z-50 border-b border-gray-200 bg-white">
+  <div className="mx-auto w-[85%] max-w-[1200px] py-3">
       <div className="flex flex-wrap items-center justify-between gap-3 md:flex-nowrap md:gap-8">
         <Link
           to="/"
@@ -95,7 +95,7 @@ const CustomerHeader = () => {
           )}
 
           <div>
-            <h1 className="text-base md:text-2xl font-extrabold text-[#ee4d2d]">
+            <h1 className="text-base md:text-xl font-extrabold text-[#ee4d2d]">
               {store.storeName}
             </h1>
 
@@ -112,7 +112,7 @@ const CustomerHeader = () => {
             to="/cart"
             className="relative flex items-center group"
           >
-            <span className="text-2xl md:text-3xl text-gray-700 group-hover:text-[#ee4d2d] transition-colors">
+            <span className="text-2xl md:text-xl text-gray-700 group-hover:text-[#ee4d2d] transition-colors">
               🛒
             </span>
 
@@ -135,7 +135,7 @@ const CustomerHeader = () => {
         {user.fullName?.charAt(0) || user.username?.charAt(0) || 'U'}
       </div>
 
-      <span className="hidden max-w-[150px] truncate text-sm font-medium text-gray-700 md:inline">
+      <span className="hidden max-w-[150px] truncate text-xs font-medium text-gray-700 md:inline">
         {user.fullName || user.username}
       </span>
     </button>
@@ -146,7 +146,7 @@ const CustomerHeader = () => {
           <Link
             to="/account/profile"
             onClick={() => setIsUserMenuOpen(false)}
-            className="px-4 py-2 text-sm hover:bg-gray-50 hover:text-[#ee4d2d]"
+            className="px-4 py-2 text-xs hover:bg-gray-50 hover:text-[#ee4d2d]"
           >
             Tài khoản của tôi
           </Link>
@@ -154,7 +154,7 @@ const CustomerHeader = () => {
           <Link
             to="/account/orders"
             onClick={() => setIsUserMenuOpen(false)}
-            className="px-4 py-2 text-sm hover:bg-gray-50 hover:text-[#ee4d2d]"
+            className="px-4 py-2 text-xs hover:bg-gray-50 hover:text-[#ee4d2d]"
           >
             Đơn mua
           </Link>
@@ -163,7 +163,7 @@ const CustomerHeader = () => {
             <Link
               to="/admin/dashboard"
               onClick={() => setIsUserMenuOpen(false)}
-              className="border-t border-gray-100 px-4 py-2 text-sm font-medium text-indigo-600 hover:bg-indigo-50"
+              className="border-t border-gray-100 px-4 py-2 text-xs font-medium text-indigo-600 hover:bg-indigo-50"
             >
               Trang quản trị
             </Link>
@@ -172,7 +172,7 @@ const CustomerHeader = () => {
           <button
             type="button"
             onClick={handleLogout}
-            className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 hover:text-[#ee4d2d]"
+            className="w-full px-4 py-2 text-left text-xs hover:bg-gray-50 hover:text-[#ee4d2d]"
           >
             Đăng xuất
           </button>
@@ -184,7 +184,7 @@ const CustomerHeader = () => {
   <div className="flex items-center gap-2 md:gap-3">
     <Link
       to="/register"
-      className="hidden text-sm font-medium text-gray-600 hover:text-[#ee4d2d] sm:block"
+      className="hidden text-xs font-medium text-gray-600 hover:text-[#ee4d2d] sm:block"
     >
       Đăng ký
     </Link>
@@ -193,7 +193,7 @@ const CustomerHeader = () => {
 
     <Link
       to="/login"
-      className="rounded-sm bg-[#ee4d2d] px-3 py-2 text-xs font-medium text-white shadow-sm hover:bg-[#d74123] md:px-4 md:text-sm"
+      className="rounded-sm bg-[#ee4d2d] px-3 py-2 text-xs font-medium text-white shadow-sm hover:bg-[#d74123] md:px-4 md:text-xs"
     >
       Đăng nhập
     </Link>
@@ -202,17 +202,17 @@ const CustomerHeader = () => {
         </div>
       </div>
     </div>
-    <div className="bg-[#D5A6A6] text-white">
-      <div className="w-[95%] max-w-[1600px] mx-auto flex items-center">
+   <div className="bg-[#D5A6A6] text-white">
+  <div className="mx-auto flex w-[85%] max-w-[1200px] items-center">
         <div
           className="relative shrink-0"
           onMouseEnter={() => setIsCategoryOpen(true)}
           onMouseLeave={() => setIsCategoryOpen(false)}
         >
           <div className="flex items-center gap-2 md:gap-3 w-auto md:w-64 px-3 md:px-6 py-3 md:py-3.5 bg-[#C28D8D] cursor-pointer font-semibold hover:bg-[#B98282] transition-colors">
-            <span className="text-lg md:text-xl">☰</span>
+            <span className="text-lg md:text-lg">☰</span>
 
-            <span className="text-xs md:text-sm uppercase tracking-wide whitespace-nowrap">
+            <span className="text-xs md:text-xs uppercase tracking-wide whitespace-nowrap">
               Danh Mục
               <span className="hidden sm:inline"> Sản Phẩm</span>
             </span>
@@ -283,7 +283,7 @@ const CustomerHeader = () => {
                                       <Link
                                         to={`/products?category=${child._id || child.id}`}
                                         onClick={() => setIsCategoryOpen(false)}
-                                        className="block px-5 py-2.5 text-sm text-gray-600 border-l-2 border-transparent hover:border-[#ee4d2d] hover:bg-gray-50 hover:text-[#ee4d2d]"
+                                        className="block px-5 py-2.5 text-xs text-gray-600 border-l-2 border-transparent hover:border-[#ee4d2d] hover:bg-gray-50 hover:text-[#ee4d2d]"
                                       >
                                         {child.name}
                                       </Link>
@@ -304,7 +304,7 @@ const CustomerHeader = () => {
             </div>
           )}
         </div>
-  <nav className="ml-4 flex items-center gap-6 overflow-x-auto whitespace-nowrap scrollbar-hide font-medium text-[11px] uppercase tracking-wide md:ml-8 md:gap-10 md:text-[13px]">
+  <nav className="ml-4 flex items-center gap-6 overflow-x-auto whitespace-nowrap scrollbar-hide font-medium text-[10px] uppercase tracking-wide md:ml-8 md:gap-10 md:text-[12px]">
 
           <Link
             to="/"

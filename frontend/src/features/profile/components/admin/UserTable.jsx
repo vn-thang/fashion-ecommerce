@@ -12,7 +12,7 @@ const UserTable = ({
   return (
     <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
       <div className="overflow-x-auto">
-        <table className="w-full text-sm">
+        <table className="w-full text-xs">
           <thead className="bg-slate-50 border-b">
             <tr className="text-left">
               <th className="px-5 py-4">Khách hàng</th>

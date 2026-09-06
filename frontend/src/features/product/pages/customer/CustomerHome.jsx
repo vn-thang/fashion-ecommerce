@@ -30,24 +30,26 @@ const CustomerHome = () => {
 
 return (
   <div className="w-full">
-    <div className="flex flex-col gap-5 md:flex-row">
-      <ProductFilter
-        categories={categories}
-        brands={brands}
-        selectedCategories={selectedCategories}
-        selectedBrands={selectedBrands}
-        priceRange={priceRange}
-        setPriceRange={setPriceRange}
-        handleCategoryChange={handleCategoryChange}
-        handleBrandChange={handleBrandChange}
-        handleApplyFilter={handleApplyFilter}
-        handleClearFilters={handleClearFilters}
-        urlCategory={urlCategory}
-        activeParentId={activeParentId}
-        setSearchParams={setSearchParams}
-      />
+   <div className="flex flex-col gap-6 md:flex-row">
+  <aside className="w-full shrink-0 md:w-[220px] lg:w-[230px]">
+    <ProductFilter
+      categories={categories}
+      brands={brands}
+      selectedCategories={selectedCategories}
+      selectedBrands={selectedBrands}
+      priceRange={priceRange}
+      setPriceRange={setPriceRange}
+      handleCategoryChange={handleCategoryChange}
+      handleBrandChange={handleBrandChange}
+      handleApplyFilter={handleApplyFilter}
+      handleClearFilters={handleClearFilters}
+      urlCategory={urlCategory}
+      activeParentId={activeParentId}
+      setSearchParams={setSearchParams}
+    />
+  </aside>
 
-      <main className="min-w-0 flex-1">
+  <main className="min-w-0 flex-1">
         <div className="mb-6 rounded-sm bg-[#ededed] px-3 py-3 shadow-sm sm:px-5 sm:py-4">
           <div className="flex w-full flex-col gap-3 sm:flex-row sm:items-center">
             <span className="hidden shrink-0 text-sm font-medium text-gray-600 md:inline">
@@ -123,14 +125,14 @@ return (
           </div>
         ) : (
           <>
-            <div className="mb-10 grid grid-cols-2 gap-3 sm:grid-cols-2 sm:gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-              {products.map(product => (
-                <ProductCard
-                  key={product.id || product._id}
-                  product={product}
-                />
-              ))}
-            </div>
+        <div className="mb-10 grid grid-cols-2 gap-3 sm:grid-cols-2 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
+          {products.map(product => (
+            <ProductCard
+              key={product.id || product._id}
+              product={product}
+            />
+          ))}
+        </div>
 
             <div className="mt-6 flex justify-center overflow-x-auto">
               <Pagination

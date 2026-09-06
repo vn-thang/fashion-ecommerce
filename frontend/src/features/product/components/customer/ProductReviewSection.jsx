@@ -59,7 +59,7 @@ const ProductReviewSection = ({
 
  return (
   <div className="bg-white mt-4 p-6 rounded-sm shadow-sm">
-    <h2 className="text-lg font-semibold text-gray-800 mb-6 uppercase">
+    <h2 className="text-sm font-semibold text-gray-800 mb-6 uppercase">
       Đánh giá sản phẩm
     </h2>
 
@@ -71,7 +71,7 @@ const ProductReviewSection = ({
       <>
         <div className="bg-orange-50 border border-orange-100 p-6 rounded-md flex items-center gap-8 mb-6">
           <div className="text-center">
-            <div className="text-3xl font-bold text-[#ee4d2d]">
+            <div className="text-2xl font-bold text-[#ee4d2d]">
               {Number(displayAverageRating).toFixed(1)}
               <span className="text-xl text-gray-500 font-normal">
                 {' '}/ 5
@@ -89,7 +89,7 @@ const ProductReviewSection = ({
         </div>
 
         <div className="border border-gray-200 rounded-md p-4 mb-6">
-          <div className="text-sm font-medium text-gray-700 mb-3">
+          <div className="text-xs font-medium text-gray-700 mb-3">
             Lọc đánh giá
           </div>
 
@@ -97,7 +97,7 @@ const ProductReviewSection = ({
             <button
               type="button"
               onClick={() => handleRatingFilter(null)}
-              className={`px-4 py-2 border rounded-md text-sm transition ${
+              className={`px-4 py-2 border rounded-md text-xs transition ${
                 ratingFilter === null
                   ? 'border-[#ee4d2d] text-[#ee4d2d] bg-orange-50'
                   : 'border-gray-300 text-gray-600 hover:border-[#ee4d2d]'
@@ -111,7 +111,7 @@ const ProductReviewSection = ({
                 key={star}
                 type="button"
                 onClick={() => handleRatingFilter(star)}
-                className={`px-4 py-2 border rounded-md text-sm transition flex items-center justify-center gap-1 ${
+                className={`px-4 py-2 border rounded-md text-xs transition flex items-center justify-center gap-1 ${
                   ratingFilter === star
                     ? 'border-[#ee4d2d] text-[#ee4d2d] bg-orange-50'
                     : 'border-gray-300 text-gray-600 hover:border-[#ee4d2d]'
@@ -129,7 +129,7 @@ const ProductReviewSection = ({
             <button
               type="button"
               onClick={handleCommentFilter}
-              className={`px-4 py-2 border rounded-md text-sm transition ${
+              className={`px-4 py-2 border rounded-md text-xs transition ${
                 hasCommentFilter
                   ? 'border-[#ee4d2d] text-[#ee4d2d] bg-orange-50'
                   : 'border-gray-300 text-gray-600 hover:border-[#ee4d2d]'
@@ -180,7 +180,7 @@ const ProductReviewSection = ({
                   />
 
                   <div className="flex-1">
-                    <div className="text-sm font-medium text-gray-800">
+                    <div className="text-xs font-medium text-gray-800">
                       {review.user?.fullName || 'Người dùng'}
                     </div>
 
@@ -209,7 +209,7 @@ const ProductReviewSection = ({
                     </div>
 
                     {review.comment?.trim() && (
-                      <div className="text-sm text-gray-700 mt-3 whitespace-pre-line bg-gray-50 p-3 rounded border">
+                      <div className="text-xs text-gray-700 mt-3 whitespace-pre-line bg-gray-50 p-3 rounded border">
                         {review.comment}
                       </div>
                     )}
@@ -230,7 +230,7 @@ const ProductReviewSection = ({
                           )}
                         </div>
 
-                        <p className="mt-2 text-sm text-gray-700 whitespace-pre-line">
+                        <p className="mt-2 text-xs text-gray-700 whitespace-pre-line">
                           {review.reply}
                         </p>
                       </div>

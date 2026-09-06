@@ -72,22 +72,22 @@ const FlashSaleVariantForm = ({
                   {variant.product.name}
                 </h3>
 
-                <div className="mt-1 text-sm text-gray-500">
+                <div className="mt-1 text-xs text-gray-500">
                   SKU: {variant.sku}
                 </div>
 
-                <div className="mt-1 text-sm text-gray-500">
+                <div className="mt-1 text-xs text-gray-500">
                   {variant.color} / {variant.size}
                 </div>
 
-                <div className="mt-2 text-sm">
+                <div className="mt-2 text-xs">
                   Giá gốc:
                   <span className="ml-2 font-semibold text-slate-700">
                     {Number(variant.price).toLocaleString('vi-VN')}đ
                   </span>
                 </div>
 
-                <div className="text-sm">
+                <div className="text-xs">
                   Tồn kho:
                   <span className="ml-2 font-semibold text-blue-600">
                     {variant.stockQuantity}
@@ -100,7 +100,7 @@ const FlashSaleVariantForm = ({
         )}
 
         <div>
-          <label className="block mb-2 text-sm font-semibold text-gray-700">
+          <label className="block mb-2 text-xs font-semibold text-gray-700">
             Giá Flash Sale
           </label>
 
@@ -115,7 +115,7 @@ const FlashSaleVariantForm = ({
         </div>
 
         <div>
-          <label className="block mb-2 text-sm font-semibold text-gray-700">
+          <label className="block mb-2 text-xs font-semibold text-gray-700">
             Số lượng Flash Sale
           </label>
 

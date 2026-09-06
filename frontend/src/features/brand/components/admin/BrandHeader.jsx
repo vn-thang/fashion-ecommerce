@@ -13,7 +13,7 @@ const BrandHeader = ({
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
 
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-800">
+          <h1 className="text-xl font-bold tracking-tight text-slate-800">
             Quản lý thương hiệu
           </h1>
 
@@ -65,7 +65,7 @@ const BrandHeader = ({
             border-gray-300
             px-4
             py-2.5
-            text-sm
+            text-xs
             outline-none
             transition
             focus:border-indigo-500

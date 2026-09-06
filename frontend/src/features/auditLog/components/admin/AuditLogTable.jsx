@@ -88,7 +88,7 @@ const formatDate = value => {
 
   return (
     <div>
-      <p className="whitespace-nowrap text-sm font-medium text-slate-700">
+      <p className="whitespace-nowrap text-xs font-medium text-slate-700">
         {date.toLocaleDateString('vi-VN')}
       </p>
       <p className="mt-0.5 whitespace-nowrap text-xs text-gray-400">
@@ -111,7 +111,7 @@ const AuditLogTable = ({
   if (loading) {
     return (
       <div className="rounded-2xl border border-gray-100 bg-white shadow-sm">
-        <div className="flex items-center justify-center py-16 text-sm text-gray-500">
+        <div className="flex items-center justify-center py-16 text-xs text-gray-500">
           <div className="flex items-center gap-2">
             <svg
               className="h-5 w-5 animate-spin"
@@ -143,13 +143,13 @@ const AuditLogTable = ({
     return (
       <div className="rounded-2xl border border-gray-100 bg-white shadow-sm">
         <div className="flex flex-col items-center justify-center py-16 text-gray-400">
-          <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-50 text-3xl">
+          <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-50 text-xl">
             📋
           </div>
           <p className="font-semibold text-slate-600">
             Không tìm thấy audit log
           </p>
-          <p className="mt-1 text-sm text-gray-400">
+          <p className="mt-1 text-xs text-gray-400">
             Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm.
           </p>
         </div>
@@ -215,12 +215,12 @@ const AuditLogTable = ({
 
                   <td className="px-5 py-4">
                     <div className="flex items-center gap-3">
-                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-indigo-50 text-sm font-bold text-indigo-600">
+                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-indigo-50 text-xs font-bold text-indigo-600">
                         {getInitial(log.user)}
                       </div>
 
                       <div className="min-w-0">
-                        <p className="truncate text-sm font-semibold text-slate-700">
+                        <p className="truncate text-xs font-semibold text-slate-700">
                           {userName}
                         </p>
 

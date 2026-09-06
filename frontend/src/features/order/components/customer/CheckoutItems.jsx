@@ -32,7 +32,7 @@ const CheckoutItems = ({ items = [], formatPrice }) => {
           const hasFlashSale = originalPrice > unitPrice;
 
           return (
-            <div key={item.id} className="flex gap-3 py-3 text-sm">
+            <div key={item.id} className="flex gap-3 py-3 text-xs">
               <img
                 src={thumbnailUrl}
                 alt={productName}

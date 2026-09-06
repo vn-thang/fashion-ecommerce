@@ -102,7 +102,7 @@ const ReturnDetailModal = ({
               <div className="text-xs text-gray-500">
                 Số tiền hoàn
               </div>
-              <div className="mt-1 text-lg font-bold text-orange-600">
+              <div className="mt-1 text-sm font-bold text-orange-600">
                 {formatPrice(selectedReturn.refundAmount)}
               </div>
             </div>
@@ -113,7 +113,7 @@ const ReturnDetailModal = ({
               <div className="text-xs text-gray-500">
                 Phương thức thanh toán
               </div>
-              <div className="mt-1 text-sm font-semibold text-gray-800">
+              <div className="mt-1 text-xs font-semibold text-gray-800">
                 {PAYMENT_METHOD_LABEL[payment?.paymentMethod] ||
                   'Không xác định'}
               </div>
@@ -123,7 +123,7 @@ const ReturnDetailModal = ({
               <div className="text-xs text-gray-500">
                 Trạng thái thanh toán
               </div>
-              <div className="mt-1 text-sm font-semibold text-gray-800">
+              <div className="mt-1 text-xs font-semibold text-gray-800">
                 {PAYMENT_STATUS_LABEL[payment?.status] ||
                   'Không xác định'}
               </div>
@@ -131,7 +131,7 @@ const ReturnDetailModal = ({
           </div>
 
           <div>
-            <div className="mb-3 text-sm font-semibold text-slate-800">
+            <div className="mb-3 text-xs font-semibold text-slate-800">
               Sản phẩm
             </div>
 
@@ -154,7 +154,7 @@ const ReturnDetailModal = ({
                           className="h-full w-full object-cover"
                         />
                       ) : (
-                        <div className="flex h-full w-full items-center justify-center text-xl text-gray-300">
+                        <div className="flex h-full w-full items-center justify-center text-lg text-gray-300">
                           🖼️
                         </div>
                       )}
@@ -165,7 +165,7 @@ const ReturnDetailModal = ({
                         {orderItem?.productName}
                       </div>
 
-                      <div className="mt-1 text-sm text-gray-500">
+                      <div className="mt-1 text-xs text-gray-500">
                         {orderItem?.color &&
                           `Màu: ${orderItem.color}`}
                         {orderItem?.color &&
@@ -175,7 +175,7 @@ const ReturnDetailModal = ({
                           `Size: ${orderItem.size}`}
                       </div>
 
-                      <div className="mt-1 text-sm text-gray-500">
+                      <div className="mt-1 text-xs text-gray-500">
                         Giá mua:{' '}
                         <span className="font-medium text-gray-700">
                           {formatPrice(orderItem?.unitPrice)}
@@ -183,7 +183,7 @@ const ReturnDetailModal = ({
                       </div>
                     </div>
 
-                    <div className="shrink-0 text-sm font-semibold text-gray-700">
+                    <div className="shrink-0 text-xs font-semibold text-gray-700">
                       × {item.quantity}
                     </div>
                   </div>
@@ -195,7 +195,7 @@ const ReturnDetailModal = ({
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="rounded-xl border border-gray-100 bg-white p-4">
               <div className="text-xs text-gray-500">Lý do</div>
-              <div className="mt-1 text-sm font-medium text-gray-800">
+              <div className="mt-1 text-xs font-medium text-gray-800">
               {RETURN_REASON_LABEL[selectedReturn.reason] || 'Không xác định'}
             </div>
             </div>
@@ -204,7 +204,7 @@ const ReturnDetailModal = ({
               <div className="text-xs text-gray-500">
                 Tiền hoàn dự kiến
               </div>
-              <div className="mt-1 text-lg font-bold text-orange-600">
+              <div className="mt-1 text-sm font-bold text-orange-600">
                 {formatPrice(selectedReturn.refundAmount)}
               </div>
             </div>
@@ -213,7 +213,7 @@ const ReturnDetailModal = ({
           {selectedReturn.description && (
             <div>
               <div className="text-xs text-gray-500">Mô tả</div>
-              <div className="mt-2 rounded-xl border border-gray-100 bg-gray-50 p-4 text-sm leading-6 text-gray-700 whitespace-pre-line">
+              <div className="mt-2 rounded-xl border border-gray-100 bg-gray-50 p-4 text-xs leading-6 text-gray-700 whitespace-pre-line">
                 {selectedReturn.description}
               </div>
             </div>
@@ -221,17 +221,17 @@ const ReturnDetailModal = ({
 
           {selectedReturn.rejectReason && (
             <div className="rounded-xl border border-red-100 bg-red-50 p-4">
-              <div className="text-sm font-semibold text-red-700">
+              <div className="text-xs font-semibold text-red-700">
                 Lý do từ chối
               </div>
-              <div className="mt-1 text-sm leading-6 text-red-600">
+              <div className="mt-1 text-xs leading-6 text-red-600">
                 {selectedReturn.rejectReason}
               </div>
             </div>
           )}
 
           <div>
-            <div className="mb-3 text-sm font-semibold text-slate-800">
+            <div className="mb-3 text-xs font-semibold text-slate-800">
               Tiến trình trả hàng
             </div>
 
@@ -243,11 +243,11 @@ const ReturnDetailModal = ({
 
           {selectedReturn.status === 'APPROVED' && (
             <div className="rounded-xl border border-blue-100 bg-blue-50 p-4">
-              <div className="text-sm font-medium text-blue-700">
+              <div className="text-xs font-medium text-blue-700">
                 Yêu cầu đã được duyệt.
               </div>
 
-              <div className="mt-1 text-sm text-blue-600">
+              <div className="mt-1 text-xs text-blue-600">
                 Sau khi gửi hàng, hãy xác nhận để cửa hàng tiếp nhận.
               </div>
 

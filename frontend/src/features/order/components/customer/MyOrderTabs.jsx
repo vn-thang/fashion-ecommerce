@@ -17,7 +17,7 @@ const MyOrderTabs = ({ currentTab, onTabChange }) => {
         <button
           key={tab.id}
           onClick={() => onTabChange(tab.id)}
-          className={`flex-1 min-w-[120px] py-4 text-sm font-medium text-center border-b-2 transition-colors whitespace-nowrap px-4
+          className={`flex-1 min-w-[120px] py-4 text-xs font-medium text-center border-b-2 transition-colors whitespace-nowrap px-4
             ${currentTab === tab.id 
               ? 'border-[#ee4d2d] text-[#ee4d2d]' 
               : 'border-transparent text-gray-700 hover:text-[#ee4d2d]'

@@ -7,7 +7,7 @@ const AuthHeader = ({
 }) => {
   return (
     <div className="mb-6 text-center">
-      <h2 className="text-3xl font-black tracking-tight text-[#1f2438]">
+      <h2 className="text-2xl font-black tracking-tight text-[#1f2438]">
         {title}
       </h2>
 

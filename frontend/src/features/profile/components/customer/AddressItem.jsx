@@ -8,7 +8,7 @@ const AddressItem = ({ address, onEdit, onDelete, onSetDefault }) => {
         <div className="flex flex-wrap items-center gap-3">
           <span className="font-semibold text-gray-800 text-base">{address.receiverName}</span>
           <span className="h-3 w-[1px] bg-gray-300 hidden sm:block"></span>
-          <span className="text-gray-500 text-sm">{address.phoneNumber}</span>
+          <span className="text-gray-500 text-xs">{address.phoneNumber}</span>
           
           {address.isDefault && (
             <span className="inline-flex items-center rounded-sm bg-rose-50 border border-rose-200 px-1.5 py-0.5 text-[11px] font-medium text-[#ee4d2d]">
@@ -17,14 +17,14 @@ const AddressItem = ({ address, onEdit, onDelete, onSetDefault }) => {
           )}
         </div>
         
-        <div className="text-gray-600 text-sm space-y-0.5">
+        <div className="text-gray-600 text-xs space-y-0.5">
           <p>{address.addressLine}</p>
           <p>{`${address.ward}, ${address.province}`}</p>
         </div>
       </div>
 
       <div className="flex flex-col items-end justify-between gap-3 shrink-0 min-w-[140px]">
-        <div className="flex items-center gap-3 text-sm">
+        <div className="flex items-center gap-3 text-xs">
           <button 
             onClick={() => onEdit(address)}
             className="text-indigo-600 hover:text-indigo-800 font-medium transition-colors outline-none"

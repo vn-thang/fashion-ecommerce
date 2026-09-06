@@ -5,7 +5,7 @@ const BannerHeader = ({ onAdd }) => {
   return (
     <div className="flex items-center justify-between">
       <div>
-        <h1 className="text-2xl font-bold text-slate-800">
+        <h1 className="text-xl font-bold text-slate-800">
           Quản lý Banner
         </h1>
 

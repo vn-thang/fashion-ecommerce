@@ -39,8 +39,8 @@ const ReviewTable = ({
             <path strokeLinecap="round" strokeLinejoin="round" d="M8 10h8M8 14h5m7-2a8 8 0 11-16 0 8 8 0 0016 0z" />
           </svg>
         </div>
-        <h3 className="mt-4 text-sm font-semibold text-slate-700">Chưa có đánh giá nào</h3>
-        <p className="mt-1 text-sm text-gray-400">Không tìm thấy đánh giá phù hợp với điều kiện hiện tại.</p>
+        <h3 className="mt-4 text-xs font-semibold text-slate-700">Chưa có đánh giá nào</h3>
+        <p className="mt-1 text-xs text-gray-400">Không tìm thấy đánh giá phù hợp với điều kiện hiện tại.</p>
       </div>
     );
   }
@@ -73,7 +73,7 @@ const ReviewTable = ({
                       className={`h-11 w-11 shrink-0 rounded-full border border-gray-200 object-cover ${review.isHidden ? 'grayscale' : ''}`}
                     />
                     <div className="min-w-0">
-                      <p className="truncate text-sm font-semibold text-slate-800">
+                      <p className="truncate text-xs font-semibold text-slate-800">
                         {review.user?.fullName || 'Khách ẩn danh'}
                       </p>
                       {review.user?.email && (
@@ -88,7 +88,7 @@ const ReviewTable = ({
 
                 <td className="px-6 py-4 align-top">
                   <div className="max-w-[220px]">
-                    <p className="line-clamp-2 text-sm font-semibold text-slate-700">
+                    <p className="line-clamp-2 text-xs font-semibold text-slate-700">
                       {review.product?.name || 'Sản phẩm đã xóa'}
                     </p>
 
@@ -116,7 +116,7 @@ const ReviewTable = ({
                       <span className="text-xs font-semibold text-slate-500">{review.rating}/5</span>
                     </div>
 
-                    <p className={`mt-2 line-clamp-3 text-sm leading-relaxed ${review.comment ? 'text-slate-600' : 'italic text-gray-400'}`}>
+                    <p className={`mt-2 line-clamp-3 text-xs leading-relaxed ${review.comment ? 'text-slate-600' : 'italic text-gray-400'}`}>
                       {review.comment || 'Không có bình luận'}
                     </p>
 

@@ -29,11 +29,11 @@ const FlashSaleStats = ({ stats }) => {
       {cards.map(card => (
         <div
           key={card.title}
-          className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6"
+          className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4"
         >
-          <p className="text-sm text-gray-500">{card.title}</p>
+          <p className="text-xs text-gray-500">{card.title}</p>
 
-          <div className={`inline-flex mt-4 px-4 py-2 rounded-xl text-3xl font-bold ${card.color}`}>
+          <div className={`inline-flex mt-4 px-4 py-2 rounded-xl text-2xl font-bold ${card.color}`}>
             {card.value}
           </div>
         </div>

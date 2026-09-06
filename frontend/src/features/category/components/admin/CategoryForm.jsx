@@ -14,12 +14,12 @@ const CategoryForm = ({ form, setForm, categories = [], editingId }) => {
       />
 
       <div className="w-full text-left space-y-1.5">
-        <label htmlFor="parent-category" className="block text-sm font-semibold text-gray-700">
+        <label htmlFor="parent-category" className="block text-xs font-semibold text-gray-700">
           Danh mục cha (Tùy chọn)
         </label>
         <select
           id="parent-category"
-          className="w-full text-sm transition-all duration-200 outline-none px-4 py-2.5 bg-white border border-gray-300 rounded-lg text-gray-900 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 shadow-sm"
+          className="w-full text-xs transition-all duration-200 outline-none px-4 py-2.5 bg-white border border-gray-300 rounded-lg text-gray-900 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 shadow-sm"
           value={form.parentId || ''}
           onChange={(e) => setForm({ ...form, parentId: e.target.value })}
         >

@@ -64,7 +64,7 @@ const TopProducts = ({
               }
               className="group flex w-full items-center gap-4 border-b border-gray-100 py-4 text-left transition last:border-none hover:bg-gray-50"
             >
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-sm font-semibold text-indigo-600">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-xs font-semibold text-indigo-600">
                 {index + 1}
               </div>
 

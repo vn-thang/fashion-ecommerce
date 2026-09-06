@@ -16,9 +16,9 @@ const ProductForm = ({ form, setForm, categories = [], brands = [], isEditing })
 
       <div className="grid grid-cols-2 gap-4">
          <div className="w-full text-left space-y-1.5">
-           <label className="block text-sm font-semibold text-gray-700">Danh mục <span className="text-red-500">*</span></label>
+           <label className="block text-xs font-semibold text-gray-700">Danh mục <span className="text-red-500">*</span></label>
            <select
-            className="w-full text-sm transition-all duration-200 outline-none px-4 py-2.5 bg-white border border-gray-300 rounded-lg text-gray-900 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 shadow-sm"
+            className="w-full text-xs transition-all duration-200 outline-none px-4 py-2.5 bg-white border border-gray-300 rounded-lg text-gray-900 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 shadow-sm"
             value={form.categoryId}
             onChange={(e) => setForm({ ...form, categoryId: e.target.value })}
           >
@@ -30,9 +30,9 @@ const ProductForm = ({ form, setForm, categories = [], brands = [], isEditing })
         </div>
 
         <div className="w-full text-left space-y-1.5">
-          <label className="block text-sm font-semibold text-gray-700">Thương hiệu <span className="text-red-500">*</span></label>
+          <label className="block text-xs font-semibold text-gray-700">Thương hiệu <span className="text-red-500">*</span></label>
           <select
-            className="w-full text-sm transition-all duration-200 outline-none px-4 py-2.5 bg-white border border-gray-300 rounded-lg text-gray-900 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 shadow-sm"
+            className="w-full text-xs transition-all duration-200 outline-none px-4 py-2.5 bg-white border border-gray-300 rounded-lg text-gray-900 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 shadow-sm"
             value={form.brandId}
             onChange={(e) => setForm({ ...form, brandId: e.target.value })}
           >
@@ -47,7 +47,7 @@ const ProductForm = ({ form, setForm, categories = [], brands = [], isEditing })
     <div>
   <label
     htmlFor="product-desc"
-    className="mb-1.5 block text-sm font-medium text-gray-700"
+    className="mb-1.5 block text-xs font-medium text-gray-700"
   >
     Mô tả sản phẩm
   </label>
@@ -63,16 +63,16 @@ const ProductForm = ({ form, setForm, categories = [], brands = [], isEditing })
       })
     }
     rows={12}
-    className="w-full resize-y rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-700 outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+    className="w-full resize-y rounded-lg border border-gray-300 px-4 py-3 text-xs text-gray-700 outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
   />
 </div>
 
            <div className="grid grid-cols-2 gap-4">
-         TRẠNG THÁI
+        
          <div className="w-full text-left space-y-1.5">
-           <label className="block text-sm font-semibold text-gray-700">Trạng thái</label>
+           <label className="block text-xs font-semibold text-gray-700">Trạng thái</label>
            <select
-            className="w-full text-sm transition-all duration-200 outline-none px-4 py-2.5 bg-white border border-gray-300 rounded-lg text-gray-900 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 shadow-sm"
+            className="w-full text-xs transition-all duration-200 outline-none px-4 py-2.5 bg-white border border-gray-300 rounded-lg text-gray-900 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 shadow-sm"
             value={form.status}
             onChange={(e) => setForm({ ...form, status: e.target.value })}
           >
