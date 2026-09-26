@@ -10,6 +10,7 @@ const { startOrderExpirationJob} = require('./jobs/orderExpiration.job');
 const { startFlashSaleNotificationJob} = require('./jobs/flashSaleNotification.job');
 
 const {startCouponNotificationJob} = require('./jobs/couponNotification.job');
+const configureSwagger = require('./config/swagger');
 
 const PORT = process.env.PORT || 3000;
 
@@ -20,6 +21,7 @@ const startServer = async () => {
     console.log('Redis connected successfully');
 
     const app = require('./app');
+    await configureSwagger(app);
 
     const server = http.createServer(app);
 

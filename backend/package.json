@@ -32,7 +32,9 @@
     "redis": "^6.2.1",
     "resend": "^6.26.0",
     "slugify": "^1.6.9",
-    "socket.io": "^4.8.3"
+    "socket.io": "^4.8.3",
+    "swagger-autogen": "^2.23.7",
+    "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {
     "@types/node": "^25.9.2",
