@@ -6,6 +6,29 @@ const swaggerAutogen = require('swagger-autogen')({
 });
 const swaggerUi = require('swagger-ui-express');
 
+const featureTags = [
+  { prefix: '/auth', name: 'Authentication' },
+  { prefix: '/categories', name: 'Category' },
+  { prefix: '/brands', name: 'Brand' },
+  { prefix: '/products', name: 'Product' },
+  { prefix: '/cart', name: 'Cart' },
+  { prefix: '/users', name: 'User' },
+  { prefix: '/coupons', name: 'Coupon' },
+  { prefix: '/order', name: 'Order' },
+  { prefix: '/orders', name: 'Order' },
+  { prefix: '/review', name: 'Review' },
+  { prefix: '/storeSetting', name: 'Store Settings' },
+  { prefix: '/banners', name: 'Banner' },
+  { prefix: '/flashSales', name: 'Flash Sale' },
+  { prefix: '/payments', name: 'Payment' },
+  { prefix: '/inventory', name: 'Inventory' },
+  { prefix: '/dashboard', name: 'Dashboard' },
+  { prefix: '/auditLog', name: 'Audit Log' },
+  { prefix: '/notifications', name: 'Notification' },
+  { prefix: '/conversations', name: 'Chat' },
+  { prefix: '/returns', name: 'Return' },
+];
+
 const swaggerDocument = {
   info: {
     title: 'Fashion Hub API',
@@ -13,6 +36,7 @@ const swaggerDocument = {
     version: '1.0.0',
   },
   servers: [{ url: '/api' }],
+  tags: [...new Set(featureTags.map(({ name }) => name))].map((name) => ({ name })),
 };
 
 const endpointsFile = './routes/index.js';
@@ -23,6 +47,20 @@ const configureSwagger = async (app) => {
 
   if (!result.success) {
     throw new Error('Failed to generate Swagger API documentation.');
+  }
+
+  for (const [routePath, operations] of Object.entries(result.data.paths)) {
+    const featurePath = routePath.replace(/^\/admin(?=\/)/, '');
+    const feature = featureTags.find(({ prefix }) =>
+      featurePath === prefix || featurePath.startsWith(`${prefix}/`)
+    );
+    const tag = feature?.name || 'Other';
+
+    for (const operation of Object.values(operations)) {
+      if (operation && typeof operation === 'object') {
+        operation.tags = [tag];
+      }
+    }
   }
 
   app.get('/api-docs.json', (_req, res) => res.json(result.data));
