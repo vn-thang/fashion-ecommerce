@@ -5,7 +5,6 @@ import { authApi } from '../api/authApi';
 export const useForgotPassword = () => {
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
-  const [resetLink, setResetLink] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -14,7 +13,6 @@ export const useForgotPassword = () => {
 
     setError('');
     setMessage('');
-    setResetLink('');
 
     if (!email.trim()) {
       setError('Vui lòng nhập Email!');
@@ -37,20 +35,9 @@ export const useForgotPassword = () => {
           email.trim()
         );
 
-      const newResetLink =
-        response?.data?.resetLink;
-
-      if (!newResetLink) {
-        throw new Error(
-          'Không tìm thấy link đặt lại mật khẩu.'
-        );
-      }
-
-      setResetLink(newResetLink);
-
       setMessage(
-        response?.data?.message ||
-        'Link đặt lại mật khẩu đã được gửi vào email của bạn!'
+        response?.message ||
+        'Nếu email này thuộc một tài khoản hợp lệ, hướng dẫn đặt lại mật khẩu sẽ được gửi đến hộp thư.'
       );
     } catch (err) {
       const message =
@@ -64,21 +51,9 @@ export const useForgotPassword = () => {
     }
   };
 
-  const handleResetPassword = () => {
-    if (!resetLink) {
-      setError(
-        'Không tìm thấy link đặt lại mật khẩu.'
-      );
-      return;
-    }
-
-    window.location.href = resetLink;
-  };
-
   const handleUseAnotherEmail = () => {
     setEmail('');
     setMessage('');
-    setResetLink('');
     setError('');
   };
 
@@ -86,11 +61,9 @@ export const useForgotPassword = () => {
     email,
     setEmail,
     message,
-    resetLink,
     error,
     loading,
     handleForgotPassword,
-    handleResetPassword,
     handleUseAnotherEmail
   };
 };

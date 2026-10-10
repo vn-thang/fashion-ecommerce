@@ -96,18 +96,15 @@ export const useRegister = () => {
       password
     });
 
-    const verificationLink =
-      response?.data?.verificationLink;
-
     toast.success(
       response?.data?.message ||
+      response?.message ||
       'Đăng ký thành công! Vui lòng xác thực tài khoản.'
     );
 
     navigate('/verify-email', {
       state: {
-        email: email.trim(),
-        verificationLink
+        email: email.trim()
       }
     });
   } catch (err) {

@@ -103,31 +103,21 @@ export const useLogin = () => {
           email
         );
 
-      const verificationLink =
-        response?.data?.verificationLink;
-
-      if (!verificationLink) {
-        throw new Error(
-          'Không tìm thấy link xác thực.'
-        );
-      }
-
       toast.success(
-        response?.data?.message ||
-        'Đã tạo link xác thực mới!'
+        response?.message ||
+        'Nếu tài khoản cần xác thực, email hướng dẫn sẽ được gửi đến hộp thư.'
       );
 
       navigate('/verify-email', {
         state: {
-          email,
-          verificationLink
+          email
         }
       });
     } catch (err) {
       const message =
         err.response?.data?.message ||
         err.message ||
-        'Không thể tạo link xác thực!';
+        'Không thể gửi email xác thực!';
 
       setError(message);
       toast.error(message);

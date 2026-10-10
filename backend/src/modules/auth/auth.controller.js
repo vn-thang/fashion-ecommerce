@@ -8,6 +8,9 @@ const authController = {
       const result = await authService.register(req.body);
       return sendSuccess(res, 201, MESSAGES.REGISTER_SUCCESS, result);
     } catch (error) {
+      if (error.code === 'EMAIL_DELIVERY_FAILED') {
+        return sendError(res, 503, error.message);
+      }
       return sendError(res, 400, error.message);
     }
   },
@@ -35,15 +38,11 @@ resendVerificationEmail: async (req, res) => {
     const result =
       await authService.resendVerificationEmail(email);
 
-    return sendSuccess(
-      res,
-      200,
-      result.message,
-      {
-        verificationLink: result.verificationLink
-      }
-    );
+    return sendSuccess(res, 200, result.message);
   } catch (error) {
+    if (error.code === 'EMAIL_DELIVERY_FAILED') {
+      return sendError(res, 503, error.message);
+    }
     return sendError(res, 400, error.message);
   }
 },
@@ -98,15 +97,11 @@ forgotPassword: async (req, res) => {
     const result =
       await authService.forgotPassword(email);
 
-    return sendSuccess(
-      res,
-      200,
-      result.message,
-      {
-        resetLink: result.resetLink
-      }
-    );
+    return sendSuccess(res, 200, result.message);
   } catch (error) {
+    if (error.code === 'EMAIL_DELIVERY_FAILED') {
+      return sendError(res, 503, error.message);
+    }
     return sendError(res, 400, error.message);
   }
 },
