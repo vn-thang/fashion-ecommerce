@@ -1,5 +1,3 @@
-import React from 'react';
-
 import Input from '../../../shared/components/Input';
 import Button from '../../../shared/components/Button';
 
@@ -14,13 +12,11 @@ const VerifyEmailPage = () => {
   const {
     email,
     setEmail,
-    verificationLink,
     loading,
     resending,
     success,
     waiting,
     error,
-    handleVerifyDemo,
     handleResend,
     handleLogin
   } = useVerifyEmail();
@@ -32,7 +28,7 @@ const VerifyEmailPage = () => {
       arrow="‹"
     >
       <AuthHeader
-        title={success ? 'Email Verified' : 'Verify Email'}
+        title={success ? 'Email đã được xác thực' : 'Xác thực email'}
         subtitle={
          success
   ? 'Tài khoản của bạn đã sẵn sàng'
@@ -90,7 +86,7 @@ const VerifyEmailPage = () => {
             {email && (
               <>
                 <p className="mt-2 text-xs text-slate-500">
-                  Chúng tôi đã gửi liên kết xác thực đến
+                  Nếu tài khoản cần xác thực, chúng tôi sẽ gửi hướng dẫn đến địa chỉ email:
                 </p>
 
                 <p className="mt-1 break-all text-sm font-bold text-[#c36374]">
@@ -100,25 +96,13 @@ const VerifyEmailPage = () => {
             )}
 
             <p className="mt-3 text-xs leading-relaxed text-slate-500">
-              Vui lòng kiểm tra hộp thư và nhấn vào
-              liên kết xác thực để hoàn tất đăng ký tài khoản.
+              Vui lòng kiểm tra hộp thư, sau đó nhấn vào liên kết trong email để hoàn tất đăng ký.
             </p>
 
-            <p className="mt-2 text-xs text-slate-400">
+            <p className="mt-2 text-xs leading-relaxed text-slate-400">
               Liên kết xác thực có hiệu lực trong 15 phút.
             </p>
           </div>
-
-          {verificationLink && (
-            <Button
-              type="button"
-              variant="auth"
-              onClick={handleVerifyDemo}
-              className="w-full py-3 text-sm font-black tracking-wide"
-            >
-              XÁC THỰC TÀI KHOẢN
-            </Button>
-          )}
 
           <div className="border-t border-slate-200 pt-4">
             <p className="mb-3 text-xs text-slate-500">
@@ -129,7 +113,7 @@ const VerifyEmailPage = () => {
               <Input
                 variant="auth"
                 type="email"
-                placeholder="Enter your Email address"
+                placeholder="Nhập địa chỉ email"
                 value={email}
                 onChange={e =>
                   setEmail(e.target.value)
@@ -145,8 +129,8 @@ const VerifyEmailPage = () => {
                 className="w-full py-3 text-sm font-black tracking-wide"
               >
              {resending
-  ? 'ĐANG TẠO LIÊN KẾT...'
-  : 'TẠO LIÊN KẾT XÁC THỰC MỚI'}
+             ? 'ĐANG GỬI EMAIL...'
+             : 'GỬI LẠI EMAIL XÁC THỰC'}
               </Button>
             </div>
           </div>
@@ -164,7 +148,7 @@ const VerifyEmailPage = () => {
           </p>
 
           <p className="text-xs leading-relaxed text-slate-400">
-            Nhập email đã đăng ký để nhận một liên kết xác thực mới.
+            Nhập địa chỉ email đã đăng ký để nhận hướng dẫn xác thực.
           </p>
 
           <Input
@@ -186,8 +170,8 @@ const VerifyEmailPage = () => {
             className="w-full py-3 text-sm font-black tracking-wide"
           >
             {resending
-              ? 'SENDING EMAIL...'
-              : 'RESEND VERIFICATION EMAIL'}
+              ? 'ĐANG GỬI EMAIL...'
+              : 'GỬI LẠI EMAIL XÁC THỰC'}
           </Button>
         </div>
       )}

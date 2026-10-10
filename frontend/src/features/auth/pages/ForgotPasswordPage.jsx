@@ -1,5 +1,3 @@
-import React from 'react';
-
 import Input from '../../../shared/components/Input';
 import Button from '../../../shared/components/Button';
 
@@ -15,11 +13,9 @@ const ForgotPasswordPage = () => {
     email,
     setEmail,
     message,
-    resetLink,
     error,
     loading,
     handleForgotPassword,
-    handleResetPassword,
     handleUseAnotherEmail
   } = useForgotPassword();
 
@@ -69,7 +65,7 @@ const ForgotPasswordPage = () => {
           >
            {loading
   ? 'ĐANG TẠO LIÊN KẾT...'
-  : 'TẠO LIÊN KẾT ĐẶT LẠI'}
+  : 'TẠO LIÊN KẾT ĐẶT LẠI MẬT KHẨU'}
           </Button>
         </form>
       ) : (
@@ -80,41 +76,17 @@ const ForgotPasswordPage = () => {
             </div>
 
             <p className="text-sm font-semibold text-slate-700">
-              Yêu cầu đặt lại mật khẩu đã được gửi!
+              Nếu địa chỉ email đã đăng ký tài khoản, hướng dẫn đặt lại mật khẩu sẽ được gửi đến bạn.
             </p>
-
-            {email && (
-              <>
-                <p className="mt-2 text-xs text-slate-500">
-                  Chúng tôi đã gửi liên kết đặt lại mật khẩu đến
-                </p>
-
-                <p className="mt-1 break-all text-sm font-bold text-[#c36374]">
-                  {email}
-                </p>
-              </>
-            )}
 
             <p className="mt-3 text-xs leading-relaxed text-slate-500">
-              Vui lòng kiểm tra hộp thư và nhấn vào
-              liên kết để thiết lập mật khẩu mới.
+              Vui lòng kiểm tra hộp thư, sau đó làm theo hướng dẫn trong email để tạo mật khẩu mới.
             </p>
 
-            <p className="mt-2 text-xs text-slate-400">
+            <p className="mt-2 text-xs leading-relaxed text-slate-400">
               Liên kết đặt lại mật khẩu có hiệu lực trong 15 phút.
             </p>
           </div>
-
-          {resetLink && (
-            <Button
-              type="button"
-              variant="auth"
-              onClick={handleResetPassword}
-              className="w-full py-3 text-sm font-black tracking-wide"
-            >
-              ĐẶT LẠI MẬT KHẨU
-            </Button>
-          )}
 
           <button
             type="button"

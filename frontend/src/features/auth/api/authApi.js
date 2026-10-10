@@ -13,7 +13,8 @@ export const authApi = {
     } catch (error) {
       throw new Error(
         error.response?.data?.message ||
-        'Đăng nhập thất bại!'
+        'Đăng nhập thất bại!',
+        { cause: error }
       );
     }
   },
@@ -24,13 +25,14 @@ export const authApi = {
         fullName,
         email,
         password,
-      });
+      }, { timeout: 40000 });
 
       return data;
     } catch (error) {
       throw new Error(
         error.response?.data?.message ||
-        'Đăng ký thất bại!'
+        'Đăng ký thất bại!',
+        { cause: error }
       );
     }
   },
@@ -48,7 +50,8 @@ export const authApi = {
     } catch (error) {
       throw new Error(
         error.response?.data?.message ||
-          'Xác thực email thất bại!'
+          'Xác thực email thất bại!',
+        { cause: error }
       );
     }
   },
@@ -59,14 +62,16 @@ export const authApi = {
         '/auth/resend-verification',
         {
           email
-        }
+        },
+        { timeout: 40000 }
       );
 
       return data;
     } catch (error) {
       throw new Error(
         error.response?.data?.message ||
-          'Không thể gửi lại email xác thực!'
+          'Không thể gửi lại email xác thực!',
+        { cause: error }
       );
     }
   },
@@ -75,13 +80,14 @@ export const authApi = {
     try {
       const data = await axiosInstance.post('/auth/forgot-password', {
         email,
-      });
+      }, { timeout: 40000 });
 
       return data;
     } catch (error) {
       throw new Error(
         error.response?.data?.message ||
-        'Gửi yêu cầu thất bại!'
+        'Gửi yêu cầu thất bại!',
+        { cause: error }
       );
     }
   },
@@ -97,7 +103,8 @@ export const authApi = {
     } catch (error) {
       throw new Error(
         error.response?.data?.message ||
-        'Đặt lại mật khẩu thất bại!'
+        'Đặt lại mật khẩu thất bại!',
+        { cause: error }
       );
     }
   },
@@ -116,7 +123,8 @@ export const authApi = {
   } catch (error) {
     throw new Error(
       error.response?.data?.message ||
-      'Đổi mật khẩu thất bại!'
+      'Đổi mật khẩu thất bại!',
+      { cause: error }
     );
   }
 },
@@ -129,7 +137,8 @@ export const authApi = {
     } catch (error) {
       throw new Error(
         error.response?.data?.message ||
-        'Đăng xuất thất bại!'
+        'Đăng xuất thất bại!',
+        { cause: error }
       );
     }
   },

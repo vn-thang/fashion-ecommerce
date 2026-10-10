@@ -1,172 +1,174 @@
-const { Resend } = require('resend');
+const crypto = require('crypto');
 
-const resend = process.env.RESEND_API_KEY
-  ? new Resend(process.env.RESEND_API_KEY)
-  : null;
+const EMAIL_DELIVERY_ERROR =
+  'Không thể gửi email lúc này. Vui lòng thử lại sau.';
+const APPS_SCRIPT_TIMEOUT_MS = 30000;
 
-const from = process.env.MAIL_FROM || 'onboarding@resend.dev';
+const signEmailRequest = payload => {
+  const secret = process.env.EMAIL_APPS_SCRIPT_SECRET;
 
-const sendPasswordResetEmail = async (email, resetLink) => {
-  try {
-    const { data, error } = await resend.emails.send({
-      from: `"FashionHub" <${from}>`,
-      to: [email],
-      subject: 'Đặt lại mật khẩu - FashionHub',
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto;">
-          <h2>Đặt lại mật khẩu</h2>
-
-          <p>Xin chào,</p>
-
-          <p>
-            Chúng tôi nhận được yêu cầu đặt lại mật khẩu
-            cho tài khoản của bạn.
-          </p>
-
-          <p>
-            Nhấn vào nút bên dưới để tạo mật khẩu mới:
-          </p>
-
-          <div style="margin: 30px 0;">
-            <a
-              href="${resetLink}"
-              style="
-                display: inline-block;
-                padding: 12px 24px;
-                background: #ee4d2d;
-                color: white;
-                text-decoration: none;
-                border-radius: 4px;
-              "
-            >
-              Đặt lại mật khẩu
-            </a>
-          </div>
-
-          <p>
-            Liên kết này chỉ có hiệu lực trong 15 phút.
-          </p>
-
-          <p>
-            Nếu bạn không yêu cầu đặt lại mật khẩu,
-            hãy bỏ qua email này.
-          </p>
-
-          <p>
-            Trân trọng,<br/>
-            FashionHub
-          </p>
-        </div>
-      `
-    });
-
-    if (error) {
-      console.error('❌ Resend error:', error);
-      throw new Error(error.message);
-    }
-
-    console.log('✅ Password reset email sent:', data);
-
-    return data;
-  } catch (error) {
-    console.error('❌ Gửi email đặt lại mật khẩu thất bại:', {
-      message: error.message
-    });
-
-    throw error;
+  if (!secret) {
+    throw new Error('EMAIL_APPS_SCRIPT_SECRET is not configured.');
   }
+
+  const canonicalPayload = [
+    payload.timestamp,
+    payload.type,
+    payload.to,
+    payload.name,
+    payload.actionUrl,
+    payload.nonce
+  ].join('\n');
+
+  return crypto
+    .createHmac('sha256', Buffer.from(secret, 'utf8'))
+    .update(canonicalPayload, 'utf8')
+    .digest('hex');
 };
 
-const sendEmailVerificationEmail = async (
-  email,
-  verifyLink
-) => {
+const sendEmail = async ({ type, email, name, actionUrl }) => {
+  const endpoint = process.env.EMAIL_APPS_SCRIPT_URL;
+
+  if (!endpoint || !process.env.EMAIL_APPS_SCRIPT_SECRET) {
+    const error = new Error(EMAIL_DELIVERY_ERROR);
+    error.code = 'EMAIL_DELIVERY_FAILED';
+    throw error;
+  }
+
+  if (process.env.EMAIL_APPS_SCRIPT_SECRET.length < 32) {
+    const error = new Error(EMAIL_DELIVERY_ERROR);
+    error.code = 'EMAIL_DELIVERY_FAILED';
+    throw error;
+  }
+
+  let endpointUrl;
   try {
-    const { data, error } = await resend.emails.send({
-      from: `"FashionHub" <${from}>`,
-      to: [email],
-      subject: 'Xác thực tài khoản - FashionHub',
-      html: `
-        <div style="
-          font-family: Arial, sans-serif;
-          max-width: 600px;
-          margin: auto;
-          padding: 20px;
-          color: #333;
-        ">
+    endpointUrl = new URL(endpoint);
+  } catch {
+    const error = new Error(EMAIL_DELIVERY_ERROR);
+    error.code = 'EMAIL_DELIVERY_FAILED';
+    throw error;
+  }
 
-          <h2 style="color: #c36374;">
-            Chào mừng bạn đến với FashionHub!
-          </h2>
+  if (endpointUrl.protocol !== 'https:') {
+    const error = new Error(EMAIL_DELIVERY_ERROR);
+    error.code = 'EMAIL_DELIVERY_FAILED';
+    throw error;
+  }
 
-          <p>Xin chào,</p>
+  const payload = {
+    timestamp: Date.now(),
+    type,
+    to: email,
+    name: name || '',
+    actionUrl,
+    nonce: crypto.randomBytes(16).toString('hex')
+  };
+  const signature = signEmailRequest(payload);
 
-          <p>
-            Cảm ơn bạn đã đăng ký tài khoản tại
-            <strong>FashionHub</strong>.
-          </p>
+  let response;
+  let stage = 'POST';
 
-          <p>
-            Để hoàn tất đăng ký và bảo vệ tài khoản,
-            vui lòng xác thực địa chỉ email của bạn
-            bằng cách nhấn vào nút bên dưới:
-          </p>
-
-          <div style="margin: 30px 0;">
-            <a
-              href="${verifyLink}"
-              style="
-                display: inline-block;
-                padding: 12px 24px;
-                background: #c36374;
-                color: white;
-                text-decoration: none;
-                border-radius: 25px;
-                font-weight: bold;
-              "
-            >
-              Xác thực tài khoản
-            </a>
-          </div>
-
-          <p>
-            Liên kết xác thực này chỉ có hiệu lực trong
-            <strong>15 phút</strong>.
-          </p>
-
-          <p>
-            Nếu bạn không thực hiện đăng ký tài khoản,
-            vui lòng bỏ qua email này.
-          </p>
-
-          <p style="margin-top: 30px;">
-            Trân trọng,<br/>
-            <strong>FashionHub</strong>
-          </p>
-
-        </div>
-      `
+  try {
+    response = await fetch(endpoint, {
+      method: 'POST',
+      redirect: 'manual',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        ...payload,
+        signature
+      }),
+      signal: AbortSignal.timeout(APPS_SCRIPT_TIMEOUT_MS)
     });
 
-    if (error) {
-      console.error('❌ Resend error:', error);
-      throw new Error(error.message);
-    }
+    if ([301, 302, 303, 307, 308].includes(response.status)) {
+      const redirectUrl = response.headers.get('location');
 
-    console.log('✅ Verification email sent:', data);
-
-    return data;
-  } catch (error) {
-    console.error(
-      '❌ Gửi email xác thực thất bại:',
-      {
-        message: error.message
+      if (!redirectUrl) {
+        throw new Error('Email endpoint returned a redirect without a location.');
       }
-    );
 
+      response = await fetch(redirectUrl, {
+        signal: AbortSignal.timeout(APPS_SCRIPT_TIMEOUT_MS)
+      });
+      stage = 'redirect response';
+    }
+
+    if (!response.ok) {
+      const error = new Error(`HTTP_${response.status}`);
+      error.code = `HTTP_${response.status}`;
+      throw error;
+    }
+
+    const result = await response.json();
+
+    if (result.success !== true) {
+      const error = new Error(
+        typeof result.code === 'string'
+          ? result.code
+          : 'DELIVERY_NOT_CONFIRMED'
+      );
+      error.code = error.message;
+      throw error;
+    }
+
+    return result;
+  } catch (cause) {
+    if (cause.code === 'INVALID_SIGNATURE') {
+      const canonicalPayload = [
+        payload.timestamp,
+        payload.type,
+        payload.to,
+        payload.name,
+        payload.actionUrl,
+        payload.nonce
+      ].join('\n');
+
+      console.error('[EMAIL] Signature diagnostic:', {
+        secretFingerprint: crypto
+          .createHash('sha256')
+          .update(process.env.EMAIL_APPS_SCRIPT_SECRET, 'utf8')
+          .digest('hex')
+          .slice(0, 12),
+        payloadFingerprint: crypto
+          .createHash('sha256')
+          .update(canonicalPayload, 'utf8')
+          .digest('hex')
+          .slice(0, 12),
+        signaturePrefix: signature.slice(0, 12)
+      });
+    }
+
+    console.error('[EMAIL] Delivery failed:', {
+      type,
+      stage,
+      error: cause.name,
+      code: cause.code || 'UNKNOWN'
+    });
+
+    const error = new Error(EMAIL_DELIVERY_ERROR);
+    error.code = 'EMAIL_DELIVERY_FAILED';
     throw error;
   }
 };
+
+const sendPasswordResetEmail = (email, resetLink, name = '') =>
+  sendEmail({
+    type: 'password_reset',
+    email,
+    name,
+    actionUrl: resetLink
+  });
+
+const sendEmailVerificationEmail = (email, verifyLink, name = '') =>
+  sendEmail({
+    type: 'email_verification',
+    email,
+    name,
+    actionUrl: verifyLink
+  });
 
 module.exports = {
   sendPasswordResetEmail,

@@ -21,9 +21,8 @@ const signRefreshToken = (userId) => {
   return jwt.sign({ userId }, process.env.JWT_REFRESH_SECRET, { expiresIn: TOKEN_EXPIRY.REFRESH });
 };
 
-const signResetToken = (userId) => {
-  return jwt.sign({ userId }, process.env.JWT_RESET_SECRET || 'M4_B1_M4T_RESET', { expiresIn: '15m' });
-};
+const EMAIL_REQUEST_MESSAGE =
+  'Nếu email này thuộc một tài khoản hợp lệ, hướng dẫn sẽ được gửi đến hộp thư của bạn.';
 
 const authService = {
   
@@ -67,12 +66,16 @@ register: async ({ fullName, email, password }) => {
   const verifyLink =
     `${process.env.FRONTEND_URL}/verify-email?token=${token}`;
 
+  await mailService.sendEmailVerificationEmail(
+    newUser.email,
+    verifyLink,
+    newUser.fullName
+  );
+
   return {
     id: newUser.id,
     email: newUser.email,
-    message:
-      'Đăng ký thành công! Vui lòng xác thực tài khoản.',
-    verificationLink: verifyLink
+    message: 'Đăng ký thành công! Vui lòng kiểm tra email để xác thực tài khoản.'
   };
 },
 
@@ -138,22 +141,10 @@ register: async ({ fullName, email, password }) => {
   const user =
     await authRepository.findUserByEmailOrPhone(email);
 
-  if (!user) {
-    throw new Error(
-      'Email này không tồn tại trên hệ thống!'
-    );
-  }
-
-  if (!user.isActive) {
-    throw new Error(
-      MESSAGES.ACCOUNT_LOCKED
-    );
-  }
-
-  if (user.emailVerified) {
-    throw new Error(
-      'Email của tài khoản này đã được xác thực!'
-    );
+  if (!user || !user.isActive || user.emailVerified) {
+    return {
+      message: EMAIL_REQUEST_MESSAGE
+    };
   }
 
   await authRepository.deleteEmailVerificationTokensByUserId(
@@ -178,10 +169,14 @@ register: async ({ fullName, email, password }) => {
   const verifyLink =
     `${process.env.FRONTEND_URL}/verify-email?token=${token}`;
 
+  await mailService.sendEmailVerificationEmail(
+    user.email,
+    verifyLink,
+    user.fullName
+  );
+
   return {
-    message:
-      'Đã tạo link xác thực mới.',
-    verificationLink: verifyLink
+    message: EMAIL_REQUEST_MESSAGE
   };
 },
 
@@ -256,16 +251,10 @@ forgotPassword: async email => {
   const user =
     await authRepository.findUserByEmailOrPhone(email);
 
-  if (!user) {
-    throw new Error(
-      'Email này không tồn tại trên hệ thống!'
-    );
-  }
-
-  if (!user.isActive) {
-    throw new Error(
-      'Tài khoản hiện đang bị khóa!'
-    );
+  if (!user || !user.isActive) {
+    return {
+      message: EMAIL_REQUEST_MESSAGE
+    };
   }
 
   const {
@@ -281,10 +270,14 @@ forgotPassword: async email => {
   const resetLink =
     `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
 
+  await mailService.sendPasswordResetEmail(
+    user.email,
+    resetLink,
+    user.fullName
+  );
+
   return {
-    message:
-      'Đã tạo link đặt lại mật khẩu. Vui lòng sử dụng link bên dưới.',
-    resetLink
+    message: EMAIL_REQUEST_MESSAGE
   };
 },
 

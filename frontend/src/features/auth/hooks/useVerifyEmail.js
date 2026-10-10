@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 
@@ -11,15 +11,11 @@ export const useVerifyEmail = () => {
   const token = new URLSearchParams(
     location.search
   ).get('token');
+  const verificationAttempted = useRef(null);
 
   const [email, setEmail] = useState(
     location.state?.email || ''
   );
-
-  const [verificationLink, setVerificationLink] =
-    useState(
-      location.state?.verificationLink || ''
-    );
 
   const [loading, setLoading] = useState(!!token);
   const [resending, setResending] = useState(false);
@@ -28,11 +24,11 @@ export const useVerifyEmail = () => {
   const [waiting, setWaiting] = useState(!token);
 
   useEffect(() => {
-    if (!token) {
-      setLoading(false);
-      setWaiting(true);
+    if (!token || verificationAttempted.current === token) {
       return;
     }
+
+    verificationAttempted.current = token;
 
     const verify = async () => {
       setLoading(true);
@@ -44,9 +40,10 @@ export const useVerifyEmail = () => {
           await authApi.verifyEmail(token);
 
         setSuccess(true);
+        setError('');
 
         toast.success(
-          response?.data?.message ||
+          response?.message ||
           'Xác thực email thành công!'
         );
       } catch (err) {
@@ -61,18 +58,6 @@ export const useVerifyEmail = () => {
 
     verify();
   }, [token]);
-
-  const handleVerifyDemo = () => {
-    if (!verificationLink) {
-      setError(
-        'Không tìm thấy link xác thực. Vui lòng đăng ký lại.'
-      );
-
-      return;
-    }
-
-    window.location.href = verificationLink;
-  };
 
 const handleResend = async () => {
   const value = email.trim();
@@ -97,33 +82,18 @@ const handleResend = async () => {
     const response =
       await authApi.resendVerificationEmail(value);
 
-    console.log(
-      'RESEND VERIFICATION RESPONSE:',
-      response
-    );
-
-    const newVerificationLink =
-      response?.data?.verificationLink;
-
-    if (!newVerificationLink) {
-      throw new Error(
-        'Không tìm thấy link xác thực mới.'
-      );
-    }
-
-    setVerificationLink(newVerificationLink);
     setWaiting(true);
     setSuccess(false);
 
     toast.success(
-      response?.data?.message ||
-      'Đã tạo link xác thực mới!'
+      response?.message ||
+      'Nếu tài khoản cần xác thực, email hướng dẫn sẽ được gửi đến hộp thư.'
     );
   } catch (err) {
     const message =
       err.response?.data?.message ||
       err.message ||
-      'Không thể tạo link xác thực mới!';
+      'Không thể gửi email xác thực!';
 
     setError(message);
     toast.error(message);
@@ -140,13 +110,11 @@ const handleResend = async () => {
     token,
     email,
     setEmail,
-    verificationLink,
     loading,
     resending,
     success,
     waiting,
     error,
-    handleVerifyDemo,
     handleResend,
     handleLogin
   };
