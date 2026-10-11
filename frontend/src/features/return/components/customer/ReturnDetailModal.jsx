@@ -1,4 +1,3 @@
-import React from 'react';
 import Modal from '../../../../shared/components/Modal';
 import Button from '../../../../shared/components/Button';
 import ReturnStatus from '../ReturnStatus';
@@ -88,6 +87,17 @@ const ReturnDetailModal = ({
               </div>
             </div>
             <ReturnStatus status={selectedReturn.status} />
+          </div>
+
+          <div>
+            <div className="mb-3 text-xs font-semibold text-slate-800">
+              Tiến trình trả hàng
+            </div>
+
+            <ReturnTimeline
+              status={selectedReturn.status}
+              returnRequest={selectedReturn}
+            />
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
@@ -229,17 +239,6 @@ const ReturnDetailModal = ({
               </div>
             </div>
           )}
-
-          <div>
-            <div className="mb-3 text-xs font-semibold text-slate-800">
-              Tiến trình trả hàng
-            </div>
-
-            <ReturnTimeline
-              status={selectedReturn.status}
-              returnRequest={selectedReturn}
-            />
-          </div>
 
           {selectedReturn.status === 'APPROVED' && (
             <div className="rounded-xl border border-blue-100 bg-blue-50 p-4">

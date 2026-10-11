@@ -20,6 +20,7 @@ const ipAddress = forwardedFor
       const result =
         await paymentService.createPaymentUrl({
           orderId,
+          userId: req.user.userId,
           ipAddress
         });
 
@@ -49,12 +50,11 @@ const ipAddress = forwardedFor
           req.query
         );
 
-      return sendSuccess(
-        res,
-        200,
-        result.message,
-        result
-      );
+      return res.status(200).json({
+        success: result.success,
+        message: result.message,
+        data: result
+      });
     } catch (err) {
       return sendError(
         res,

@@ -1,4 +1,7 @@
 const prisma = require('../../config/database');
+const orderRepository = require('../order/order.repository');
+const { PAYMENT_STATUS } = require('../../constants/paymentStatus.constant');
+const { ORDER_STATUS, ORDER_STATUS_CHANGE_SOURCE } = require('../order/order.constants');
 
 const paymentRepository = {
   findOrderById: async (orderId) => {
@@ -114,30 +117,94 @@ const paymentRepository = {
     paymentId,
     paymentData,
     orderId,
-    orderStatus
+    orderStatus,
+    restoreResources = false
   }) => {
     return await prisma.$transaction(
       async (tx) => {
-        const payment =
-          await tx.payment.update({
-            where: {
-              id: paymentId
-            },
-            data: paymentData
-          });
+        const transition = await tx.payment.updateMany({
+          where: {
+            id: paymentId,
+            status: PAYMENT_STATUS.PENDING
+          },
+          data: paymentData
+        });
 
-        const order =
-          await tx.order.update({
+        if (transition.count === 0) {
+          const [payment, order] = await Promise.all([
+            tx.payment.findUnique({
+              where: { id: paymentId }
+            }),
+            tx.order.findUnique({
+              where: { id: orderId },
+              include: { payment: true }
+            })
+          ]);
+
+          return {
+            processed: false,
+            payment,
+            order
+          };
+        }
+
+        if (restoreResources) {
+          await orderRepository.restoreOrderResourcesWithinTransaction(
+            tx,
+            orderId,
+            { restoreCoupon: true }
+          );
+        } else {
+          const order = await tx.order.findUnique({
             where: {
               id: orderId
             },
-            data: {
-              status: orderStatus
+            select: {
+              userId: true,
+              items: {
+                select: { productVariantId: true }
+              }
             }
           });
 
+          const variantIds = order.items.map(
+            item => item.productVariantId
+          );
+
+          if (variantIds.length > 0) {
+            await tx.cartItem.deleteMany({
+              where: {
+                productVariantId: { in: variantIds },
+                cart: { userId: order.userId }
+              }
+            });
+          }
+        }
+
+        const order =
+          await orderRepository.transitionOrderStatusWithinTransaction(
+            tx,
+            {
+              orderId,
+              fromStatus: ORDER_STATUS.PENDING,
+              toStatus: orderStatus,
+              source: ORDER_STATUS_CHANGE_SOURCE.SYSTEM,
+              note:
+                paymentData.status === PAYMENT_STATUS.SUCCESS
+                  ? 'VNPay xác nhận thanh toán thành công.'
+                  : `VNPay trả kết quả thanh toán: ${paymentData.status}.`
+            }
+          );
+
+        if (!order) {
+          throw new Error(
+            'Trạng thái đơn hàng đã thay đổi trước khi xử lý kết quả thanh toán.'
+          );
+        }
+
         return {
-          payment,
+          processed: true,
+          payment: order.payment,
           order
         };
       }

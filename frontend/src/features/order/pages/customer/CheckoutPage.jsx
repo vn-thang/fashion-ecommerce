@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useCheckout } from '../../hooks/useCheckout';
 
@@ -13,7 +13,10 @@ import AddressFormModal from '../../../profile/components/customer/AddressFormMo
 const CheckoutPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const itemsToCheckout = location.state?.itemsToCheckout || [];
+  const itemsToCheckout = useMemo(
+    () => location.state?.itemsToCheckout || [],
+    [location.state?.itemsToCheckout]
+  );
   const isBuyNow = location.state?.isBuyNow || false;
   
   const cartItemIds = useMemo(() => {
@@ -58,7 +61,7 @@ const CheckoutPage = () => {
   const formatPrice = (p) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(p || 0);
 
   return (
-    <div className="bg-gray-50 min-h-screen py-8 text-slate-800 font-sans">
+    <div className="mx-auto w-full max-w-7xl py-2 text-slate-800">
       <div className="w-full">
   
         {apiError && (

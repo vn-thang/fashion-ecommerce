@@ -1,5 +1,4 @@
 
-import React from 'react';
 import { Link } from 'react-router-dom';
 
 const ProductCard = ({ product }) => {
@@ -25,11 +24,11 @@ const ProductCard = ({ product }) => {
 
 const renderNormalPrice = () => (
   <div className="flex items-baseline gap-1">
-    <span className="text-sm font-medium text-[#ee4d2d]">
+    <span className="text-[13px] font-medium text-[#ee4d2d]">
       Từ
     </span>
 
-    <span className="text-sm font-bold text-[#ee4d2d]">
+    <span className="text-[13px] font-semibold text-[#ee4d2d]">
       {formatPrice(product.minPrice)}
     </span>
   </div>
@@ -37,11 +36,11 @@ const renderNormalPrice = () => (
 
 const renderFlashPrice = () => (
   <div className="flex items-baseline gap-1">
-    <span className="text-sm font-medium text-[#ee4d2d]">
+    <span className="text-[13px] font-medium text-[#ee4d2d]">
       Từ
     </span>
 
-    <span className="text-sm font-bold text-[#ee4d2d]">
+    <span className="text-[13px] font-semibold text-[#ee4d2d]">
       {formatPrice(flash.minFlashPrice)}
     </span>
   </div>
@@ -49,11 +48,11 @@ const renderFlashPrice = () => (
 
 const renderOriginalPrice = () => (
   <div className="flex items-baseline gap-1 mt-1">
-    <span className="text-sm text-gray-400">
+    <span className="text-[13px] text-gray-400">
       Từ
     </span>
 
-    <span className="text-sm text-gray-400 line-through">
+    <span className="text-[13px] text-gray-400 line-through">
       {formatPrice(flash.minOriginalPrice)}
     </span>
   </div>
@@ -83,7 +82,7 @@ const renderOriginalPrice = () => (
       </div>
 
       <div className="flex flex-1 flex-col p-3">
-        <h4 className="mb-2 min-h-[2.5rem] line-clamp-2 text-sm leading-relaxed text-gray-800 transition-colors group-hover:text-[#ee4d2d]">
+        <h4 className="mb-2 min-h-[2.5rem] line-clamp-2 text-[13px] leading-5 text-gray-800 transition-colors group-hover:text-[#ee4d2d]">
           {product.name}
         </h4>
 

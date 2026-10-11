@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useOrderDetails } from '../../hooks/useOrderDetails';
 import Button from '../../../../shared/components/Button';
-import { orderApi } from '../../api/orderApi';
 import CancelOrderModal from '../../shares/CancelOrderModal';
 import toast from 'react-hot-toast';
 
@@ -10,6 +9,7 @@ import OrderHeader from '../../components/customer/OrderHeader';
 import ShippingAddress from '../../components/customer/ShippingAddress';
 import OrderItemsList from '../../components/customer/OrderItemsList';
 import OrderSummary from '../../components/customer/OrderSummary';
+import OrderStatusTimeline from '../../components/customer/OrderStatusTimeline';
 import CreateReviewModal from '../../../review/components/customer/CreateReviewModal';
 import ReturnRequestModal from '../../../return/components/customer/ReturnRequestModal';
 
@@ -33,7 +33,14 @@ const formatDate = (dateString) => {
 
 const OrderDetailPage = () => {
   const navigate = useNavigate();
-  const { order, loading, refreshOrder,  cancelOrder,  retryPayment } = useOrderDetails();
+  const {
+    order,
+    loading,
+    cancelling,
+    refreshOrder,
+    cancelOrder,
+    retryPayment
+  } = useOrderDetails();
 
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [selectedItemForReview, setSelectedItemForReview] = useState(null);
@@ -92,6 +99,7 @@ return (
         statusConfig={STATUS_CONFIG}
         formatDate={formatDate}
       />
+      <OrderStatusTimeline order={order} />
       <ShippingAddress order={order} />
     </div>
 
@@ -172,7 +180,7 @@ return (
       order={order}
       onClose={() => setIsCancelModalOpen(false)}
       onConfirm={handleConfirmCancel}
-      loading={loading}
+      loading={cancelling}
     />
   </div>
 );

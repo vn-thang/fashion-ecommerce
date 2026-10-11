@@ -6,7 +6,6 @@ const axios = require('axios');
 const crypto = require('crypto'); 
 
 const { ORDER_STATUS } = require('../../constants/orderStatus.constant');
-const orderRepository = require('../order/order.repository');
 const paginationHelper = require('../../utils/pagination');
 const notificationService = require('../notification/notification.service');
 const NOTIFICATION_CONSTANTS = require('../notification/notification.constants');
@@ -18,12 +17,44 @@ const {
   VNPAY_RESPONSE_CODE
 } = require('./payment.constants');
 
+const getPaymentResultMessage = status => {
+  if (status === PAYMENT_STATUS.SUCCESS) {
+    return PAYMENT_MESSAGES.PAYMENT_SUCCESS;
+  }
+  if (status === PAYMENT_STATUS.CANCELLED) {
+    return PAYMENT_MESSAGES.PAYMENT_CANCELLED;
+  }
+  if (status === PAYMENT_STATUS.FAILED) {
+    return PAYMENT_MESSAGES.PAYMENT_FAILED;
+  }
+  return 'Giao dịch thanh toán đang được xử lý.';
+};
 
+const formatPaymentResult = (order, paymentStatus) => ({
+  success: paymentStatus === PAYMENT_STATUS.SUCCESS,
+  orderId: order.id,
+  orderNumber: order.orderNumber,
+  receiverName: order.receiverName,
+  phoneNumber: order.phoneNumber,
+  address: `${order.addressLine}, ${order.ward}, ${order.province}`,
+  subtotal: Number(order.subtotal),
+  discountAmount: Number(order.discountAmount),
+  shippingFee: Number(order.shippingFee),
+  totalAmount: Number(order.totalAmount),
+  amount: Number(order.payment.amount),
+  paymentMethod: order.payment.paymentMethod,
+  transactionNo: order.payment.transactionNo,
+  paymentStatus,
+  message: getPaymentResultMessage(paymentStatus)
+});
 
 const paymentService = {
 
-  createPaymentUrl: async ({ orderId, ipAddress }) => {
-  const order = await paymentRepository.findOrderById(orderId);
+  createPaymentUrl: async ({ orderId, userId, ipAddress }) => {
+  const order = await paymentRepository.findOrderByIdAndUser(
+    orderId,
+    userId
+  );
 
   if (!order)
     throw new Error(PAYMENT_MESSAGES.ORDER_NOT_FOUND);
@@ -85,34 +116,22 @@ handleReturn: async query => {
     throw new Error(PAYMENT_MESSAGES.PAYMENT_NOT_FOUND);
   }
 
-  if (order.payment.status !== PAYMENT_STATUS.PENDING) {
-  return {
-    success: order.payment.status === PAYMENT_STATUS.SUCCESS,
-    orderId: order.id,
-    orderNumber: order.orderNumber,
-    receiverName: order.receiverName,
-    phoneNumber: order.phoneNumber,
-    address: `${order.addressLine}, ${order.ward}, ${order.province}`,
-    subtotal: Number(order.subtotal),
-    discountAmount: Number(order.discountAmount),
-    shippingFee: Number(order.shippingFee),
-    totalAmount: Number(order.totalAmount),
-    amount: Number(order.payment.amount),
-    paymentMethod: order.payment.paymentMethod,
-    transactionNo: order.payment.transactionNo,
-    paymentStatus: order.payment.status,
-    message: 'Đơn hàng đã được xử lý.'
-  };
-}
+  if (order.payment.paymentMethod !== PAYMENT_METHOD.VNPAY) {
+    throw new Error(PAYMENT_MESSAGES.INVALID_PAYMENT_METHOD);
+  }
 
-  const gatewayAmount =
-    Number(query.vnp_Amount) / 100;
+  const gatewayAmount = Number(query.vnp_Amount);
+  const expectedAmount = Math.round(Number(order.payment.amount) * 100);
 
-  const orderAmount =
-    Number(order.totalAmount);
-
-  if (gatewayAmount !== orderAmount) {
+  if (
+    !Number.isSafeInteger(gatewayAmount) ||
+    gatewayAmount !== expectedAmount
+  ) {
     throw new Error(PAYMENT_MESSAGES.INVALID_AMOUNT);
+  }
+
+  if (order.payment.status !== PAYMENT_STATUS.PENDING) {
+    return formatPaymentResult(order, order.payment.status);
   }
 
   const paymentStatus =
@@ -136,10 +155,11 @@ handleReturn: async query => {
   transactionDate: query.vnp_PayDate || null
 });
 
-  await paymentRepository.updatePaymentAndOrderTransaction({
+  const updateResult = await paymentRepository.updatePaymentAndOrderTransaction({
     paymentId: order.payment.id,
     orderId: order.id,
     orderStatus,
+    restoreResources: paymentStatus !== PAYMENT_STATUS.SUCCESS,
     paymentData: {
       status: paymentStatus,
       transactionRef: txnRef,
@@ -154,17 +174,16 @@ handleReturn: async query => {
     }
   });
 
-console.log('[VNPAY] Payment/Order updated successfully');
-  if (paymentStatus === PAYMENT_STATUS.SUCCESS) {
-    await orderRepository.deleteCartItemsByOrder(order.id);
-  } else {
-    await orderRepository.restoreOrderResourcesTransaction(
-      order.id,
-      {
-        restoreCoupon: true
-      }
+  if (!updateResult.processed) {
+    if (!updateResult.order?.payment) {
+      throw new Error(PAYMENT_MESSAGES.PAYMENT_NOT_FOUND);
+    }
+    return formatPaymentResult(
+      updateResult.order,
+      updateResult.order.payment.status
     );
   }
+
   try {
     if (paymentStatus === PAYMENT_STATUS.SUCCESS) {
       await notificationService.createNotification({
@@ -269,43 +288,10 @@ console.log('[VNPAY] Payment/Order updated successfully');
       notificationError
     );
   }
-if (paymentStatus === PAYMENT_STATUS.SUCCESS) {
-  return {
-    success: true,
-    orderId: order.id,
-    orderNumber: order.orderNumber,
-    receiverName: order.receiverName,
-    phoneNumber: order.phoneNumber,
-    address: `${order.addressLine}, ${order.ward}, ${order.province}`,
-    subtotal: Number(order.subtotal),
-    discountAmount: Number(order.discountAmount),
-    shippingFee: Number(order.shippingFee),
-    totalAmount: Number(order.totalAmount),
-    amount: Number(order.payment.amount),
-    paymentMethod: order.payment.paymentMethod,
-    transactionNo: order.payment.transactionNo,
-    paymentStatus,
-    message: PAYMENT_MESSAGES.PAYMENT_SUCCESS
-  };
-}
- const result = {
-  success: true,
-  orderId: order.id,
-  orderNumber: order.orderNumber,
-  receiverName: order.receiverName,
-  phoneNumber: order.phoneNumber,
-  address: `${order.addressLine}, ${order.ward}, ${order.province}`,
-  subtotal: Number(order.subtotal),
-  discountAmount: Number(order.discountAmount),
-  shippingFee: Number(order.shippingFee),
-  totalAmount: Number(order.totalAmount),
-  amount: Number(order.payment.amount),
-  paymentMethod: order.payment.paymentMethod,
-  transactionNo: order.payment.transactionNo,
-  paymentStatus,
-  message: PAYMENT_MESSAGES.PAYMENT_SUCCESS
-};
-  return result;
+  return formatPaymentResult(
+    updateResult.order,
+    updateResult.order.payment.status
+  );
 },
 
 handleIpn: async query => {
@@ -322,12 +308,6 @@ handleIpn: async query => {
     await paymentRepository.findOrderByOrderNumber(
       txnRef
     );
-    console.log('[VNPAY] After update:', {
-  orderStatus: updatedOrder?.status,
-  paymentStatus: updatedOrder?.payment?.status,
-  transactionNo: updatedOrder?.payment?.transactionNo,
-  transactionDate: updatedOrder?.payment?.transactionDate
-});
 
   if (!order) {
     return {
@@ -341,22 +321,28 @@ handleIpn: async query => {
       Message: 'Payment not Found'
     };
   }
-  if (
-    order.payment.status !==
-    PAYMENT_STATUS.PENDING
-  ) {
+  if (order.payment.paymentMethod !== PAYMENT_METHOD.VNPAY) {
     return {
-      RspCode: '00',
-      Message: 'Confirm Success'
+      RspCode: '01',
+      Message: 'Invalid payment method'
     };
   }
-  const gatewayAmount = Number(query.vnp_Amount) / 100;
-  const orderAmount = Number(order.totalAmount);
+  const gatewayAmount = Number(query.vnp_Amount);
+  const expectedAmount = Math.round(Number(order.payment.amount) * 100);
 
-  if (gatewayAmount !== orderAmount) {
+  if (
+    !Number.isSafeInteger(gatewayAmount) ||
+    gatewayAmount !== expectedAmount
+  ) {
     return {
       RspCode: '04',
       Message: 'Invalid Amount'
+    };
+  }
+  if (order.payment.status !== PAYMENT_STATUS.PENDING) {
+    return {
+      RspCode: '00',
+      Message: 'Confirm Success'
     };
   }
   const paymentStatus =
@@ -371,10 +357,11 @@ handleIpn: async query => {
       ? ORDER_STATUS.PROCESSING
       : ORDER_STATUS.CANCELLED;
 
-  await paymentRepository.updatePaymentAndOrderTransaction({
+  const updateResult = await paymentRepository.updatePaymentAndOrderTransaction({
     paymentId: order.payment.id,
     orderId: order.id,
     orderStatus,
+    restoreResources: paymentStatus !== PAYMENT_STATUS.SUCCESS,
     paymentData: {
       status: paymentStatus,
       transactionRef: txnRef,
@@ -388,17 +375,17 @@ handleIpn: async query => {
     }
   });
 
-  if (paymentStatus === PAYMENT_STATUS.SUCCESS) {
-    await orderRepository.deleteCartItemsByOrder(
-      order.id
-    );
-  } else {
-    await orderRepository.restoreOrderResourcesTransaction(
-      order.id,
-      {
-        restoreCoupon: true
-      }
-    );
+  if (!updateResult.processed) {
+    if (!updateResult.order?.payment) {
+      return {
+        RspCode: '01',
+        Message: 'Payment not Found'
+      };
+    }
+    return {
+      RspCode: '00',
+      Message: 'Confirm Success'
+    };
   }
   try {
     if (paymentStatus === PAYMENT_STATUS.SUCCESS) {

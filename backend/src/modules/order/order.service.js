@@ -1,6 +1,8 @@
+const crypto = require('crypto');
 const orderRepository = require('./order.repository');
 const SHIPPING_CONFIG = require('./shipping.config');
-const { ORDER_MESSAGES, ORDER_STATUS, ORDER_CANCELLED_BY  } = require('./order.constants');
+const { ORDER_MESSAGES, ORDER_STATUS, ORDER_CANCELLED_BY, 
+  ORDER_STATUS_CHANGE_SOURCE } = require('./order.constants');
 const paginationHelper = require('../../utils/pagination');
 const prisma = require('../../config/database');
 const { PAYMENT_METHOD, PAYMENT_MESSAGES, PAYMENT_STATUS} = require('../payment/payment.constants');
@@ -10,6 +12,95 @@ const { TYPE, ORDER: NOTIFICATION_ORDER, PAYMENT: NOTIFICATION_PAYMENT, ADMIN: N
 
 const ORDER_EXPIRE_MINUTES =
   Number(process.env.ORDER_EXPIRE_MINUTES) || 30;
+
+const SHIPPING_SIMULATION_ENABLED =
+  process.env.SHIPPING_SIMULATION_ENABLED?.trim().toLowerCase() === 'true';
+
+const getDelayMilliseconds = (envValue, defaultMinutes) => {
+  const minutes = Number(envValue);
+  const delayMinutes = Number.isFinite(minutes) && minutes > 0
+      ? minutes
+      : defaultMinutes;
+
+  return delayMinutes * 60 * 1000;
+};
+
+const PROCESSING_DELAY_MS = getDelayMilliseconds(
+  process.env.SHIPPING_PROCESSING_DELAY_MINUTES,
+  8 * 60
+);
+
+const DELIVERY_DELAY_MS = getDelayMilliseconds(
+  process.env.SHIPPING_DELIVERY_DELAY_MINUTES,
+  2 * 24 * 60
+);
+
+const canonicalize = value => {
+  if (Array.isArray(value)) {
+    return value.map(canonicalize);
+  }
+
+  if (value && typeof value === 'object') {
+    return Object.keys(value)
+      .sort()
+      .reduce((result, key) => {
+        result[key] = canonicalize(value[key]);
+        return result;
+      }, {});
+  }
+
+  return value;
+};
+
+const getOrderRequestHash = payload =>
+  crypto
+    .createHash('sha256')
+    .update(JSON.stringify(canonicalize(payload)))
+    .digest('hex');
+
+const formatCreatedOrder = (order, paymentMethod) => ({
+  orderId: order.id,
+  orderNumber: order.orderNumber,
+  receiverName: order.receiverName,
+  phoneNumber: order.phoneNumber,
+  address: `${order.addressLine}, ${order.ward}, ${order.province}`,
+  subtotal: Number(order.subtotal),
+  discountAmount: Number(order.discountAmount),
+  shippingFee: Number(order.shippingFee),
+  totalAmount: Number(order.totalAmount),
+  paymentMethod,
+  paymentStatus: order.payment?.status
+});
+
+const getIdempotentOrderReplay = async (
+  userId,
+  idempotencyKey,
+  requestHash
+) => {
+  const existingOrder =
+    await orderRepository.findOrderByIdempotencyKey(
+      userId,
+      idempotencyKey
+    );
+
+  if (!existingOrder) {
+    return null;
+  }
+
+  if (existingOrder.requestHash !== requestHash) {
+    const error = new Error(ORDER_MESSAGES.IDEMPOTENCY_KEY_REUSED);
+    error.statusCode = 409;
+    throw error;
+  }
+
+  return {
+    ...formatCreatedOrder(
+      existingOrder,
+      existingOrder.payment?.paymentMethod
+    ),
+    idempotencyReplay: true
+  };
+};
 
 const orderService = {
 calculateOrderData: async (userId, { cartItemIds, buyNowItems, province, couponCode }) => {
@@ -82,9 +173,7 @@ if (couponCode) {
     now <= coupon.endDate
   ) {
     if (coupon.usedCount >= coupon.usageLimit) {
-      throw new Error(
-        'Mã giảm giá này đã hết lượt sử dụng!'
-      );
+      throw new Error(ORDER_MESSAGES.COUPON_EXHAUSTED);
     }
     const hasUsed =
       await orderRepository.checkUserCouponUsage(
@@ -93,9 +182,7 @@ if (couponCode) {
       );
 
     if (hasUsed) {
-      throw new Error(
-        'Bạn đã sử dụng mã giảm giá này rồi! Mỗi tài khoản chỉ được dùng 1 lần.'
-      );
+      throw new Error(ORDER_MESSAGES.COUPON_ALREADY_USED);
     }
     if (
       subtotal >= Number(coupon.minOrderAmount)
@@ -176,7 +263,22 @@ previewOrder: async (userId, payload) => {
     };
   },
 
- createOrder: async (userId, payload) => {
+ createOrder: async (userId, payload, idempotencyKey) => {
+  if (!idempotencyKey) {
+    throw new Error(ORDER_MESSAGES.IDEMPOTENCY_KEY_REQUIRED);
+  }
+
+  const requestHash = getOrderRequestHash(payload);
+  const existingOrder = await getIdempotentOrderReplay(
+    userId,
+    idempotencyKey,
+    requestHash
+  );
+
+  if (existingOrder) {
+    return existingOrder;
+  }
+
   const {
     cartItemIds,
     province,
@@ -197,12 +299,28 @@ previewOrder: async (userId, payload) => {
     throw new Error(PAYMENT_MESSAGES.INVALID_PAYMENT_METHOD);
   }
 
-  const calcData = await orderService.calculateOrderData(
-    userId,
-    payload
-  );
+  let calcData;
+  try {
+    calcData = await orderService.calculateOrderData(
+      userId,
+      payload
+    );
+  } catch (error) {
+    const idempotentReplay = await getIdempotentOrderReplay(
+      userId,
+      idempotencyKey,
+      requestHash
+    );
 
-  const orderNumber = `ORD-${Math.floor(Date.now() / 1000)}`;
+    if (idempotentReplay) {
+      return idempotentReplay;
+    }
+
+    throw error;
+  }
+
+  const orderNumber =
+    `ORD-${Date.now()}-${crypto.randomBytes(4).toString('hex').toUpperCase()}`;
 
   const orderData = {
     userId,
@@ -221,14 +339,24 @@ previewOrder: async (userId, payload) => {
     note
   };
 
-  const { order, lowStockVariants } = await orderRepository.createOrderTransaction({
+  const { order, lowStockVariants, replayed } =
+    await orderRepository.createOrderTransaction({
     orderData,
     orderItemsData: calcData.itemsData,
     cartItemIds,
     couponId: calcData.appliedCouponId,
     userId,
-    paymentMethod
+    paymentMethod,
+    idempotencyKey,
+    requestHash
   });
+
+  if (replayed) {
+    return {
+      ...formatCreatedOrder(order, order.payment?.paymentMethod),
+      idempotencyReplay: true
+    };
+  }
 
   await auditLogService.createAuditLog({
     userId,
@@ -316,17 +444,8 @@ try {
 }
 
 return {
-  orderId: order.id,
-  orderNumber: order.orderNumber,
-  receiverName: order.receiverName,
-  phoneNumber: order.phoneNumber,
-  address: `${order.addressLine}, ${order.ward}, ${order.province}`,
-  subtotal: Number(order.subtotal),
-  discountAmount: Number(order.discountAmount),
-  shippingFee: Number(order.shippingFee),
-  totalAmount: Number(order.totalAmount),
-  paymentMethod,
-  paymentStatus: order.payment?.status
+  ...formatCreatedOrder(order, paymentMethod),
+  idempotencyReplay: false
 };
 },
 
@@ -383,24 +502,22 @@ cancelOrder: async (
     paymentStatus = PAYMENT_STATUS.CANCELLED;
   }
 
-  await orderRepository.restoreOrderResourcesTransaction(
-    order.id,
-    {
-      restoreCoupon: true
-    }
-  );
-
   const reason =
     cancelReason.trim() ||
     'Khách hàng hủy đơn.';
 
-  await orderRepository.cancelOrderTransaction({
+  const cancellation = await orderRepository.cancelOrderTransaction({
     orderId: order.id,
+    expectedStatus: order.status,
     paymentId: order.payment.id,
     paymentStatus,
     cancelledBy: ORDER_CANCELLED_BY.CUSTOMER,
     cancelReason: reason
   });
+
+  if (!cancellation.transitioned) {
+    throw new Error('Đơn hàng đã được cập nhật, vui lòng tải lại.');
+  }
 
   await auditLogService.createAuditLog({
     userId,
@@ -546,6 +663,114 @@ getOrdersForAdmin: async (query) => {
     return order;
   },
 
+advanceShippingSimulation: async () => {
+  if (!SHIPPING_SIMULATION_ENABLED) {
+    return 0;
+  }
+
+  const orders = await orderRepository.findShippingSimulationCandidates();
+  const now = Date.now();
+  let transitionedCount = 0;
+
+  for (const order of orders) {
+    const latestHistory = order.statusHistory[0];
+
+    if (!latestHistory || latestHistory.newStatus !== order.status ) {
+      continue;
+    }
+
+    const elapsed = now - new Date(latestHistory.changedAt).getTime();
+
+    if (!Number.isFinite(elapsed)) {
+      continue;
+    }
+
+    let nextStatus;
+    let delay;
+
+    if (order.status === ORDER_STATUS.PROCESSING) {
+      const canShip =
+        order.payment?.paymentMethod === PAYMENT_METHOD.COD ||
+        (
+          order.payment?.paymentMethod === PAYMENT_METHOD.VNPAY &&
+          order.payment?.status === PAYMENT_STATUS.SUCCESS
+        );
+
+      if (!canShip) {
+        continue;
+      }
+
+      nextStatus = ORDER_STATUS.SHIPPING;
+      delay = PROCESSING_DELAY_MS;
+    } else if (order.status === ORDER_STATUS.SHIPPING) {
+      if (order.payment?.status !== PAYMENT_STATUS.SUCCESS) {
+        continue;
+      }
+
+      nextStatus = ORDER_STATUS.COMPLETED;
+      delay = DELIVERY_DELAY_MS;
+    } else {
+      continue;
+    }
+
+    if (elapsed < delay) {
+      continue;
+    }
+
+    const updated = await orderRepository.transitionOrderStatus({
+      orderId: order.id,
+      fromStatus: order.status,
+      toStatus: nextStatus,
+      source: ORDER_STATUS_CHANGE_SOURCE.SYSTEM,
+      note: 'Trạng thái được cập nhật bởi đơn vị vận chuyển.',
+      incrementSoldCountOnCompletion:
+        nextStatus === ORDER_STATUS.COMPLETED
+    });
+
+    if (updated) {
+      transitionedCount += 1;
+
+      const notification =
+        nextStatus === ORDER_STATUS.SHIPPING
+          ? {
+              title: NOTIFICATION_ORDER.SHIPPING_TITLE,
+              content: NOTIFICATION_ORDER.SHIPPING_CONTENT(
+                order.orderNumber
+              ),
+              type: TYPE.ORDER_SHIPPING
+            }
+          : {
+              title: NOTIFICATION_ORDER.SUCCESS_TITLE,
+              content: NOTIFICATION_ORDER.SUCCESS_CONTENT(
+                order.orderNumber
+              ),
+              type: TYPE.ORDER_SUCCESS
+            };
+
+      try {
+        await notificationService.createNotification({
+          userId: order.userId,
+          title: notification.title,
+          content: notification.content,
+          type: notification.type,
+          data: {
+            orderId: order.id,
+            orderNumber: order.orderNumber,
+            status: nextStatus
+          }
+        });
+      } catch (error) {
+        console.error(
+          'Shipping simulation notification failed:',
+          error.message
+        );
+      }
+    }
+  }
+
+  return transitionedCount;
+},
+
 updateOrderStatusByAdmin: async (adminId, orderId, status) => {
   if (!Object.values(ORDER_STATUS).includes(status)) {
     throw new Error(`Trạng thái [${status}] không hợp lệ!`);
@@ -571,14 +796,23 @@ updateOrderStatusByAdmin: async (adminId, orderId, status) => {
     };
 
     const result = await prisma.$transaction(async tx => {
-      const updated = await tx.order.update({
-        where: {
-          id: orderId
-        },
-        data: {
-          status
-        }
-      });
+      const updated =
+        await orderRepository.transitionOrderStatusWithinTransaction(
+          tx,
+          {
+            orderId,
+            fromStatus: existingOrder.status,
+            toStatus: status,
+            source: ORDER_STATUS_CHANGE_SOURCE.ADMIN,
+            note: `Quản trị viên cập nhật trạng thái thành ${status}.`
+          }
+        );
+
+      if (!updated) {
+        throw new Error(
+          'Trạng thái đơn hàng đã được cập nhật ở nơi khác. Vui lòng tải lại.'
+        );
+      }
 
       if (
         status === ORDER_STATUS.COMPLETED &&
@@ -797,24 +1031,22 @@ cancelOrderByAdmin: async (
     paymentStatus = PAYMENT_STATUS.CANCELLED;
   }
 
-  await orderRepository.restoreOrderResourcesTransaction(
-    order.id,
-    {
-      restoreCoupon: true
-    }
-  );
-
   const reason =
     cancelReason.trim() ||
     'Quản trị viên hủy đơn.';
 
-  await orderRepository.cancelOrderTransaction({
+  const cancellation = await orderRepository.cancelOrderTransaction({
     orderId: order.id,
+    expectedStatus: order.status,
     paymentId: order.payment.id,
     paymentStatus,
     cancelledBy: ORDER_CANCELLED_BY.ADMIN,
     cancelReason: reason
   });
+
+  if (!cancellation.transitioned) {
+    throw new Error('Đơn hàng đã được cập nhật, vui lòng tải lại.');
+  }
 
   await auditLogService.createAuditLog({
     userId: adminId,
@@ -875,18 +1107,20 @@ cancelExpiredPendingOrders: async () => {
         continue;
       }
 
-      await orderRepository.restoreOrderResourcesTransaction(
-        order.id
-      );
-
-      await orderRepository.cancelOrderTransaction({
+      const cancellation =
+        await orderRepository.cancelOrderTransaction({
         orderId: order.id,
+        expectedStatus: ORDER_STATUS.PENDING,
         paymentId: order.payment.id,
         paymentStatus: PAYMENT_STATUS.CANCELLED,
         cancelledBy: ORDER_CANCELLED_BY.SYSTEM,
         cancelReason:
           'Đơn hàng tự động hủy do quá thời gian thanh toán.'
       });
+
+      if (!cancellation.transitioned) {
+        continue;
+      }
 
       try {
         await notificationService.createNotification({

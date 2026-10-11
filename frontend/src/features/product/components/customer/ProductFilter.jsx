@@ -45,17 +45,17 @@ const displayedCategories = showAllCategories
   : finalCategoriesToRender.slice(0, 5);
 
 return (
-  <aside className="w-full shrink-0 md:w-[220px] lg:w-[230px]">
-    <div className="overflow-hidden rounded-md border border-gray-200 bg-white">
-      <div className="border-b border-gray-100 px-4 py-3">
-        <h2 className="text-sm font-semibold text-gray-800">
+  <div className="w-full">
+    <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+      <div className="border-b border-gray-100 px-4 py-3.5">
+        <h2 className="text-[13px] font-semibold leading-5 text-gray-800">
           Bộ lọc tìm kiếm
         </h2>
       </div>
 
       <div className="border-b border-gray-100 px-4 py-4">
         <div className="mb-3 flex items-center justify-between">
-          <h3 className="text-sm font-semibold text-gray-800">
+          <h3 className="text-[13px] font-semibold leading-5 text-gray-800">
             Danh mục
           </h3>
 
@@ -99,7 +99,7 @@ return (
                         className="h-3.5 w-3.5 cursor-pointer rounded border-gray-300 text-[#ee4d2d] focus:ring-2 focus:ring-orange-100"
                       />
 
-                      <span className="text-sm text-gray-600 transition-colors group-hover:text-[#ee4d2d]">
+                      <span className="text-[13px] leading-5 text-gray-600 transition-colors group-hover:text-[#ee4d2d]">
                         {cat.name}
                       </span>
                     </label>
@@ -108,7 +108,7 @@ return (
                       onClick={() =>
                         setSearchParams({ category: catId })
                       }
-                      className="group flex w-full items-center gap-2 text-left text-sm text-gray-600 transition-colors hover:text-[#ee4d2d]"
+                      className="group flex w-full items-center gap-2 text-left text-[13px] leading-5 text-gray-600 transition-colors hover:text-[#ee4d2d]"
                     >
                       <span className="text-gray-400 transition-colors group-hover:text-[#ee4d2d]">
                         ›
@@ -122,7 +122,7 @@ return (
             })
           ) : (
             <li>
-              <p className="text-xs italic text-gray-400">
+              <p className="text-xs leading-5 italic text-gray-400">
                 Không có danh mục phù hợp
               </p>
             </li>
@@ -145,7 +145,7 @@ return (
       </div>
 
       <div className="border-b border-gray-100 px-4 py-4">
-        <h3 className="mb-3 text-sm font-semibold text-gray-800">
+        <h3 className="mb-3 text-[13px] font-semibold leading-5 text-gray-800">
           Thương hiệu
         </h3>
 
@@ -164,7 +164,7 @@ return (
                       className="h-3.5 w-3.5 cursor-pointer rounded border-gray-300 text-[#ee4d2d] focus:ring-2 focus:ring-orange-100"
                     />
 
-                    <span className="truncate text-sm text-gray-600 transition-colors group-hover:text-[#ee4d2d]">
+                    <span className="truncate text-[13px] leading-5 text-gray-600 transition-colors group-hover:text-[#ee4d2d]">
                       {brand.name}
                     </span>
                   </label>
@@ -173,7 +173,7 @@ return (
             })
           ) : (
             <li>
-              <p className="text-xs italic text-gray-400">
+              <p className="text-xs leading-5 italic text-gray-400">
                 Đang tải...
               </p>
             </li>
@@ -196,7 +196,7 @@ return (
       </div>
 
       <div className="border-b border-gray-100 px-4 py-4">
-        <h3 className="mb-3 text-sm font-semibold text-gray-800">
+        <h3 className="mb-3 text-[13px] font-semibold leading-5 text-gray-800">
           Khoảng giá
         </h3>
 
@@ -209,6 +209,8 @@ return (
             <input
               type="number"
               min="0"
+              inputMode="numeric"
+              aria-label="Giá thấp nhất"
               placeholder="Từ"
               value={priceRange.min}
               onChange={e =>
@@ -217,7 +219,7 @@ return (
                   min: e.target.value
                 })
               }
-              className="w-full rounded-md border border-gray-200 py-1.5 pl-5 pr-1.5 text-[11px] text-gray-700 outline-none transition-all focus:border-[#ee4d2d] focus:ring-1 focus:ring-orange-100"
+              className="w-full rounded-md border border-gray-200 py-1.5 pl-5 pr-1.5 text-xs leading-5 text-gray-700 outline-none transition-all focus:border-[#ee4d2d] focus:ring-1 focus:ring-orange-100"
             />
           </div>
 
@@ -233,6 +235,8 @@ return (
             <input
               type="number"
               min="0"
+              inputMode="numeric"
+              aria-label="Giá cao nhất"
               placeholder="Đến"
               value={priceRange.max}
               onChange={e =>
@@ -241,7 +245,7 @@ return (
                   max: e.target.value
                 })
               }
-              className="w-full rounded-md border border-gray-200 py-1.5 pl-5 pr-1.5 text-[11px] text-gray-700 outline-none transition-all focus:border-[#ee4d2d] focus:ring-1 focus:ring-orange-100"
+              className="w-full rounded-md border border-gray-200 py-1.5 pl-5 pr-1.5 text-xs leading-5 text-gray-700 outline-none transition-all focus:border-[#ee4d2d] focus:ring-1 focus:ring-orange-100"
             />
           </div>
         </div>
@@ -250,20 +254,20 @@ return (
       <div className="px-4 py-4">
         <button
           onClick={handleApplyFilter}
-          className="w-full rounded-md bg-[#ee4d2d] py-2 text-xs font-semibold text-white transition-colors hover:bg-[#d74123]"
+          className="w-full rounded-md bg-[#ee4d2d] py-2 text-xs font-semibold leading-5 text-white transition-colors hover:bg-[#d74123]"
         >
           ÁP DỤNG
         </button>
 
         <button
           onClick={handleClearFilters}
-          className="mt-2 w-full rounded-md border border-gray-200 bg-white py-2 text-xs font-medium text-gray-600 transition-colors hover:border-gray-300 hover:bg-gray-50"
+          className="mt-2 w-full rounded-md border border-gray-200 bg-white py-2 text-xs font-medium leading-5 text-gray-600 transition-colors hover:border-gray-300 hover:bg-gray-50"
         >
           XÓA TẤT CẢ
         </button>
       </div>
     </div>
-  </aside>
+  </div>
 );
 };
 

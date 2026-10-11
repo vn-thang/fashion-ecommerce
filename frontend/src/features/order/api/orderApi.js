@@ -4,8 +4,12 @@ export const orderApi = {
   previewCheckout: (data) => {
     return axiosInstance.post('/order/preview', data);
   },
-  createOrder: (data) => {
-    return axiosInstance.post('/order/create', data);
+  createOrder: (data, idempotencyKey) => {
+    return axiosInstance.post('/order/create', data, {
+      headers: {
+        'Idempotency-Key': idempotencyKey
+      }
+    });
   },
   getMyOrders: (params) => {
     return axiosInstance.get('/order', { params });

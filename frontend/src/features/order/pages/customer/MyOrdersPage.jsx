@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import toast from 'react-hot-toast';
 
 import { useMyOrders } from '../../hooks/useMyOrders';
@@ -10,6 +10,7 @@ import ReturnRequestModal from '../../../return/components/customer/ReturnReques
 
 import Button from '../../../../shared/components/Button';
 import CreateReviewModal from '../../../review/components/customer/CreateReviewModal';
+import CustomerPageHeader from '../../../../shared/components/CustomerPageHeader';
 
 const MyOrdersPage = () => {
   const {
@@ -64,12 +65,13 @@ const MyOrdersPage = () => {
 };
 
   return (
-    <div className="max-w-5xl mx-auto py-6 px-4 sm:px-0">
-      <h1 className="text-2xl font-bold text-gray-800 mb-6">
-        Đơn mua của tôi
-      </h1>
+    <div className="mx-auto w-full max-w-5xl space-y-5 py-2">
+      <CustomerPageHeader
+        title="Đơn mua"
+        description="Theo dõi trạng thái, thanh toán và lịch sử đơn hàng của bạn."
+      />
 
-      <div className="mb-6 rounded-xl overflow-hidden shadow-sm">
+      <div className="overflow-hidden rounded-2xl border border-slate-200 shadow-sm">
         <MyOrderTabs
           currentTab={filters.status}
           onTabChange={handleTabChange}
@@ -78,19 +80,22 @@ const MyOrdersPage = () => {
 
       <div className="space-y-4">
         {loading ? (
-          <div className="py-10 text-center text-gray-500">
+          <div className="rounded-2xl border border-dashed border-slate-300 bg-white py-16 text-center text-sm text-slate-500">
             Đang tải dữ liệu...
           </div>
         ) : orders.length === 0 ? (
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-12 text-center">
+          <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center sm:p-14">
             <img
               src="https://cdn-icons-png.flaticon.com/512/11329/11329060.png"
               alt="Empty Order"
-              className="w-24 h-24 mx-auto mb-4 opacity-50"
+              className="mx-auto mb-4 h-20 w-20 opacity-50"
             />
 
-            <p className="text-gray-500 font-medium">
+            <p className="font-medium text-slate-700">
               Chưa có đơn hàng nào
+            </p>
+            <p className="mt-1 text-sm text-slate-500">
+              Các đơn hàng bạn đặt sẽ xuất hiện tại đây.
             </p>
           </div>
         ) : (

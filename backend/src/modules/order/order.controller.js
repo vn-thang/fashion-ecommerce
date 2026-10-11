@@ -16,10 +16,20 @@ const orderController = {
   createOrder: async (req, res) => {
     try {
       const userId = req.user.userId;
-      const result = await orderService.createOrder(userId, req.body);
-      return sendSuccess(res, 201, ORDER_MESSAGES.CREATE_SUCCESS, result);
+      const result = await orderService.createOrder(
+        userId,
+        req.body,
+        req.idempotencyKey
+      );
+      const { idempotencyReplay, ...data } = result;
+      return sendSuccess(
+        res,
+        idempotencyReplay ? 200 : 201,
+        ORDER_MESSAGES.CREATE_SUCCESS,
+        data
+      );
     } catch (err) {
-      return sendError(res, 400, err.message);
+      return sendError(res, err.statusCode || 400, err.message);
     }
   },
 

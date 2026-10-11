@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useCart } from '../hooks/CartContext';
 import EmptyCart from '../components/EmptyCart';
 import CartItem from '../components/CartItem';
 import CartSummary from '../components/CartSummary';
+import CustomerPageHeader from '../../../shared/components/CustomerPageHeader';
 
 const CartPage = () => {
   const { cart, isLoading, updateQuantity, removeItem } = useCart();
@@ -56,19 +57,25 @@ const CartPage = () => {
 
   if (!cart?.items || cart.items.length === 0) {
     return (
-      <div className="bg-gray-100 min-h-screen py-8 px-4">
-        <div className="max-w-7xl mx-auto">
-          <EmptyCart />
-        </div>
+      <div className="mx-auto w-full max-w-7xl py-2">
+        <CustomerPageHeader
+          title="Giỏ hàng"
+          description="Kiểm tra sản phẩm trước khi hoàn tất đơn hàng."
+          className="mb-6"
+        />
+        <EmptyCart />
       </div>
     );
   }
 
   return (
-    <div className="bg-gray-100 min-h-screen py-8">
-
+    <div className="mx-auto w-full max-w-7xl py-2">
        <div className="w-full">
-        <h1 className="text-2xl font-bold text-gray-800 mb-6">Giỏ hàng của bạn</h1>
+        <CustomerPageHeader
+          title="Giỏ hàng"
+          description={`${cart?.totalItems || 0} sản phẩm đang có trong giỏ hàng.`}
+          className="mb-6"
+        />
 
         <div className="flex flex-col lg:flex-row gap-6">
           <div className="flex-1 bg-white rounded-lg shadow-sm overflow-hidden">

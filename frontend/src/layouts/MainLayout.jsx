@@ -8,12 +8,12 @@ import ScrollToTop from '../shared/components/ScrollToTop';
 const MainLayout = () => {
   return (
     <CustomerChatProvider>
-    <div className="flex min-h-screen flex-col bg-[#f5f5f5] font-sans text-gray-900">
+    <div className="customer-app flex min-h-screen flex-col bg-slate-50 text-slate-900">
 
        <ScrollToTop />
       <CustomerHeader />
 
-<main className="mx-auto w-[85%] max-w-[1200px] flex-1 px-4 pb-10 pt-5">
+<main className="mx-auto w-full max-w-7xl flex-1 px-4 pb-12 pt-6 sm:px-6 lg:px-8 lg:pt-8">
   <Outlet />
 </main>
 

@@ -29,7 +29,6 @@ export const useCustomerHome = () => {
     min: '',
     max: ''
   });
-
   const [triggerFetch, setTriggerFetch] = useState(0);
 
   useEffect(() => {
@@ -214,7 +213,6 @@ useEffect(() => {
 
     priceRange,
     setPriceRange,
-
     handleSearch,
     handleApplyFilter,
     handleClearFilters,

@@ -1,4 +1,3 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
 import { FaChevronRight } from 'react-icons/fa';
 
@@ -9,8 +8,8 @@ const PolicyLayout = ({
   children
 }) => {
   return (
-    <main className="min-h-screen bg-gray-50 py-8 sm:py-10 lg:py-12">
-      <div className="mx-auto w-[95%] max-w-[1100px]">
+    <div className="w-full py-4 sm:py-6 lg:py-8">
+      <div className="w-full">
         <nav
           aria-label="Breadcrumb"
           className="mb-6 flex items-center gap-2 text-sm text-gray-500"
@@ -47,7 +46,7 @@ const PolicyLayout = ({
         </article>
 
       </div>
-    </main>
+    </div>
   );
 };
 

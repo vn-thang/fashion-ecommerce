@@ -65,10 +65,6 @@ const CustomerHeader = () => {
     fetchCategories();
   }, []);
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-  };
-
   const handleLogout = () => { 
      disconnectSocket(); 
     logout();
@@ -76,7 +72,7 @@ const CustomerHeader = () => {
   };
  return (
 <header className="sticky top-0 z-50 border-b border-gray-200 bg-white">
-  <div className="mx-auto w-[85%] max-w-[1200px] py-3">
+  <div className="mx-auto w-full max-w-7xl px-4 py-3 sm:px-6 lg:px-8">
       <div className="flex flex-wrap items-center justify-between gap-3 md:flex-nowrap md:gap-8">
         <Link
           to="/"
@@ -203,7 +199,7 @@ const CustomerHeader = () => {
       </div>
     </div>
    <div className="bg-[#D5A6A6] text-white">
-  <div className="mx-auto flex w-[85%] max-w-[1200px] items-center">
+  <div className="mx-auto flex w-full max-w-7xl px-4 sm:px-6 lg:px-8 items-center">
         <div
           className="relative shrink-0"
           onMouseEnter={() => setIsCategoryOpen(true)}

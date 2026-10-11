@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useProfile } from '../../hooks/customer/useProfile';
 import ProfileInfo from '../../components/customer/ProfileInfo';
 import ChangePassword from '../../../auth/components/ChangePassword';
+import CustomerPageHeader from '../../../../shared/components/CustomerPageHeader';
 
 const ProfilePage = () => {
   const { user, isLoading, isSubmitLoading, updateProfile } = useProfile();
@@ -13,6 +14,11 @@ const ProfilePage = () => {
 
   return (
     <div className="w-full">
+      <CustomerPageHeader
+        title="Tài khoản của tôi"
+        description="Cập nhật thông tin cá nhân và bảo mật tài khoản."
+        className="mb-6"
+      />
       <div className="flex gap-6 border-b border-gray-100 mb-6">
         <button
           onClick={() => setActiveSection('info')}

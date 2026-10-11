@@ -6,6 +6,11 @@ const ORDER_CANCELLED_BY = {
   SYSTEM: 'SYSTEM'
 };
 
+const ORDER_STATUS_CHANGE_SOURCE = {
+  ADMIN: 'ADMIN',
+  SYSTEM: 'SYSTEM'
+};
+
 const ORDER_MESSAGES = {
   INVALID_ID: 'ID không hợp lệ',
 
@@ -21,7 +26,15 @@ const ORDER_MESSAGES = {
   COUPON_MIN_NOT_MET:
     'Đơn hàng chưa đạt giá trị tối thiểu để áp dụng mã giảm giá',
 
+  COUPON_EXHAUSTED:
+    'Mã giảm giá này đã hết lượt sử dụng!',
+
+  COUPON_ALREADY_USED:
+    'Bạn đã sử dụng mã giảm giá này rồi! Mỗi tài khoản chỉ được dùng 1 lần.',
+
   ORDER_NOT_FOUND: 'Không tìm thấy đơn hàng',
+  IDEMPOTENCY_KEY_REQUIRED: 'Thiếu mã idempotency cho yêu cầu đặt hàng.',
+  IDEMPOTENCY_KEY_REUSED: 'Mã idempotency đã được dùng cho nội dung đặt hàng khác.',
 
   CREATE_SUCCESS: 'Tạo đơn hàng thành công',
 
@@ -41,5 +54,6 @@ const ORDER_MESSAGES = {
 module.exports = {
   ORDER_MESSAGES,
   ORDER_STATUS,
-  ORDER_CANCELLED_BY
+  ORDER_CANCELLED_BY,
+  ORDER_STATUS_CHANGE_SOURCE
 };

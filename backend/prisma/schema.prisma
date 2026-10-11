@@ -267,6 +267,8 @@ model Order {
   cancelledAt   DateTime? @db.Timestamp
   cancelledBy   String?   @db.VarChar(30)
   cancelReason  String?   @db.Text
+  idempotencyKey String?  @db.VarChar(100)
+  requestHash    String?  @db.VarChar(64)
   createdAt      DateTime      @default(now()) @db.Timestamp
   updatedAt      DateTime      @updatedAt @db.Timestamp
 
@@ -275,8 +277,24 @@ model Order {
   payment        Payment?
   couponUsages   CouponUsage[]
   returnRequests ReturnRequest[]
+  statusHistory  OrderStatusHistory[]
+  @@unique([userId, idempotencyKey])
   @@index([userId, createdAt])
   @@index([status, createdAt])
+}
+
+model OrderStatusHistory {
+  id        String   @id @default(uuid()) @db.Uuid
+  orderId   String   @db.Uuid
+  oldStatus String?  @db.VarChar(30)
+  newStatus String   @db.VarChar(30)
+  source    String   @db.VarChar(20)
+  note      String?  @db.Text
+  changedAt DateTime @default(now()) @db.Timestamp
+
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId, changedAt])
 }
 
 // 16. OrderItems
@@ -354,6 +372,7 @@ model CouponUsage {
   order    Order    @relation(fields: [orderId], references: [id])
 
   @@unique([couponId, orderId])
+  @@unique([couponId, userId])
   @@index([userId, couponId])
 }
 

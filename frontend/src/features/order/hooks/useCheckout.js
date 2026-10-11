@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { orderApi } from '../api/orderApi';
 import { paymentApi } from '../../payment/api/paymentApi';
@@ -30,6 +30,8 @@ export const useCheckout = (
   const [apiError, setApiError] = useState('');
 
   const [availableCoupons, setAvailableCoupons] = useState([]);
+  const idempotencyRequestRef = useRef(null);
+  const submittingRef = useRef(false);
 
   const cartItemIdsString = cartItemIds?.join(',');
 
@@ -209,6 +211,7 @@ export const useCheckout = (
   };
   const handlePlaceOrder = async e => {
     if (e) e.preventDefault();
+    if (submittingRef.current) return;
 
     if (!shippingAddress.province) {
       setApiError('Vui lòng chọn địa chỉ giao hàng hợp lệ.');
@@ -220,22 +223,67 @@ export const useCheckout = (
     }
 
     try {
+      submittingRef.current = true;
       setIsSubmitting(true);
       setApiError('');
 
+      const createOrderPayload = {
+        ...getCheckoutPayload(),
+        receiverName: shippingAddress.receiverName,
+        phoneNumber: shippingAddress.phoneNumber,
+        province: shippingAddress.province,
+        ward: shippingAddress.ward,
+        addressLine: shippingAddress.addressLine,
+        note,
+        paymentMethod,
+        couponCode: appliedCoupon || undefined
+      };
+      const requestFingerprint = JSON.stringify(createOrderPayload);
+      const fingerprintDigest = await crypto.subtle.digest(
+        'SHA-256',
+        new TextEncoder().encode(requestFingerprint)
+      );
+      const requestFingerprintHash = Array.from(
+        new Uint8Array(fingerprintDigest),
+        byte => byte.toString(16).padStart(2, '0')
+      ).join('');
+      const storedFingerprint = sessionStorage.getItem(
+        'fashionhub.checkout.idempotency.fingerprint'
+      );
+      const storedKey = sessionStorage.getItem(
+        'fashionhub.checkout.idempotency.key'
+      );
+
+      if (
+        !idempotencyRequestRef.current ||
+        idempotencyRequestRef.current.requestFingerprint !==
+          requestFingerprintHash
+      ) {
+        const key =
+          storedFingerprint === requestFingerprintHash && storedKey
+            ? storedKey
+            : crypto.randomUUID();
+
+        idempotencyRequestRef.current = {
+          requestFingerprint: requestFingerprintHash,
+          key
+        };
+
+        sessionStorage.setItem(
+          'fashionhub.checkout.idempotency.fingerprint',
+          requestFingerprintHash
+        );
+        sessionStorage.setItem(
+          'fashionhub.checkout.idempotency.key',
+          key
+        );
+      }
+
       const orderResponse =
-        await orderApi.createOrder({
-          ...getCheckoutPayload(),
-          receiverName: shippingAddress.receiverName,
-          phoneNumber: shippingAddress.phoneNumber,
-          province: shippingAddress.province,
-          ward: shippingAddress.ward,
-          addressLine: shippingAddress.addressLine,
-          note,
-          paymentMethod,
-          couponCode:
-            appliedCoupon || undefined
-        });
+        await orderApi.createOrder(
+          createOrderPayload,
+          idempotencyRequestRef.current.key
+        );
 
       if (!orderResponse.success) {
         throw new Error(
@@ -246,6 +294,14 @@ export const useCheckout = (
 
       const order = orderResponse.data;
       if (paymentMethod === 'COD') {
+        sessionStorage.removeItem(
+          'fashionhub.checkout.idempotency.fingerprint'
+        );
+        sessionStorage.removeItem(
+          'fashionhub.checkout.idempotency.key'
+        );
+        idempotencyRequestRef.current = null;
+
         if (!isBuyNow) {
           await fetchCart();
         }
@@ -268,8 +324,15 @@ export const useCheckout = (
     paymentResponse.success &&
     paymentResponse.data?.paymentUrl
     ) {
-        window.location.href =
-            paymentResponse.data.paymentUrl;
+         sessionStorage.removeItem(
+           'fashionhub.checkout.idempotency.fingerprint'
+         );
+         sessionStorage.removeItem(
+           'fashionhub.checkout.idempotency.key'
+         );
+         idempotencyRequestRef.current = null;
+         window.location.href =
+             paymentResponse.data.paymentUrl;
 
         return;
     }
@@ -285,6 +348,7 @@ export const useCheckout = (
           'Đặt hàng thất bại.'
       );
     } finally {
+      submittingRef.current = false;
       setIsSubmitting(false);
     }
   };

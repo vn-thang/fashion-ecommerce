@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import Button from '../../../../shared/components/Button';
 import Pagination from '../../../../shared/components/Pagination';
 import NotificationList from '../../components/NotificationList';
 import NotificationDetailModal from '../../components/NotificationDetailModal';
 import { useNotification } from '../../hooks/useNotification';
+import CustomerPageHeader from '../../../../shared/components/CustomerPageHeader';
 
 const NotificationPage = () => {
   const {
@@ -34,18 +35,11 @@ const NotificationPage = () => {
 
   return (
     <>
-      <div className="mx-auto max-w-[1000px] space-y-6 animate-fadeIn">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">
-              Thông báo
-            </h1>
-            <p className="mt-1 text-sm text-gray-500">
-              Theo dõi các thông báo và hoạt động mới nhất.
-            </p>
-          </div>
-
-          {unreadCount > 0 && (
+      <div className="mx-auto w-full max-w-5xl space-y-5 animate-fadeIn">
+        <CustomerPageHeader
+          title="Thông báo"
+          description="Theo dõi các thông báo và hoạt động mới nhất."
+          action={unreadCount > 0 && (
             <Button
               variant="outline"
               size="sm"
@@ -54,8 +48,8 @@ const NotificationPage = () => {
               Đọc tất cả
             </Button>
           )}
-        </div>
-        <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
+        />
+        <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
           <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
             <div>
               <h2 className="text-base font-bold text-gray-800">

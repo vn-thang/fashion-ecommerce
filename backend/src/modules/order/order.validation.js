@@ -27,6 +27,18 @@ const orderValidation = {
   },
 
   validateCreateOrder: (req, res, next) => {
+    const idempotencyKey = req.get('Idempotency-Key');
+    if (
+      typeof idempotencyKey !== 'string' ||
+      !/^[A-Za-z0-9._:-]{16,100}$/.test(idempotencyKey)
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: ORDER_MESSAGES.IDEMPOTENCY_KEY_REQUIRED
+      });
+    }
+    req.idempotencyKey = idempotencyKey;
+
     const { 
       cartItemIds, buyNowItems, receiverName, phoneNumber, 
       province, ward, addressLine, paymentMethod 

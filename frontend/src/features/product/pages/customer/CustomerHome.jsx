@@ -1,4 +1,3 @@
-import React from 'react';
 import { useCustomerHome } from '../../hooks/useCustomerHome';
 import ProductCard from '../../components/customer/ProductCard';
 import ProductFilter from '../../components/customer/ProductFilter';
@@ -31,7 +30,7 @@ const CustomerHome = () => {
 return (
   <div className="w-full">
    <div className="flex flex-col gap-6 md:flex-row">
-  <aside className="w-full shrink-0 md:w-[220px] lg:w-[230px]">
+  <aside className="w-full shrink-0 self-start md:sticky md:top-5 md:max-h-[calc(100vh-2.5rem)] md:w-[220px] md:overflow-y-auto lg:w-[250px]">
     <ProductFilter
       categories={categories}
       brands={brands}
@@ -59,7 +58,7 @@ return (
             <div className="grid w-full grid-cols-3 gap-2 sm:flex sm:w-auto">
               <button
                 onClick={() => handleSortToggle('newest')}
-                className={`rounded-sm px-2 py-2 text-xs transition-colors sm:px-5 sm:text-sm ${
+                className={`rounded-sm px-2 py-2 text-xs leading-5 transition-colors sm:px-5 ${
                   sortBy === 'newest'
                     ? 'bg-[#ee4d2d] text-white shadow-sm'
                     : 'bg-white text-gray-800 hover:bg-gray-50'
@@ -70,7 +69,7 @@ return (
 
               <button
                 onClick={() => handleSortToggle('bestSeller')}
-                className={`rounded-sm px-2 py-2 text-xs transition-colors sm:px-5 sm:text-sm ${
+                className={`rounded-sm px-2 py-2 text-xs leading-5 transition-colors sm:px-5 ${
                   sortBy === 'bestSeller'
                     ? 'bg-[#ee4d2d] text-white shadow-sm'
                     : 'bg-white text-gray-800 hover:bg-gray-50'
@@ -82,7 +81,7 @@ return (
 
                <button
               onClick={() => handleSortToggle('highestRated')}
-              className={`rounded-sm px-2 py-2 text-xs transition-colors sm:px-5 sm:text-sm ${
+              className={`rounded-sm px-2 py-2 text-xs leading-5 transition-colors sm:px-5 ${
                 sortBy === 'highestRated'
                   ? 'bg-[#ee4d2d] text-white shadow-sm'
                   : 'bg-white text-gray-800 hover:bg-gray-50'
@@ -99,7 +98,7 @@ return (
                     : 'default'
                 }
                 onChange={e => handleSortToggle(e.target.value)}
-                className={`min-w-0 rounded-sm border px-2 py-2 text-xs outline-none transition-colors sm:px-4 sm:text-sm ${
+                className={`min-w-0 rounded-sm border px-2 py-2 text-xs leading-5 outline-none transition-colors sm:px-4 ${
                   sortBy === 'price_asc' || sortBy === 'price_desc'
                     ? 'border-[#ee4d2d] bg-[#ee4d2d] text-white'
                     : 'border-transparent bg-white text-gray-800'

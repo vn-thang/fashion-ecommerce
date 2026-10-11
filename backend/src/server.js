@@ -10,6 +10,7 @@ const { startOrderExpirationJob} = require('./jobs/orderExpiration.job');
 const { startFlashSaleNotificationJob} = require('./jobs/flashSaleNotification.job');
 
 const {startCouponNotificationJob} = require('./jobs/couponNotification.job');
+const { startShippingSimulationJob } = require('./jobs/shippingSimulation.job');
 const configureSwagger = require('./config/swagger');
 
 const PORT = process.env.PORT || 3000;
@@ -33,6 +34,7 @@ const startServer = async () => {
       startOrderExpirationJob();
       startFlashSaleNotificationJob();
       startCouponNotificationJob();
+      startShippingSimulationJob();
     });
   } catch (error) {
     console.error('Failed to start server:', error);

@@ -1,4 +1,6 @@
 const prisma = require('../../config/database');
+const orderRepository = require('../order/order.repository');
+const { ORDER_STATUS, ORDER_STATUS_CHANGE_SOURCE } = require('../order/order.constants');
 
 const returnRepository = {
   create: async data => {
@@ -541,14 +543,25 @@ const updatedReturn =
   });
 
 if (isFullReturn) {
-  await tx.order.update({
-    where: {
-      id: returnRequest.order.id
-    },
-    data: {
-      status: 'RETURN'
-    }
-  });
+  const transitioned =
+    await orderRepository.transitionOrderStatusWithinTransaction(
+      tx,
+      {
+        orderId: returnRequest.order.id,
+        fromStatus: returnRequest.order.status,
+        toStatus: ORDER_STATUS.RETURN,
+        source: ORDER_STATUS_CHANGE_SOURCE.SYSTEM,
+        note: 'Yêu cầu hoàn trả toàn bộ đơn hàng đã hoàn tất.'
+      }
+    );
+
+  if (!transitioned) {
+    throw new Error(
+      'Trạng thái đơn hàng đã thay đổi trước khi hoàn tất trả hàng.'
+    );
+  }
+
+  updatedReturn.order.status = transitioned.status;
 }
 
     if (returnRequest.order.payment) {
@@ -561,6 +574,9 @@ if (isFullReturn) {
           refundedAmount
         }
       });
+
+      updatedReturn.order.payment.status = paymentStatus;
+      updatedReturn.order.payment.refundedAmount = refundedAmount;
     }
 
     return updatedReturn;

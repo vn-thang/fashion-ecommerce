@@ -1,1 +1,9 @@
 @import "tailwindcss";
+
+.customer-app {
+  font-family:
+    ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+}

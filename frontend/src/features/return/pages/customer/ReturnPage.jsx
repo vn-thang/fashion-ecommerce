@@ -1,9 +1,9 @@
-import React from 'react';
 import Pagination from '../../../../shared/components/Pagination';
 
 import { useReturn } from '../../hooks/useReturn';
 import ReturnList from '../../components/customer/ReturnList';
 import ReturnDetailModal from '../../components/customer/ReturnDetailModal';
+import CustomerPageHeader from '../../../../shared/components/CustomerPageHeader';
 
 const ReturnPage = () => {
   const {
@@ -24,17 +24,13 @@ const ReturnPage = () => {
     Number(value || 0).toLocaleString('vi-VN') + 'đ';
 
   return (
-    <div className="mx-auto max-w-[1200px] space-y-6 animate-fadeIn">
-      <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
-        <h1 className="text-xl font-bold tracking-tight text-slate-800">
-          Yêu cầu trả hàng
-        </h1>
-        <p className="mt-1 text-sm text-gray-500">
-          Theo dõi lịch sử và trạng thái các yêu cầu trả hàng của bạn.
-        </p>
-      </div>
+    <div className="mx-auto w-full space-y-5 animate-fadeIn">
+      <CustomerPageHeader
+        title="Yêu cầu trả hàng"
+        description="Theo dõi lịch sử và trạng thái các yêu cầu trả hàng của bạn."
+      />
 
-      <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
+      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
         {loading ? (
           <div className="flex items-center justify-center py-16 text-sm text-gray-500">
             Đang tải danh sách yêu cầu trả hàng...
